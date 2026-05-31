@@ -690,6 +690,9 @@ function renderClientsTable() {
         state.deleteClient(id);
         renderClientsTable();
         populateBrevoClientSelector();
+        if (typeof populateAdminRealSearchSelector === "function") {
+          populateAdminRealSearchSelector();
+        }
         if (state.currentUser && state.currentUser.id === id) {
           logoutUser();
         }
@@ -890,6 +893,9 @@ function handleAddClient(e) {
   renderClientsTable();
   populateBrevoClientSelector();
   renderCentralDiscoveries();
+  if (typeof populateAdminRealSearchSelector === "function") {
+    populateAdminRealSearchSelector();
+  }
   alert(`¡Cliente ${name} registrado con éxito! Puedes iniciar sesión usando su email en el portal privado.`);
 }
 
@@ -975,6 +981,9 @@ function loginUser(email, password) {
     document.getElementById("portal-search-beds").textContent = `${user.beds} habs / ${user.baths} baños`;
 
     renderPrivateProperties();
+    if (typeof updateRealSearchLinks === "function") {
+      updateRealSearchLinks(user);
+    }
     
     document.getElementById("portal-section-wrapper").scrollIntoView({ behavior: 'smooth' });
     return true;
@@ -1616,6 +1625,85 @@ document.addEventListener("DOMContentLoaded", () => {
       checkAdminUnlockState();
     });
   }
+
+  // --- REAL-TIME LIVE SEARCH ENGINES HUB ENGINE ---
+  function updateRealSearchLinks(client, prefix = "") {
+    const fnBtn = document.getElementById(`${prefix}real-search-fincaraiz`);
+    const fbBtn = document.getElementById(`${prefix}real-search-facebook`);
+    const mcBtn = document.getElementById(`${prefix}real-search-metrocuadrado`);
+    const mlBtn = document.getElementById(`${prefix}real-search-mercadolibre`);
+    const goBtn = document.getElementById(`${prefix}real-search-google`);
+
+    if (!fnBtn || !fbBtn || !mcBtn || !mlBtn || !goBtn) return;
+
+    const tipo = client.type || "Apartamento";
+    const barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
+      ? client.barrio[0].replace("Todos los barrios de ", "") 
+      : (typeof client.barrio === "string" ? client.barrio : "Cali");
+    
+    const budget = client.maxPrice || 500000000;
+
+    // 1. Finca Raíz search link
+    const keywordFinca = encodeURIComponent(`${tipo} ${barrio} Cali`);
+    fnBtn.href = `https://www.fincaraiz.com.co/buscar?keyword=${keywordFinca}`;
+
+    // 2. Facebook Marketplace
+    const queryFB = encodeURIComponent(`${tipo} ${barrio}`);
+    fbBtn.href = `https://www.facebook.com/marketplace/cali/search/?query=${queryFB}`;
+
+    // 3. Metro Cuadrado
+    const keywordMetro = encodeURIComponent(`${tipo} ${barrio} Cali`);
+    mcBtn.href = `https://www.metrocuadrado.com/fincaraiz/buscar?keyword=${keywordMetro}`;
+
+    // 4. Mercado Libre
+    const keywordML = encodeURIComponent(`${tipo} ${barrio}`);
+    mlBtn.href = `https://listado.mercadolibre.com.co/inmuebles/cali/${keywordML}`;
+
+    // 5. Google Search (Anti-Blocks)
+    const googleQuery = encodeURIComponent(`site:fincaraiz.com.co OR site:metrocuadrado.com OR site:facebook.com/marketplace/cali Cali "${barrio}" ${tipo} "${budget}"`);
+    goBtn.href = `https://www.google.com/search?q=${googleQuery}`;
+  }
+
+  function populateAdminRealSearchSelector() {
+    const select = document.getElementById("admin-real-search-client-select");
+    if (!select) return;
+
+    select.innerHTML = "";
+    const activeClients = state.clients.filter(c => c.status === 'active');
+    
+    if (activeClients.length === 0) {
+      select.innerHTML = `<option value="">Sin clientes activos</option>`;
+      return;
+    }
+
+    activeClients.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = `${c.name} (${c.type})`;
+      select.appendChild(opt);
+    });
+
+    // Set initial links for the first active client
+    const currentClient = activeClients[0];
+    if (currentClient) {
+      updateRealSearchLinks(currentClient, "admin-");
+    }
+  }
+
+  // Bind change handler on the admin selector
+  const adminRealSelect = document.getElementById("admin-real-search-client-select");
+  if (adminRealSelect) {
+    adminRealSelect.addEventListener("change", (e) => {
+      const clientId = e.target.value;
+      const client = state.clients.find(c => c.id === clientId);
+      if (client) {
+        updateRealSearchLinks(client, "admin-");
+      }
+    });
+  }
+
+  // Hook populateAdminRealSearchSelector when rendering or loading
+  populateAdminRealSearchSelector();
 
   // Run initial secure check
   checkAdminUnlockState();

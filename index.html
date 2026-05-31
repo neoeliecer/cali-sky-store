@@ -236,6 +236,46 @@
         </div>
       </div>
 
+      <!-- Real-Time Search Engines Hub (Caza Inmuebles Real) -->
+      <div class="glass-panel" style="padding: 24px; margin-bottom: 40px; border: 1px solid var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.08); margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+          <div>
+            <h3 style="font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-earth-americas text-glow-cyan"></i> Caza Inmuebles Real (Multi-Motor)
+            </h3>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">
+              Haz búsquedas <strong>reales y en vivo</strong> en los portales más grandes de Colombia pre-filtrados con tu perfil premium actual.
+            </p>
+          </div>
+          <span class="badge-status-brevo" style="background: rgba(0, 243, 255, 0.1); border-color: var(--accent-cyan); color: var(--accent-cyan); font-weight: 700;">
+            <i class="fa-solid fa-bolt"></i> Motores en Vivo
+          </span>
+        </div>
+        
+        <div class="real-search-engines-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+          <!-- Finca Raíz -->
+          <a href="#" id="real-search-fincaraiz" target="_blank" class="btn" style="background: linear-gradient(135deg, #d32f2f, #ff6659); border: none; color: #fff; padding: 12px; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; text-shadow: 0 1px 3px rgba(0,0,0,0.5); text-transform: uppercase; font-size: 12px; margin: 0;">
+            <i class="fa-solid fa-house-circle-exclamation"></i> Finca Raíz (Real)
+          </a>
+          <!-- Facebook Marketplace -->
+          <a href="#" id="real-search-facebook" target="_blank" class="btn" style="background: linear-gradient(135deg, #1877f2, #4092ff); border: none; color: #fff; padding: 12px; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; text-shadow: 0 1px 3px rgba(0,0,0,0.5); text-transform: uppercase; font-size: 12px; margin: 0;">
+            <i class="fa-brands fa-facebook"></i> Marketplace FB (Real)
+          </a>
+          <!-- Metro Cuadrado -->
+          <a href="#" id="real-search-metrocuadrado" target="_blank" class="btn" style="background: linear-gradient(135deg, #f57c00, #ffb74d); border: none; color: #fff; padding: 12px; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; text-shadow: 0 1px 3px rgba(0,0,0,0.5); text-transform: uppercase; font-size: 12px; margin: 0;">
+            <i class="fa-solid fa-square-poll-horizontal"></i> Metro Cuadrado (Real)
+          </a>
+          <!-- Mercado Libre -->
+          <a href="#" id="real-search-mercadolibre" target="_blank" class="btn" style="background: linear-gradient(135deg, #fbc02d, #ffeb3b); border: none; color: #333; padding: 12px; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; text-shadow: 0 1px 1px rgba(255,255,255,0.5); text-transform: uppercase; font-size: 12px; margin: 0;">
+            <i class="fa-solid fa-handshake"></i> Mercado Libre (Real)
+          </a>
+          <!-- Google Search (Anti-Bloqueos) -->
+          <a href="#" id="real-search-google" target="_blank" class="btn btn-glow-purple" style="padding: 12px; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; margin: 0; text-transform: uppercase; font-size: 12px;">
+            <i class="fa-brands fa-google text-glow-purple"></i> Super Buscador Google
+          </a>
+        </div>
+      </div>
+
       <div class="portal-main-content">
         <div class="section-header text-left">
           <h2 class="section-title"><i class="fa-solid fa-unlock text-glow-gold"></i> Tus Coincidencias Exclusivas</h2>
@@ -522,6 +562,37 @@
               <button type="button" class="btn btn-glow-cyan" id="btn-save-discoveries-cron" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; font-weight: 700;">
                 <i class="fa-solid fa-floppy-disk"></i> Guardar Frecuencia
               </button>
+            </div>
+          </div>
+
+          <!-- Admin Real-Time Search Engines Hub -->
+          <div class="glass-panel" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-light); padding: 16px 20px; border-radius: 8px; margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <h4 style="font-size: 14px; font-weight: 700; color: #fff; margin: 0;"><i class="fa-solid fa-earth-americas text-glow-cyan"></i> Caza Inmuebles Real para Cliente Seleccionado</h4>
+                <p style="color: var(--text-muted); font-size: 11.5px; margin-top: 2px; margin-bottom: 0;">Selecciona un cliente de tu base de datos para buscar listados reales y en vivo pre-filtrados en portales de Colombia.</p>
+              </div>
+              <select id="admin-real-search-client-select" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #fff; cursor: pointer; min-width: 180px; font-family: var(--font-body); font-weight: 600;">
+                <!-- Filled dynamically by app.js -->
+              </select>
+            </div>
+            
+            <div class="real-search-engines-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+              <a href="#" id="admin-real-search-fincaraiz" target="_blank" class="btn" style="background: linear-gradient(135deg, #d32f2f, #ff6659); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase;">
+                <i class="fa-solid fa-house-circle-exclamation"></i> Finca Raíz (Real)
+              </a>
+              <a href="#" id="admin-real-search-facebook" target="_blank" class="btn" style="background: linear-gradient(135deg, #1877f2, #4092ff); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase;">
+                <i class="fa-brands fa-facebook"></i> Marketplace FB
+              </a>
+              <a href="#" id="admin-real-search-metrocuadrado" target="_blank" class="btn" style="background: linear-gradient(135deg, #f57c00, #ffb74d); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase;">
+                <i class="fa-solid fa-square-poll-horizontal"></i> Metro Cuadrado
+              </a>
+              <a href="#" id="admin-real-search-mercadolibre" target="_blank" class="btn" style="background: linear-gradient(135deg, #fbc02d, #ffeb3b); border: none; color: #333; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 1px rgba(255,255,255,0.4); text-transform: uppercase;">
+                <i class="fa-solid fa-handshake"></i> Mercado Libre
+              </a>
+              <a href="#" id="admin-real-search-google" target="_blank" class="btn btn-glow-purple" style="padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; margin: 0; text-transform: uppercase;">
+                <i class="fa-brands fa-google text-glow-purple"></i> Super Google
+              </a>
             </div>
           </div>
 
