@@ -1543,32 +1543,34 @@ async function runNightlyWorkflow() {
 
   // 1. Cron Trigger Node
   document.getElementById("node-trigger").classList.add("active-node");
-  addTerminalLog("Node 'Cron-Job.org': Disparado por temporizador programado (Webhook HTTP recibido).", "cron");
+  addTerminalLog("Node 'Cron-Job Trigger': Disparado por temporizador programado (Trigger de n8n / cron).", "cron");
   await sleep(1500);
   
   document.getElementById("node-trigger").classList.add("done-node");
   document.getElementById("node-trigger").classList.remove("active-node");
   document.getElementById("connector-1").classList.add("active-link");
 
-  // 2. Read DB
+  // 2. Apify Scraper
   document.getElementById("node-read-db").classList.add("active-node");
-  addTerminalLog("Node 'WP Get Profiles': Conectando a WordPress DB... Solicitando perfiles activos.", "wp");
-  await sleep(1500);
-
-  const activeCount = state.clients.filter(c => c.status === 'active').length;
-  addTerminalLog(`Node 'WP Get Profiles': Obtenidos ${activeCount} perfiles de búsqueda activos con múltiples zonas asociadas.`, "wp");
+  addTerminalLog("Node 'Apify Actor': Iniciando rastreo inteligente sin bloqueos de captchas...", "system");
+  await sleep(1200);
+  addTerminalLog("Node 'Apify Actor': Ejecutando scrapers en Finca Raíz, Metro Cuadrado y Facebook Marketplace...", "system");
+  await sleep(1200);
+  addTerminalLog("Node 'Apify Actor': Extrayendo anuncios en Cali Cali. Recolectando URLs de fotos (Créditos optimizados).", "system");
+  await sleep(1200);
+  addTerminalLog("Node 'Apify Actor': Raspado completado con éxito. Apify dispara Webhook HTTP en Vercel.", "success");
   document.getElementById("node-read-db").classList.add("done-node");
   document.getElementById("node-read-db").classList.remove("active-node");
   document.getElementById("connector-1").classList.remove("active-link");
   document.getElementById("connector-2").classList.add("active-link");
   await sleep(1500);
 
-  // 3. Prompt Builder
+  // 3. Vercel Webhook /api/cron-harvest
   document.getElementById("node-prompt").classList.add("active-node");
-  addTerminalLog("Node 'Prompt Builder': Armando instrucciones detalladas para la API de Groq Cloud...", "system");
-  await sleep(1500);
-
-  addTerminalLog("Node 'Prompt Builder': Inyectando arrays de Zonas y Barrios en el prompt para Groq Llama-3...", "system");
+  addTerminalLog("Node 'Vercel Webhook': /api/cron-harvest recibe POST con datos de propiedades raspadas...", "wp");
+  await sleep(1200);
+  const activeCount = state.clients.filter(c => c.status === 'active').length;
+  addTerminalLog(`Node 'Vercel Webhook': Consultando perfiles activos de Vercel Redis DB. Obtenidos ${activeCount} perfiles.`, "wp");
   document.getElementById("node-prompt").classList.add("done-node");
   document.getElementById("node-prompt").classList.remove("active-node");
   document.getElementById("connector-2").classList.remove("active-link");
@@ -1577,58 +1579,37 @@ async function runNightlyWorkflow() {
 
   // 4. Groq API
   document.getElementById("node-groq").classList.add("active-node");
-  addTerminalLog("Node 'Groq Cloud': Conectando a Groq API Llama-3-70B de alta velocidad...", "groq");
+  addTerminalLog("Node 'Groq Cloud': Conectando a Groq API Llama-3-70B de alta velocidad (Latency: 12ms)...", "groq");
   await sleep(1200);
-
-  addTerminalLog("Node 'Groq Cloud': Iniciando escaneo de portales inmobiliarios en Cali...", "groq");
-  await sleep(1000);
-
-  addTerminalLog("Node 'Groq Cloud': [1/4] Rastreando listados nuevos en Finca Raíz Cali...", "system");
-  await sleep(1000);
-
-  addTerminalLog("Node 'Groq Cloud': [2/4] Extrayendo anuncios de venta/arriendo en Mercado Libre...", "system");
-  await sleep(1000);
-
-  addTerminalLog("Node 'Groq Cloud': [3/4] Escaneando Facebook Marketplace (Filtro por ubicación geográfica)...", "system");
-  await sleep(1000);
-
-  addTerminalLog("Node 'Groq Cloud': [4/4] Monitoreando chats de WhatsApp de corretaje inmobiliario (Matrix)...", "system");
-  await sleep(1000);
-
-  addTerminalLog("Node 'Groq Cloud': Llama-3-70B consolidando datos de listados de lujo, extrayendo números de propietarios y direcciones...", "groq");
+  addTerminalLog("Node 'Groq Cloud': Llama-3 evaluando coincidencias de presupuestos, zonas y portales activos...", "groq");
+  await sleep(1200);
+  addTerminalLog("Node 'Groq Cloud': Generando comentarios comerciales ultra-premium y persuasivos de 2 líneas para el asesor...", "groq");
   await sleep(1500);
-
-  addTerminalLog("Node 'Groq Cloud': Groq filtró con éxito coincidiendo propiedades en las áreas solicitadas.", "groq");
   state.addProperties(SIMULATED_NEW_PROPERTIES);
-
   document.getElementById("node-groq").classList.add("done-node");
   document.getElementById("node-groq").classList.remove("active-node");
   document.getElementById("connector-3").classList.remove("active-link");
   document.getElementById("connector-4").classList.add("active-link");
   await sleep(1500);
 
-  // 5. Publish WP
+  // 5. Vercel Redis DB
   document.getElementById("node-publish").classList.add("active-node");
-  addTerminalLog("Node 'WP Publish': Creando posts privados en WordPress visibles únicamente para sus respectivos clientes...", "wp");
-  await sleep(1800);
-
-  addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50921 para Juan Pérez (Zonas: Sur / Barrio: El Ingenio).", "wp");
-  addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50922 para Sophia Gómez (Zonas: Sur / Barrio: Ciudad Jardín).", "wp");
+  addTerminalLog("Node 'Vercel Redis DB': Sincronizando en la nube las coincidencias desbloqueadas por cliente...", "wp");
+  await sleep(1500);
+  addTerminalLog("Node 'Vercel Redis DB': Persistencia en la nube completada con éxito. Actualizado estado del portal cliente (0ms UI lag).", "success");
   document.getElementById("node-publish").classList.add("done-node");
   document.getElementById("node-publish").classList.remove("active-node");
   document.getElementById("connector-4").classList.remove("active-link");
   document.getElementById("connector-5").classList.add("active-link");
-  await sleep(2000);
+  await sleep(1800);
 
   // 6. Brevo Email
   document.getElementById("node-brevo").classList.add("active-node");
-  addTerminalLog("Node 'Brevo API': Armado de payload JSON transaccional. Enviando alertas...", "brevo");
-  await sleep(2000);
-
+  addTerminalLog("Node 'Brevo SMTP': Armando newsletter transaccional altamente personalizado...", "brevo");
+  await sleep(1500);
   state.clients.filter(c => c.status === 'active').forEach(c => {
-    addTerminalLog(`Node 'Brevo API': Email transaccional enviado a <${c.email}> con plantilla premium de Cali Sky.`, "brevo");
+    addTerminalLog(`Node 'Brevo SMTP': Email transaccional enviado a <${c.email}>. Alertas de nuevos hallazgos enviadas en Cali.`, "brevo");
   });
-
   document.getElementById("node-brevo").classList.add("done-node");
   document.getElementById("node-brevo").classList.remove("active-node");
   document.getElementById("connector-5").classList.remove("active-link");
@@ -1646,8 +1627,7 @@ async function runNightlyWorkflow() {
   }
   updateBrevoPreview();
   renderCentralDiscoveries();
-
-  alert("¡Simulación completada con éxito! El flujo automatizado por Cron-Job.org ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados multi-zona. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
+  alert("¡Simulación completada con éxito! El flujo automatizado ha recibido el Webhook de Apify Scraper, cargado perfiles de Vercel Redis DB, procesado notas personalizadas con Groq Llama-3-70B y notificado por Brevo. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevos hallazgos desbloqueados.");
 }
 
 // Render AI Central Discoveries Hub Dashboard

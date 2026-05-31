@@ -458,6 +458,8 @@ body {
 .bg-purple-trans { background: rgba(156, 39, 176, 0.1); color: #c084fc; border: 1px solid rgba(156, 39, 176, 0.2); }
 .bg-gold-trans { background: rgba(249, 168, 37, 0.1); color: var(--accent-gold); border: 1px solid rgba(249, 168, 37, 0.2); }
 .bg-pink-trans { background: rgba(236, 72, 153, 0.1); color: var(--accent-pink); border: 1px solid rgba(236, 72, 153, 0.2); }
+.bg-orange-trans { background: rgba(255, 136, 0, 0.1); color: #ffa726; border: 1px solid rgba(255, 136, 0, 0.2); }
+.bg-red-trans { background: rgba(239, 68, 68, 0.1); color: #ef5350; border: 1px solid rgba(239, 68, 68, 0.2); }
 
 .stack-info h4 {
   font-family: var(--font-display);

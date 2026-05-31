@@ -760,7 +760,7 @@
               <div class="n8n-node" id="node-trigger">
                 <div class="node-icon bg-red-trans"><i class="fa-solid fa-clock"></i></div>
                 <div class="node-meta">
-                  <h5>Cron-Job.org</h5>
+                  <h5>Cron-Job Trigger</h5>
                   <span>Cada día 2:00 AM</span>
                 </div>
                 <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
@@ -771,12 +771,12 @@
                 <div class="connector-pulse"></div>
               </div>
 
-              <!-- Node 2: Read WP DB -->
+              <!-- Node 2: Apify Scraper -->
               <div class="n8n-node" id="node-read-db">
-                <div class="node-icon bg-cyan-trans"><i class="fa-brands fa-wordpress"></i></div>
+                <div class="node-icon bg-orange-trans"><i class="fa-solid fa-spider"></i></div>
                 <div class="node-meta">
-                  <h5>WP Get Profiles</h5>
-                  <span>Leer clientes activos</span>
+                  <h5>Apify Actor</h5>
+                  <span>Rastreador Inmobiliario</span>
                 </div>
                 <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
               </div>
@@ -786,12 +786,12 @@
                 <div class="connector-pulse"></div>
               </div>
 
-              <!-- Node 3: AI Prompt Builder -->
+              <!-- Node 3: Vercel serverless /api -->
               <div class="n8n-node" id="node-prompt">
-                <div class="node-icon bg-purple-trans"><i class="fa-solid fa-file-code"></i></div>
+                <div class="node-icon bg-cyan-trans"><i class="fa-solid fa-server"></i></div>
                 <div class="node-meta">
-                  <h5>Prompt Builder</h5>
-                  <span>Inyectar parámetros</span>
+                  <h5>Vercel Webhook</h5>
+                  <span>cron-harvest.js Endpoint</span>
                 </div>
                 <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
               </div>
@@ -806,7 +806,7 @@
                 <div class="node-icon bg-gold-trans"><i class="fa-solid fa-brain"></i></div>
                 <div class="node-meta">
                   <h5>Groq Cloud</h5>
-                  <span>Llama-3-70B Search</span>
+                  <span>Llama-3-70B AI Note</span>
                 </div>
                 <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
               </div>
@@ -816,12 +816,12 @@
                 <div class="connector-pulse"></div>
               </div>
 
-              <!-- Node 5: WP Private Post -->
+              <!-- Node 5: Redis Cloud DB -->
               <div class="n8n-node" id="node-publish">
-                <div class="node-icon bg-cyan-trans"><i class="fa-brands fa-wordpress"></i></div>
+                <div class="node-icon bg-purple-trans"><i class="fa-solid fa-database"></i></div>
                 <div class="node-meta">
-                  <h5>WP Publish</h5>
-                  <span>Crear Post Privado</span>
+                  <h5>Vercel Redis DB</h5>
+                  <span>Guardar Coincidencias</span>
                 </div>
                 <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
               </div>
@@ -835,8 +835,8 @@
               <div class="n8n-node" id="node-brevo">
                 <div class="node-icon bg-pink-trans"><i class="fa-solid fa-paper-plane"></i></div>
                 <div class="node-meta">
-                  <h5>Brevo API</h5>
-                  <span>Mandar Email</span>
+                  <h5>Brevo SMTP</h5>
+                  <span>Email de Alerta</span>
                 </div>
                 <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
               </div>
