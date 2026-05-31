@@ -321,8 +321,37 @@ const SIMULATED_NEW_PROPERTIES = [
 class AppState {
   constructor() {
     this.clients = JSON.parse(localStorage.getItem("calisky_clients")) || DEFAULT_CLIENTS;
+    
+    // Sanitize and migrate legacy string formats to arrays
+    this.clients = this.clients.map(c => {
+      if (typeof c.zone === "string") {
+        c.zone = [c.zone];
+      }
+      if (typeof c.barrio === "string") {
+        c.barrio = [c.barrio];
+      }
+      if (c.baths === undefined) c.baths = 2;
+      if (c.minArea === undefined) c.minArea = 80;
+      if (c.phone === undefined) c.phone = "3004567890";
+      if (c.password === undefined) c.password = "calisky123";
+      return c;
+    });
+
     this.properties = JSON.parse(localStorage.getItem("calisky_properties")) || DEFAULT_PROPERTIES;
     this.currentUser = JSON.parse(localStorage.getItem("calisky_current_user")) || null;
+    
+    if (this.currentUser) {
+      if (typeof this.currentUser.zone === "string") {
+        this.currentUser.zone = [this.currentUser.zone];
+      }
+      if (typeof this.currentUser.barrio === "string") {
+        this.currentUser.barrio = [this.currentUser.barrio];
+      }
+      if (this.currentUser.baths === undefined) this.currentUser.baths = 2;
+      if (this.currentUser.minArea === undefined) this.currentUser.minArea = 80;
+      if (this.currentUser.phone === undefined) this.currentUser.phone = "3004567890";
+      if (this.currentUser.password === undefined) this.currentUser.password = "calisky123";
+    }
     this.logs = [];
   }
 
