@@ -335,6 +335,9 @@ class AppState {
       if (c.phone === undefined) c.phone = "3004567890";
       if (c.password === undefined) c.password = "calisky123";
       if (c.favorites === undefined) c.favorites = [];
+      if (c.sources === undefined) {
+        c.sources = ["Finca Raíz", "Facebook Marketplace", "Metro Cuadrado", "Mercado Libre"];
+      }
       return c;
     });
 
@@ -353,6 +356,9 @@ class AppState {
       if (this.currentUser.phone === undefined) this.currentUser.phone = "3004567890";
       if (this.currentUser.password === undefined) this.currentUser.password = "calisky123";
       if (this.currentUser.favorites === undefined) this.currentUser.favorites = [];
+      if (this.currentUser.sources === undefined) {
+        this.currentUser.sources = ["Finca Raíz", "Facebook Marketplace", "Metro Cuadrado", "Mercado Libre"];
+      }
     }
     
     this.inquiries = JSON.parse(localStorage.getItem("calisky_inquiries")) || [];
@@ -1212,6 +1218,7 @@ function handleAddClient(e) {
   // Get arrays of selected checkboxes for Zones and Barrios
   const selectedZones = Array.from(document.querySelectorAll('input[name="client-zone"]:checked')).map(cb => cb.value);
   const selectedBarrios = Array.from(document.querySelectorAll('input[name="client-barrio"]:checked')).map(cb => cb.value);
+  const selectedPortals = Array.from(document.querySelectorAll('input[name="client-source-portal"]:checked')).map(cb => cb.value);
 
   const minPrice = parseInt(document.getElementById("client-min-price").value) || 0;
   const maxPrice = parseInt(document.getElementById("client-max-price").value);
@@ -1230,6 +1237,10 @@ function handleAddClient(e) {
     alert("Por favor selecciona al menos un Barrio.");
     return;
   }
+  if (selectedPortals.length === 0) {
+    alert("Por favor selecciona al menos un Portal de Búsqueda Activo.");
+    return;
+  }
 
   if (state.clients.some(c => c.email.toLowerCase() === email.toLowerCase())) {
     alert("Este correo electrónico ya está registrado con otro cliente.");
@@ -1238,7 +1249,7 @@ function handleAddClient(e) {
 
   state.addClient({ 
     name, email, phone, password, type, zone: selectedZones, barrio: selectedBarrios, minPrice, maxPrice, 
-    beds, baths, parking, minArea, features, deal 
+    beds, baths, parking, minArea, features, deal, sources: selectedPortals 
   });
   
   // Reset Form
@@ -1248,6 +1259,12 @@ function handleAddClient(e) {
   document.querySelectorAll('input[name="client-zone"]').forEach(cb => {
     cb.checked = (cb.value === "Sur");
   });
+  
+  // Reset portals checklist to checked
+  document.querySelectorAll('input[name="client-source-portal"]').forEach(cb => {
+    cb.checked = true;
+  });
+  
   loadBarriosForSelectedZones(); 
 
   renderClientsTable();
@@ -2158,19 +2175,47 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const matchPct = 90 + Math.floor(Math.random() * 10);
 
-        // Rotate source logo badge to show Finca Raiz / Metro Cuadrado / Mercado Libre in rotation
+        // Rotate source logo badge to show Finca Raiz / Metro Cuadrado / Mercado Libre / Facebook in rotation
         let sourceName = "Mercado Libre";
         let sourceBadgeColor = "var(--accent-gold)";
         let sourceIcon = "fa-solid fa-handshake";
         
-        if (index === 1 || index === 4) {
+        const rotationIndex = index % 4;
+        if (rotationIndex === 1) {
           sourceName = "Finca Raíz";
           sourceBadgeColor = "#ff3d00";
           sourceIcon = "fa-solid fa-house-circle-exclamation";
-        } else if (index === 2 || index === 5) {
+        } else if (rotationIndex === 2) {
           sourceName = "Metro Cuadrado";
           sourceBadgeColor = "#4caf50";
           sourceIcon = "fa-solid fa-square-poll-horizontal";
+        } else if (rotationIndex === 3) {
+          sourceName = "Facebook Marketplace";
+          sourceBadgeColor = "#1877f2";
+          sourceIcon = "fa-brands fa-facebook";
+        }
+
+        // Restrict to the active search portals selected by the client in their checklist profile
+        const allowedSources = client.sources && client.sources.length > 0
+          ? client.sources
+          : ["Finca Raíz", "Facebook Marketplace", "Metro Cuadrado", "Mercado Libre"];
+
+        if (!allowedSources.includes(sourceName)) {
+          // If the rotated source is not active for this client, map it to the first active portal
+          sourceName = allowedSources[0];
+          if (sourceName === "Finca Raíz") {
+            sourceBadgeColor = "#ff3d00";
+            sourceIcon = "fa-solid fa-house-circle-exclamation";
+          } else if (sourceName === "Metro Cuadrado") {
+            sourceBadgeColor = "#4caf50";
+            sourceIcon = "fa-solid fa-square-poll-horizontal";
+          } else if (sourceName === "Facebook Marketplace") {
+            sourceBadgeColor = "#1877f2";
+            sourceIcon = "fa-brands fa-facebook";
+          } else {
+            sourceBadgeColor = "var(--accent-gold)";
+            sourceIcon = "fa-solid fa-handshake";
+          }
         }
 
         card.innerHTML = `
