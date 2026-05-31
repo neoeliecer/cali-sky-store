@@ -320,16 +320,49 @@ const SIMULATED_NEW_PROPERTIES = [
 // 3. STATE MANAGER
 class AppState {
   constructor() {
+    // Initial quick load from local storage to keep the interface fast
     this.clients = JSON.parse(localStorage.getItem("calisky_clients")) || DEFAULT_CLIENTS;
-    
-    // Sanitize and migrate legacy string formats to arrays
+    this.properties = JSON.parse(localStorage.getItem("calisky_properties")) || DEFAULT_PROPERTIES;
+    this.currentUser = JSON.parse(localStorage.getItem("calisky_current_user")) || null;
+    this.inquiries = JSON.parse(localStorage.getItem("calisky_inquiries")) || [];
+    this.logs = [];
+  }
+
+  async init() {
+    try {
+      const clientsRes = await fetch("/api/clients");
+      if (clientsRes.ok) {
+        this.clients = await clientsRes.json();
+      }
+    } catch (e) {
+      console.warn("Failed to fetch clients from cloud API, using local storage backup.", e);
+    }
+
+    try {
+      const propsRes = await fetch("/api/properties");
+      if (propsRes.ok) {
+        const cloudProps = await propsRes.json();
+        if (cloudProps && cloudProps.length > 0) {
+          this.properties = cloudProps;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to fetch properties from cloud API.", e);
+    }
+
+    try {
+      const inquiriesRes = await fetch("/api/inquiries");
+      if (inquiriesRes.ok) {
+        this.inquiries = await inquiriesRes.json();
+      }
+    } catch (e) {
+      console.warn("Failed to fetch inquiries from cloud API.", e);
+    }
+
+    // Sanitize and migrate formats
     this.clients = this.clients.map(c => {
-      if (typeof c.zone === "string") {
-        c.zone = [c.zone];
-      }
-      if (typeof c.barrio === "string") {
-        c.barrio = [c.barrio];
-      }
+      if (typeof c.zone === "string") c.zone = [c.zone];
+      if (typeof c.barrio === "string") c.barrio = [c.barrio];
       if (c.baths === undefined) c.baths = 2;
       if (c.minArea === undefined) c.minArea = 80;
       if (c.phone === undefined) c.phone = "3004567890";
@@ -341,35 +374,43 @@ class AppState {
       return c;
     });
 
-    this.properties = JSON.parse(localStorage.getItem("calisky_properties")) || DEFAULT_PROPERTIES;
-    this.currentUser = JSON.parse(localStorage.getItem("calisky_current_user")) || null;
-    
     if (this.currentUser) {
-      if (typeof this.currentUser.zone === "string") {
-        this.currentUser.zone = [this.currentUser.zone];
-      }
-      if (typeof this.currentUser.barrio === "string") {
-        this.currentUser.barrio = [this.currentUser.barrio];
-      }
-      if (this.currentUser.baths === undefined) this.currentUser.baths = 2;
-      if (this.currentUser.minArea === undefined) this.currentUser.minArea = 80;
-      if (this.currentUser.phone === undefined) this.currentUser.phone = "3004567890";
-      if (this.currentUser.password === undefined) this.currentUser.password = "calisky123";
-      if (this.currentUser.favorites === undefined) this.currentUser.favorites = [];
-      if (this.currentUser.sources === undefined) {
-        this.currentUser.sources = ["Finca Raíz", "Facebook Marketplace", "Metro Cuadrado", "Mercado Libre"];
+      const activeUser = this.clients.find(c => c.id === this.currentUser.id);
+      if (activeUser) {
+        this.currentUser = activeUser;
       }
     }
-    
-    this.inquiries = JSON.parse(localStorage.getItem("calisky_inquiries")) || [];
-    this.logs = [];
   }
 
-  save() {
+  async save() {
+    // 1. Keep local storage backup
     localStorage.setItem("calisky_clients", JSON.stringify(this.clients));
     localStorage.setItem("calisky_properties", JSON.stringify(this.properties));
     localStorage.setItem("calisky_current_user", JSON.stringify(this.currentUser));
     localStorage.setItem("calisky_inquiries", JSON.stringify(this.inquiries));
+
+    // 2. Asynchronously sync to the cloud database on Vercel Redis
+    try {
+      fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.clients)
+      }).catch(err => console.warn("Failed background clients sync:", err));
+
+      fetch("/api/properties", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.properties)
+      }).catch(err => console.warn("Failed background properties sync:", err));
+
+      fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.inquiries)
+      }).catch(err => console.warn("Failed background inquiries sync:", err));
+    } catch (e) {
+      console.warn("Error triggering background cloud DB sync:", e);
+    }
   }
 
   addClient(client) {
@@ -1712,7 +1753,7 @@ function renderCentralDiscoveries() {
 }
 
 // 6. APP ENGINE INITS & DOM BINDINGS
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   
   // Dynamic Barrio Checkboxes initial load
   loadBarriosForSelectedZones();
@@ -1721,6 +1762,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('input[name="client-zone"]').forEach(cb => {
     cb.addEventListener("change", loadBarriosForSelectedZones);
   });
+
+  // Load latest state from Vercel Redis cloud storage
+  if (typeof state.init === "function") {
+    await state.init();
+  }
 
   // Render initial layouts
   renderPublicProperties();
