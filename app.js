@@ -1996,6 +1996,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnLockAdmin = document.getElementById("btn-lock-admin");
 
   const checkAdminUnlockState = () => {
+    const navAdmin = document.getElementById("nav-admin");
+    const adminSec = document.getElementById("admin-section");
+
+    // If a client is logged in, strictly hide the Admin section and its tab link
+    if (state.currentUser) {
+      if (navAdmin) navAdmin.style.display = "none";
+      if (adminSec) adminSec.classList.add("hidden");
+      return;
+    }
+
+    // Otherwise, restore default display states and run lock/unlock validation
+    if (navAdmin) navAdmin.style.display = "inline-flex";
+    if (adminSec) adminSec.classList.remove("hidden");
+
     const isUnlocked = sessionStorage.getItem("calisky_admin_unlocked") === "true";
     if (isUnlocked) {
       if (adminLockScreen) adminLockScreen.style.display = "none";
