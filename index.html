@@ -96,10 +96,10 @@
               </div>
             </div>
             <div class="stack-item">
-              <div class="stack-icon-wrap bg-purple-trans"><i class="fa-solid fa-code-branch"></i></div>
+              <div class="stack-icon-wrap bg-purple-trans"><i class="fa-solid fa-clock"></i></div>
               <div class="stack-info">
-                <h4>n8n Orquestador</h4>
-                <p>Ejecuta la lógica nocturna, lee perfiles y conecta APIs.</p>
+                <h4>Cron-Job.org</h4>
+                <p>Disparador en la nube gratuito que ejecuta la búsqueda diaria.</p>
               </div>
             </div>
             <div class="stack-item">
@@ -283,7 +283,7 @@
           <i class="fa-solid fa-wand-magic-sparkles text-glow-gold"></i> Últimos Hallazgos
         </button>
         <button class="tab-btn" data-tab="tab-workflow">
-          <i class="fa-solid fa-network-wired"></i> Flujo n8n + Groq
+          <i class="fa-solid fa-network-wired"></i> Flujo Cron-Job + Groq
         </button>
         <button class="tab-btn" data-tab="tab-brevo">
           <i class="fa-solid fa-envelope-open-text"></i> Plantilla Brevo
@@ -468,13 +468,13 @@
         </div>
       </div>
 
-      <!-- Tab Content 2: n8n Flow Simulator -->
+      <!-- Tab Content 2: Cron-Job Flow Simulator -->
       <div class="tab-content" id="tab-workflow">
         
         <!-- Trigger Automation Configuration Panel -->
         <div class="glass-panel admin-subcard" style="margin-bottom: 24px; padding: 24px;">
           <div class="subcard-header" style="margin-bottom: 16px;">
-            <h3><i class="fa-solid fa-clock text-glow-gold"></i> Configuración del Disparador Automático (n8n Cron Trigger)</h3>
+            <h3><i class="fa-solid fa-clock text-glow-gold"></i> Configuración del Disparador Automático (Cron-Job.org Webhook)</h3>
             <span class="badge-status-brevo" id="cron-active-badge"><i class="fa-solid fa-circle-check text-glow-cyan"></i> Programador Activo</span>
           </div>
           <div class="admin-form">
@@ -492,7 +492,7 @@
                 <input type="time" id="cron-time" value="02:00">
               </div>
               <div class="form-group">
-                <label>Expresión Cron en n8n</label>
+                <label>Expresión Cron en Cron-Job.org</label>
                 <div style="font-family: var(--font-code); background: rgba(0,0,0,0.5); padding: 11px 14px; border-radius: 8px; border: 1px solid var(--border-light); font-size: 13px; text-align: center; color: var(--accent-cyan); font-weight: 500;" id="cron-expression-display">
                   0 2 * * *
                 </div>
@@ -500,7 +500,7 @@
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 15px;">
               <button type="button" class="btn btn-glow-gold" id="btn-save-cron" style="min-width: 250px;">
-                <i class="fa-solid fa-floppy-disk"></i> Guardar Cron de n8n
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Cron-Job
               </button>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <label class="pulse-dot" style="margin: 0; background-color: var(--accent-green);" id="cron-indicator"></label>
@@ -514,14 +514,14 @@
           <div class="workflow-actions-bar">
             <div class="wf-title">
               <span class="wf-pulse-light green"></span>
-              <h4>n8n Workflow: <code>Rastreador_Grok_CaliSky</code></h4>
+              <h4>Flujo Automatizado: <code>Rastreador_Grok_CaliSky</code></h4>
             </div>
             <button class="btn btn-glow-gold" id="btn-run-workflow">
               <i class="fa-solid fa-play"></i> Ejecutar Búsqueda Nocturna
             </button>
           </div>
 
-          <!-- n8n Node Map Grid -->
+          <!-- Flowchart Node Map Grid -->
           <div class="n8n-flowchart-container">
             <div class="n8n-nodes-wrapper">
               
@@ -529,7 +529,7 @@
               <div class="n8n-node" id="node-trigger">
                 <div class="node-icon bg-red-trans"><i class="fa-solid fa-clock"></i></div>
                 <div class="node-meta">
-                  <h5>Cron Trigger</h5>
+                  <h5>Cron-Job.org</h5>
                   <span>Cada día 2:00 AM</span>
                 </div>
                 <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>

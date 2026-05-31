@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CALI SKY STORES - CLIENT LOGIC, N8N SIMULATOR & BREVO PARSER ENGINE
+   CALI SKY STORES - CLIENT LOGIC, CRON-JOB.ORG SIMULATOR & BREVO PARSER ENGINE
    ========================================================================== */
 
 // 1. ZONING DATA STRUCTURE
@@ -524,7 +524,7 @@ function renderPrivateProperties() {
         </p>
         <div class="alert-box note-box margin-t-md max-w-md margin-center">
           <i class="fa-solid fa-cloud-bolt text-glow-cyan"></i>
-          <p>Ve a la **Consola Admin** y haz clic en **"Ejecutar Búsqueda Nocturna"** en la pestaña n8n para simular que el rastreador encuentra una propiedad adaptada a tus gustos.</p>
+          <p>Ve a la **Consola Admin** y haz clic en **"Ejecutar Búsqueda Nocturna"** en la pestaña Cron-Job para simular que el rastreador encuentra una propiedad adaptada a tus gustos.</p>
         </div>
       </div>
     `;
@@ -720,7 +720,7 @@ function generateBrevoEmailHtml(client, matches) {
               <!-- Header Brand -->
               <div class="email-header-top">
                 <div class="email-logo"><span>CALI SKY</span> STORES</div>
-                <div style="color: #00f3ff; font-family: 'Fira Code', monospace; font-size: 10px; margin-top: 6px; letter-spacing: 1px;">CRON AI PROPERTY ALERT • POWERED BY GROQ & N8N</div>
+                <div style="color: #00f3ff; font-family: 'Fira Code', monospace; font-size: 10px; margin-top: 6px; letter-spacing: 1px;">CRON AI PROPERTY ALERT • POWERED BY GROQ & CRON-JOB.ORG</div>
               </div>
               
               <!-- Content -->
@@ -1003,7 +1003,7 @@ function handleContactFormSubmit(e) {
   window.open(whatsappUrl, "_blank");
 }
 
-// N8N AUTOMATED WORKFLOW FLOWCHART SIMULATION
+// CRON-JOB.ORG AUTOMATED WORKFLOW FLOWCHART SIMULATION
 let isRunningWorkflow = false;
 
 function addTerminalLog(text, type = "system") {
@@ -1040,12 +1040,12 @@ function runNightlyWorkflow() {
     document.getElementById(c).classList.remove("active-link");
   });
 
-  addTerminalLog("INICIANDO AUTOMATIZACIÓN NOCTURNA (Simulando ejecución programada en n8n)...", "cron");
+  addTerminalLog("INICIANDO AUTOMATIZACIÓN NOCTURNA (Simulando ejecución programada por Cron-Job.org)...", "cron");
 
   setTimeout(() => {
     // 1. Cron Node
     document.getElementById("node-trigger").classList.add("active-node");
-    addTerminalLog("Node 'Cron Trigger': Disparado por temporizador programado.", "cron");
+    addTerminalLog("Node 'Cron-Job.org': Disparado por temporizador programado (Webhook HTTP recibido).", "cron");
     
     setTimeout(() => {
       document.getElementById("node-trigger").classList.add("done-node");
@@ -1131,7 +1131,7 @@ function runNightlyWorkflow() {
                   updateBrevoPreview();
                   renderCentralDiscoveries();
                   
-                  alert("¡Simulación completada con éxito! El flujo de n8n ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados multi-zona. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
+                  alert("¡Simulación completada con éxito! El flujo automatizado por Cron-Job.org ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados multi-zona. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
                   
                 }, 2000);
               }, 2000);
@@ -1174,7 +1174,7 @@ function renderCentralDiscoveries() {
         <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 40px; margin-bottom: 12px; color: var(--accent-gold); display: block; text-shadow: 0 0 10px rgba(249,168,37,0.3);"></i>
         <p style="font-size: 15px; font-weight: 600; color: #fff; margin-top: 10px;">No hay hallazgos activos en este momento.</p>
         <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.4;">
-          Asegúrate de tener perfiles de búsqueda de clientes activos y ejecuta la simulación nocturna en la pestaña "Flujo n8n" para buscar nuevas ofertas en Cali.
+          Asegúrate de tener perfiles de búsqueda de clientes activos y ejecuta la simulación nocturna en la pestaña "Flujo Cron-Job" para buscar nuevas ofertas en Cali.
         </p>
       </div>
     `;
@@ -1359,7 +1359,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Brevo Client Selector change trigger
   document.getElementById("brevo-select-client").addEventListener("change", updateBrevoPreview);
 
-  // --- N8N CRON AUTOMATION TRIGGER LOGIC ---
+  // --- CRON-JOB.ORG AUTOMATION TRIGGER LOGIC ---
   const cronFreqSelect = document.getElementById("cron-frequency");
   const cronTimeInput = document.getElementById("cron-time");
   const cronExpressionDisplay = document.getElementById("cron-expression-display");
@@ -1437,9 +1437,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      addTerminalLog(`Programador de n8n actualizado con éxito. Expresión cron activa: "${details.expression}". Próxima ejecución programada.`, "success");
+      addTerminalLog(`Programador de Cron-Job.org actualizado con éxito. Expresión cron activa: "${details.expression}". Próxima ejecución programada.`, "success");
 
-      alert(`¡Disparador de n8n configurado exitosamente!\n\nFrecuencia: ${details.summaryText}\nCron Expression: ${details.expression}\n\nLos cambios se han guardado de forma permanente en la base de datos local y se han reflejado en el nodo visual de n8n.`);
+      alert(`¡Disparador de Cron-Job.org configurado exitosamente!\n\nFrecuencia: ${details.summaryText}\nCron Expression: ${details.expression}\n\nLos cambios se han guardado de forma permanente en la base de datos local y se han reflejado en el nodo visual.`);
     });
   }
 });
