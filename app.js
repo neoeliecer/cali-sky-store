@@ -1048,7 +1048,9 @@ function addTerminalLog(text, type = "system") {
   term.scrollTop = term.scrollHeight;
 }
 
-function runNightlyWorkflow() {
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function runNightlyWorkflow() {
   if (isRunningWorkflow) return;
   isRunningWorkflow = true;
 
@@ -1070,106 +1072,115 @@ function runNightlyWorkflow() {
   });
 
   addTerminalLog("INICIANDO AUTOMATIZACIÓN NOCTURNA (Simulando ejecución programada por Cron-Job.org)...", "cron");
+  await sleep(1000);
 
-  setTimeout(() => {
-    // 1. Cron Node
-    document.getElementById("node-trigger").classList.add("active-node");
-    addTerminalLog("Node 'Cron-Job.org': Disparado por temporizador programado (Webhook HTTP recibido).", "cron");
-    
-    setTimeout(() => {
-      document.getElementById("node-trigger").classList.add("done-node");
-      document.getElementById("node-trigger").classList.remove("active-node");
-      document.getElementById("connector-1").classList.add("active-link");
-      
-      // 2. Read DB
-      document.getElementById("node-read-db").classList.add("active-node");
-      addTerminalLog("Node 'WP Get Profiles': Conectando a WordPress DB... Solicitando perfiles activos.", "wp");
-      
-      setTimeout(() => {
-        const activeCount = state.clients.filter(c => c.status === 'active').length;
-        addTerminalLog(`Node 'WP Get Profiles': Obtenidos ${activeCount} perfiles de búsqueda activos con múltiples zonas asociadas.`, "wp");
-        document.getElementById("node-read-db").classList.add("done-node");
-        document.getElementById("node-read-db").classList.remove("active-node");
-        document.getElementById("connector-1").classList.remove("active-link");
-        document.getElementById("connector-2").classList.add("active-link");
-        
-        // 3. Prompt Builder
-        document.getElementById("node-prompt").classList.add("active-node");
-        addTerminalLog("Node 'Prompt Builder': Armando instrucciones detalladas para la API de Groq Cloud...", "system");
-        
-        setTimeout(() => {
-          addTerminalLog("Node 'Prompt Builder': Inyectando arrays de Zonas y Barrios en el prompt para Groq Llama-3...", "system");
-          document.getElementById("node-prompt").classList.add("done-node");
-          document.getElementById("node-prompt").classList.remove("active-node");
-          document.getElementById("connector-2").classList.remove("active-link");
-          document.getElementById("connector-3").classList.add("active-link");
-          
-          // 4. Groq API
-          document.getElementById("node-groq").classList.add("active-node");
-          addTerminalLog("Node 'Groq Cloud': Conectando a Groq API Llama-3-70B de alta velocidad...", "groq");
-          
-          setTimeout(() => {
-            addTerminalLog("Node 'Groq Cloud': Llama-3 escaneando Fincaraiz, Metrocuadrado, OLX y grupos de Whatsapp en múltiples sectores de Cali...", "groq");
-            
-            setTimeout(() => {
-              addTerminalLog("Node 'Groq Cloud': Groq filtró con éxito coincidiendo propiedades en las áreas solicitadas.", "groq");
-              
-              state.addProperties(SIMULATED_NEW_PROPERTIES);
-              
-              document.getElementById("node-groq").classList.add("done-node");
-              document.getElementById("node-groq").classList.remove("active-node");
-              document.getElementById("connector-3").classList.remove("active-link");
-              document.getElementById("connector-4").classList.add("active-link");
-              
-              // 5. Publish WP
-              document.getElementById("node-publish").classList.add("active-node");
-              addTerminalLog("Node 'WP Publish': Creando posts privados en WordPress visibles únicamente para sus respectivos clientes...", "wp");
-              
-              setTimeout(() => {
-                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50921 para Juan Pérez (Zonas: Sur / Barrio: El Ingenio).", "wp");
-                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50922 para Sophia Gómez (Zonas: Sur / Barrio: Ciudad Jardín).", "wp");
-                document.getElementById("node-publish").classList.add("done-node");
-                document.getElementById("node-publish").classList.remove("active-node");
-                document.getElementById("connector-4").classList.remove("active-link");
-                document.getElementById("connector-5").classList.add("active-link");
-                
-                // 6. Brevo Email
-                document.getElementById("node-brevo").classList.add("active-node");
-                addTerminalLog("Node 'Brevo API': Armado de payload JSON transaccional. Enviando alertas...", "brevo");
-                
-                setTimeout(() => {
-                  state.clients.filter(c => c.status === 'active').forEach(c => {
-                    addTerminalLog(`Node 'Brevo API': Email transaccional enviado a <${c.email}> con plantilla premium de Cali Sky.`, "brevo");
-                  });
-                  
-                  document.getElementById("node-brevo").classList.add("done-node");
-                  document.getElementById("node-brevo").classList.remove("active-node");
-                  document.getElementById("connector-5").classList.remove("active-link");
-                  
-                  isRunningWorkflow = false;
-                  btn.disabled = false;
-                  btn.innerHTML = `<i class="fa-solid fa-play"></i> Ejecutar Búsqueda Nocturna`;
-                  wfPulse.className = "wf-pulse-light green";
-                  
-                  addTerminalLog("PROCESO TERMINADO SATISFACTORIAMENTE. Base de datos e emails actualizados.", "success");
-                  
-                  renderPublicProperties();
-                  if (state.currentUser) {
-                    renderPrivateProperties();
-                  }
-                  updateBrevoPreview();
-                  renderCentralDiscoveries();
-                  
-                  alert("¡Simulación completada con éxito! El flujo automatizado por Cron-Job.org ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados multi-zona. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
-                  
-                }, 2000);
-              }, 2000);
-            }, 1800);
-          }, 1500);
-        }, 1500);
-      }, 1500);
-    }, 1500);
-  }, 1000);
+  // 1. Cron Trigger Node
+  document.getElementById("node-trigger").classList.add("active-node");
+  addTerminalLog("Node 'Cron-Job.org': Disparado por temporizador programado (Webhook HTTP recibido).", "cron");
+  await sleep(1500);
+  
+  document.getElementById("node-trigger").classList.add("done-node");
+  document.getElementById("node-trigger").classList.remove("active-node");
+  document.getElementById("connector-1").classList.add("active-link");
+
+  // 2. Read DB
+  document.getElementById("node-read-db").classList.add("active-node");
+  addTerminalLog("Node 'WP Get Profiles': Conectando a WordPress DB... Solicitando perfiles activos.", "wp");
+  await sleep(1500);
+
+  const activeCount = state.clients.filter(c => c.status === 'active').length;
+  addTerminalLog(`Node 'WP Get Profiles': Obtenidos ${activeCount} perfiles de búsqueda activos con múltiples zonas asociadas.`, "wp");
+  document.getElementById("node-read-db").classList.add("done-node");
+  document.getElementById("node-read-db").classList.remove("active-node");
+  document.getElementById("connector-1").classList.remove("active-link");
+  document.getElementById("connector-2").classList.add("active-link");
+  await sleep(1500);
+
+  // 3. Prompt Builder
+  document.getElementById("node-prompt").classList.add("active-node");
+  addTerminalLog("Node 'Prompt Builder': Armando instrucciones detalladas para la API de Groq Cloud...", "system");
+  await sleep(1500);
+
+  addTerminalLog("Node 'Prompt Builder': Inyectando arrays de Zonas y Barrios en el prompt para Groq Llama-3...", "system");
+  document.getElementById("node-prompt").classList.add("done-node");
+  document.getElementById("node-prompt").classList.remove("active-node");
+  document.getElementById("connector-2").classList.remove("active-link");
+  document.getElementById("connector-3").classList.add("active-link");
+  await sleep(1500);
+
+  // 4. Groq API
+  document.getElementById("node-groq").classList.add("active-node");
+  addTerminalLog("Node 'Groq Cloud': Conectando a Groq API Llama-3-70B de alta velocidad...", "groq");
+  await sleep(1200);
+
+  addTerminalLog("Node 'Groq Cloud': Iniciando escaneo de portales inmobiliarios en Cali...", "groq");
+  await sleep(1000);
+
+  addTerminalLog("Node 'Groq Cloud': [1/4] Rastreando listados nuevos en Finca Raíz Cali...", "system");
+  await sleep(1000);
+
+  addTerminalLog("Node 'Groq Cloud': [2/4] Extrayendo anuncios de venta/arriendo en Mercado Libre...", "system");
+  await sleep(1000);
+
+  addTerminalLog("Node 'Groq Cloud': [3/4] Escaneando Facebook Marketplace (Filtro por ubicación geográfica)...", "system");
+  await sleep(1000);
+
+  addTerminalLog("Node 'Groq Cloud': [4/4] Monitoreando chats de WhatsApp de corretaje inmobiliario (Matrix)...", "system");
+  await sleep(1000);
+
+  addTerminalLog("Node 'Groq Cloud': Llama-3-70B consolidando datos de listados de lujo, extrayendo números de propietarios y direcciones...", "groq");
+  await sleep(1500);
+
+  addTerminalLog("Node 'Groq Cloud': Groq filtró con éxito coincidiendo propiedades en las áreas solicitadas.", "groq");
+  state.addProperties(SIMULATED_NEW_PROPERTIES);
+
+  document.getElementById("node-groq").classList.add("done-node");
+  document.getElementById("node-groq").classList.remove("active-node");
+  document.getElementById("connector-3").classList.remove("active-link");
+  document.getElementById("connector-4").classList.add("active-link");
+  await sleep(1500);
+
+  // 5. Publish WP
+  document.getElementById("node-publish").classList.add("active-node");
+  addTerminalLog("Node 'WP Publish': Creando posts privados en WordPress visibles únicamente para sus respectivos clientes...", "wp");
+  await sleep(1800);
+
+  addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50921 para Juan Pérez (Zonas: Sur / Barrio: El Ingenio).", "wp");
+  addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50922 para Sophia Gómez (Zonas: Sur / Barrio: Ciudad Jardín).", "wp");
+  document.getElementById("node-publish").classList.add("done-node");
+  document.getElementById("node-publish").classList.remove("active-node");
+  document.getElementById("connector-4").classList.remove("active-link");
+  document.getElementById("connector-5").classList.add("active-link");
+  await sleep(2000);
+
+  // 6. Brevo Email
+  document.getElementById("node-brevo").classList.add("active-node");
+  addTerminalLog("Node 'Brevo API': Armado de payload JSON transaccional. Enviando alertas...", "brevo");
+  await sleep(2000);
+
+  state.clients.filter(c => c.status === 'active').forEach(c => {
+    addTerminalLog(`Node 'Brevo API': Email transaccional enviado a <${c.email}> con plantilla premium de Cali Sky.`, "brevo");
+  });
+
+  document.getElementById("node-brevo").classList.add("done-node");
+  document.getElementById("node-brevo").classList.remove("active-node");
+  document.getElementById("connector-5").classList.remove("active-link");
+
+  isRunningWorkflow = false;
+  btn.disabled = false;
+  btn.innerHTML = `<i class="fa-solid fa-play"></i> Ejecutar Búsqueda Nocturna`;
+  wfPulse.className = "wf-pulse-light green";
+
+  addTerminalLog("PROCESO TERMINADO SATISFACTORIAMENTE. Base de datos e emails actualizados.", "success");
+
+  renderPublicProperties();
+  if (state.currentUser) {
+    renderPrivateProperties();
+  }
+  updateBrevoPreview();
+  renderCentralDiscoveries();
+
+  alert("¡Simulación completada con éxito! El flujo automatizado por Cron-Job.org ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados multi-zona. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
 }
 
 // Render AI Central Discoveries Hub Dashboard
