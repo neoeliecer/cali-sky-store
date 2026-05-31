@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cali Sky Stores | Inmuebles de Lujo & Automatización AI</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Portal inmobiliario premium en Cali, Colombia. Asesoría exclusiva asistida por Inteligencia Artificial (Groq Llama-3) y flujos automáticos de n8n para cazar los mejores inmuebles del mercado.">
+  <meta name="keywords" content="inmobiliaria cali, cali sky stores, casas de lujo cali, apartamentos cali, n8n real estate, groq llama-3">
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <!-- Background Ambient Glows -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Header Section -->
+  <header class="main-header" id="header-section">
+    <div class="header-container">
+      <a href="#" class="logo-area" id="logo-button">
+        <div class="logo-icon">
+          <i class="fa-solid fa-cloud-bolt text-glow-cyan"></i>
+        </div>
+        <div class="logo-text">
+          <span class="brand-sky">CALI SKY</span>
+          <span class="brand-stores">STORES</span>
+        </div>
+      </a>
+
+      <!-- Navigation Menu -->
+      <nav class="navigation-bar" id="main-navigation">
+        <a href="#hero-section" class="nav-link active" id="nav-home"><i class="fa-solid fa-house"></i> Inicio</a>
+        <a href="#showcase-section" class="nav-link" id="nav-showcase"><i class="fa-solid fa-gem"></i> Vitrina Pública</a>
+        <a href="#portal-section" class="nav-link" id="nav-portal"><i class="fa-solid fa-user-lock"></i> Portal Privado</a>
+        <a href="#admin-section" class="nav-link" id="nav-admin"><i class="fa-solid fa-gears"></i> Consola Admin</a>
+      </nav>
+
+      <!-- Connection / Action State -->
+      <div class="header-actions">
+        <div class="system-badge" id="system-status-indicator">
+          <span class="pulse-dot"></span>
+          <span class="badge-label">Groq Cloud OK</span>
+        </div>
+        <button class="btn btn-primary" id="login-toggle-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> <span id="login-btn-text">Iniciar Sesión</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Landing Section -->
+  <section class="hero-section" id="hero-section">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-tag">
+          <span class="glow-border"><i class="fa-solid fa-wand-magic-sparkles text-glow-gold"></i> Premium Real Estate AI</span>
+        </div>
+        <h1 class="hero-title" id="main-headline">
+          El Buscador Inteligente <br>
+          <span class="gradient-text-gold-cyan">de Propiedades en Cali</span>
+        </h1>
+        <p class="hero-subtitle">
+          Fusionamos el lujo inmobiliario con automatización en la nube. Nuestro rastreador autónomo con <strong>Groq Llama-3</strong> y <strong>n8n</strong> escanea el mercado cada noche para cazar oportunidades exclusivas antes que nadie.
+        </p>
+        <div class="hero-actions-row">
+          <a href="#showcase-section" class="btn btn-glow-purple" id="btn-explore-public">
+            <i class="fa-solid fa-compass"></i> Ver Vitrina Pública
+          </a>
+          <a href="#portal-section" class="btn btn-outline" id="btn-client-access">
+            <i class="fa-solid fa-key"></i> Acceso Cliente Premium
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Visual Card / Tech Stack Panel -->
+      <div class="hero-visual" id="hero-interactive-card">
+        <div class="glass-panel tech-stack-card">
+          <div class="card-header-bar">
+            <span class="dot-red"></span>
+            <span class="dot-yellow"></span>
+            <span class="dot-green"></span>
+            <span class="card-bar-title"><i class="fa-solid fa-network-wired"></i> CALI SKY STACK</span>
+          </div>
+          <div class="card-body-stack">
+            <div class="stack-item">
+              <div class="stack-icon-wrap bg-cyan-trans"><i class="fa-brands fa-wordpress"></i></div>
+              <div class="stack-info">
+                <h4>WordPress DB</h4>
+                <p>Almacena perfiles de búsqueda seguros y posts privados.</p>
+              </div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-icon-wrap bg-purple-trans"><i class="fa-solid fa-code-branch"></i></div>
+              <div class="stack-info">
+                <h4>n8n Orquestador</h4>
+                <p>Ejecuta la lógica nocturna, lee perfiles y conecta APIs.</p>
+              </div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-icon-wrap bg-gold-trans"><i class="fa-solid fa-brain"></i></div>
+              <div class="stack-info">
+                <h4>Groq AI Engine</h4>
+                <p>Llama-3 de ultra-alta velocidad filtra, resume y valora.</p>
+              </div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-icon-wrap bg-pink-trans"><i class="fa-solid fa-paper-plane"></i></div>
+              <div class="stack-info">
+                <h4>Brevo Transaccional</h4>
+                <p>Notifica al email personalizado con plantillas premium.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer-glow">
+            <span class="glow-text"><i class="fa-solid fa-bolt"></i> 100% Nube Costo Cero</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Public Showcase Section (Vitrina Pública) -->
+  <section class="showcase-section" id="showcase-section">
+    <div class="section-container">
+      <div class="section-header text-center">
+        <h2 class="section-title"><span class="accent-line">Vitrina</span> Inmobiliaria Pública</h2>
+        <p class="section-desc">
+          Propiedades exclusivas seleccionadas en Cali. La información detallada (dirección exacta y contacto original) está reservada para clientes privados.
+        </p>
+        <!-- Filter Controls -->
+        <div class="filter-controls-row" id="showcase-filter-row">
+          <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-list"></i> Todos</button>
+          <button class="filter-btn" data-filter="apartamento"><i class="fa-solid fa-building"></i> Apartamentos</button>
+          <button class="filter-btn" data-filter="casa"><i class="fa-solid fa-house-chimney"></i> Casas</button>
+          <button class="filter-btn" data-filter="local"><i class="fa-solid fa-shop"></i> Locales/Lotes</button>
+        </div>
+      </div>
+
+      <!-- Public Showcase Grid -->
+      <div class="showcase-grid" id="public-properties-grid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Login Modal / Portal Trigger Frame -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="glass-panel modal-card">
+      <button class="modal-close-btn" id="close-login-modal"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-lock text-glow-purple"></i> Iniciar Sesión</h3>
+        <p>Ingresa tus credenciales para acceder a tu catálogo privado personalizado.</p>
+      </div>
+      <form id="login-form" class="modal-form">
+        <div class="form-group">
+          <label for="login-email"><i class="fa-solid fa-envelope"></i> Correo Electrónico</label>
+          <input type="email" id="login-email" required placeholder="ejemplo@correo.com">
+        </div>
+        <div class="form-group">
+          <label for="login-password"><i class="fa-solid fa-key"></i> Contraseña</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+          <span class="input-helper">Puedes usar cuentas demo: <strong>juan@email.com</strong> o <strong>sophia@email.com</strong> (clave: cualquiera)</span>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="fa-solid fa-unlock-keyhole"></i> Acceder al Portal Privado
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div class="modal-overlay" id="contact-modal">
+    <div class="glass-panel modal-card">
+      <button class="modal-close-btn" id="close-contact-modal"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-paper-plane text-glow-cyan"></i> Solicitar Información Completa</h3>
+        <p>¿Te interesa esta propiedad? Cuéntanos tu interés y un asesor de Cali Sky se pondrá en contacto contigo de inmediato.</p>
+      </div>
+      <div class="selected-property-preview" id="contact-property-preview">
+        <!-- Displayed dynamically -->
+      </div>
+      <form id="contact-form" class="modal-form">
+        <div class="form-group">
+          <label for="contact-name"><i class="fa-solid fa-user"></i> Tu Nombre</label>
+          <input type="text" id="contact-name" required placeholder="Ingresa tu nombre completo">
+        </div>
+        <div class="form-group">
+          <label for="contact-email"><i class="fa-solid fa-envelope"></i> Correo Electrónico</label>
+          <input type="email" id="contact-email" required placeholder="correo@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label for="contact-phone"><i class="fa-solid fa-phone"></i> Teléfono / WhatsApp</label>
+          <input type="tel" id="contact-phone" required placeholder="+57 300 000 0000">
+        </div>
+        <div class="form-group">
+          <label for="contact-message"><i class="fa-solid fa-message"></i> Mensaje Adicional</label>
+          <textarea id="contact-message" rows="3" placeholder="Hola, me gustaría agendar una cita o conocer más detalles de esta propiedad..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-glow-purple btn-block">
+          <i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp Directo
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Private Client Portal Section -->
+  <section class="portal-section section-padding hidden" id="portal-section-wrapper">
+    <div class="section-container">
+      <div class="portal-user-bar glass-panel">
+        <div class="user-welcome">
+          <div class="user-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="user-meta">
+            <h3 id="portal-welcome-name">Hola, Juan</h3>
+            <span class="user-badge-premium"><i class="fa-solid fa-crown text-glow-gold"></i> Cliente Premium</span>
+          </div>
+        </div>
+        <div class="user-search-profile-summary">
+          <div class="summary-chip"><i class="fa-solid fa-magnifying-glass"></i> <span id="portal-search-type">Apartamento</span></div>
+          <div class="summary-chip"><i class="fa-solid fa-location-dot"></i> <span id="portal-search-zone">El Ingenio</span></div>
+          <div class="summary-chip"><i class="fa-solid fa-tags"></i> <span id="portal-search-budget">Máx $350M</span></div>
+          <div class="summary-chip"><i class="fa-solid fa-bed"></i> <span id="portal-search-beds">3 habs</span></div>
+        </div>
+        <button class="btn btn-outline-danger" id="logout-btn">
+          <i class="fa-solid fa-right-from-bracket"></i> Salir
+        </button>
+      </div>
+
+      <div class="portal-main-content">
+        <div class="section-header text-left">
+          <h2 class="section-title"><i class="fa-solid fa-unlock text-glow-gold"></i> Tus Coincidencias Exclusivas</h2>
+          <p class="section-desc">
+            Inmuebles recolectados y filtrados por nuestro rastreador de IA en tiempo real. Estos listados revelan las direcciones exactas, teléfonos del propietario y enlaces originales.
+          </p>
+        </div>
+
+        <div class="showcase-grid" id="private-properties-grid">
+          <!-- Rendered dynamically by app.js when logged in -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fallback Portal Not Logged In Section -->
+  <section class="portal-section section-padding" id="portal-fallback-wrapper">
+    <div class="section-container text-center">
+      <div class="fallback-glass glass-panel pad-xl">
+        <div class="fallback-icon-wrap">
+          <i class="fa-solid fa-shield-halved text-glow-purple"></i>
+        </div>
+        <h2>Área Privada Segura</h2>
+        <p class="section-desc max-w-md margin-center">
+          Esta sección contiene alertas de propiedades en tiempo real, direcciones directas, contactos de vendedores y la fuente original de cada hallazgo. Debes iniciar sesión con tu cuenta premium.
+        </p>
+        <button class="btn btn-glow-purple" id="btn-portal-login">
+          <i class="fa-solid fa-key"></i> Iniciar Sesión para Desbloquear
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Admin & Automation Control Center Section -->
+  <section class="admin-section section-padding" id="admin-section">
+    <div class="section-container">
+      <div class="section-header text-center">
+        <h2 class="section-title"><i class="fa-solid fa-screwdriver-wrench text-glow-cyan"></i> Consola de Administración</h2>
+        <p class="section-desc">
+          Administra los perfiles de búsqueda de tus clientes, visualiza el flujo de trabajo de n8n, controla la IA de Groq y previsualiza las notificaciones de Brevo.
+        </p>
+      </div>
+
+      <!-- Admin Tabs Navigation -->
+      <div class="admin-tabs-row glass-panel">
+        <button class="tab-btn active" data-tab="tab-clients">
+          <i class="fa-solid fa-users-gear"></i> Perfiles de Clientes
+        </button>
+        <button class="tab-btn" data-tab="tab-workflow">
+          <i class="fa-solid fa-network-wired"></i> Flujo n8n + Groq
+        </button>
+        <button class="tab-btn" data-tab="tab-brevo">
+          <i class="fa-solid fa-envelope-open-text"></i> Plantilla Brevo
+        </button>
+      </div>
+
+      <!-- Tab Content 1: Client Profiles Manager -->
+      <div class="tab-content active" id="tab-clients">
+        <div class="admin-grid-layout">
+          <!-- Client Database Manager Table -->
+          <div class="glass-panel admin-subcard overflow-x">
+            <div class="subcard-header">
+              <h3><i class="fa-solid fa-database text-glow-cyan"></i> Base de Datos de Clientes</h3>
+              <span class="table-count" id="clients-count-badge">3 Registrados</span>
+            </div>
+            <table class="premium-table" id="clients-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Email</th>
+                  <th>Búsqueda</th>
+                  <th>Zona</th>
+                  <th>Presupuesto</th>
+                  <th>Hab.</th>
+                  <th>Operación</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="clients-table-body">
+                <!-- Rendered dynamically by app.js -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Add New Client Form -->
+          <div class="glass-panel admin-subcard">
+            <div class="subcard-header">
+              <h3><i class="fa-solid fa-user-plus text-glow-purple"></i> Registrar Nuevo Cliente</h3>
+            </div>
+            <form id="add-client-form" class="admin-form">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="client-name">Nombre Completo</label>
+                  <input type="text" id="client-name" required placeholder="Juan Pérez">
+                </div>
+                <div class="form-group">
+                  <label for="client-email">Email</label>
+                  <input type="email" id="client-email" required placeholder="juan@email.com">
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="client-type">Tipo de Inmueble</label>
+                  <select id="client-type">
+                    <option value="apartamento">Apartamento</option>
+                    <option value="casa">Casa</option>
+                    <option value="local">Local Comercial</option>
+                    <option value="lote">Lote</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="client-zone">Zona / Barrio en Cali</label>
+                  <select id="client-zone">
+                    <option value="El Ingenio">El Ingenio</option>
+                    <option value="Ciudad Jardín">Ciudad Jardín</option>
+                    <option value="Av. Colombia">Avenida Colombia</option>
+                    <option value="Pance">Pance</option>
+                    <option value="Normandía">Normandía</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label for="client-max-price">Presupuesto Máximo (COP)</label>
+                  <input type="number" id="client-max-price" required placeholder="350000000" min="50000000">
+                </div>
+                <div class="form-group">
+                  <label for="client-beds">Habitaciones Mín.</label>
+                  <input type="number" id="client-beds" required value="3" min="1" max="10">
+                </div>
+                <div class="form-group">
+                  <label for="client-deal">Tipo Negocio</label>
+                  <select id="client-deal">
+                    <option value="Compra">Compra</option>
+                    <option value="Arriendo">Arriendo</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-glow-cyan btn-block">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Perfil de Cliente
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 2: n8n Flow Simulator -->
+      <div class="tab-content" id="tab-workflow">
+        <div class="glass-panel workflow-simulator-card">
+          <div class="workflow-actions-bar">
+            <div class="wf-title">
+              <span class="wf-pulse-light green"></span>
+              <h4>n8n Workflow: <code>Rastreador_Grok_CaliSky</code></h4>
+            </div>
+            <button class="btn btn-glow-gold" id="btn-run-workflow">
+              <i class="fa-solid fa-play"></i> Ejecutar Búsqueda Nocturna
+            </button>
+          </div>
+
+          <!-- n8n Node Map Grid -->
+          <div class="n8n-flowchart-container">
+            <div class="n8n-nodes-wrapper">
+              
+              <!-- Node 1: Trigger -->
+              <div class="n8n-node" id="node-trigger">
+                <div class="node-icon bg-red-trans"><i class="fa-solid fa-clock"></i></div>
+                <div class="node-meta">
+                  <h5>Cron Trigger</h5>
+                  <span>Cada día 2:00 AM</span>
+                </div>
+                <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+
+              <div class="node-connector" id="connector-1">
+                <div class="connector-line"></div>
+                <div class="connector-pulse"></div>
+              </div>
+
+              <!-- Node 2: Read WP DB -->
+              <div class="n8n-node" id="node-read-db">
+                <div class="node-icon bg-cyan-trans"><i class="fa-brands fa-wordpress"></i></div>
+                <div class="node-meta">
+                  <h5>WP Get Profiles</h5>
+                  <span>Leer clientes activos</span>
+                </div>
+                <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+
+              <div class="node-connector" id="connector-2">
+                <div class="connector-line"></div>
+                <div class="connector-pulse"></div>
+              </div>
+
+              <!-- Node 3: AI Prompt Builder -->
+              <div class="n8n-node" id="node-prompt">
+                <div class="node-icon bg-purple-trans"><i class="fa-solid fa-file-code"></i></div>
+                <div class="node-meta">
+                  <h5>Prompt Builder</h5>
+                  <span>Inyectar parámetros</span>
+                </div>
+                <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+
+              <div class="node-connector" id="connector-3">
+                <div class="connector-line"></div>
+                <div class="connector-pulse"></div>
+              </div>
+
+              <!-- Node 4: Groq API Llama-3 -->
+              <div class="n8n-node" id="node-groq">
+                <div class="node-icon bg-gold-trans"><i class="fa-solid fa-brain"></i></div>
+                <div class="node-meta">
+                  <h5>Groq Cloud</h5>
+                  <span>Llama-3-70B Search</span>
+                </div>
+                <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+
+              <div class="node-connector" id="connector-4">
+                <div class="connector-line"></div>
+                <div class="connector-pulse"></div>
+              </div>
+
+              <!-- Node 5: WP Private Post -->
+              <div class="n8n-node" id="node-publish">
+                <div class="node-icon bg-cyan-trans"><i class="fa-brands fa-wordpress"></i></div>
+                <div class="node-meta">
+                  <h5>WP Publish</h5>
+                  <span>Crear Post Privado</span>
+                </div>
+                <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+
+              <div class="node-connector" id="connector-5">
+                <div class="connector-line"></div>
+                <div class="connector-pulse"></div>
+              </div>
+
+              <!-- Node 6: Brevo Notification -->
+              <div class="n8n-node" id="node-brevo">
+                <div class="node-icon bg-pink-trans"><i class="fa-solid fa-paper-plane"></i></div>
+                <div class="node-meta">
+                  <h5>Brevo API</h5>
+                  <span>Mandar Email</span>
+                </div>
+                <div class="node-status"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Console log output -->
+          <div class="terminal-container">
+            <div class="terminal-header">
+              <span><i class="fa-solid fa-terminal"></i> Terminal Output Logs</span>
+              <button class="terminal-clear-btn" id="btn-clear-terminal"><i class="fa-solid fa-trash-can"></i> Limpiar</button>
+            </div>
+            <div class="terminal-body" id="workflow-terminal-logs">
+              <div class="log-line system">[INFO 18:24:27] Sistema en reposo. Esperando disparador del Cron o ejecución manual.</div>
+              <div class="log-line system">[INFO 18:24:27] Groq Llama-3 Cloud conectado (Latency: 12ms).</div>
+              <div class="log-line system">[INFO 18:24:27] Servidor de WordPress de Cali Sky Stores listo.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 3: Brevo Template Editor & Live Preview -->
+      <div class="tab-content" id="tab-brevo">
+        <div class="brevo-container-grid">
+          <!-- Template Variables & Controls -->
+          <div class="glass-panel admin-subcard">
+            <div class="subcard-header">
+              <h3><i class="fa-solid fa-sliders text-glow-pink"></i> Variables del Template</h3>
+            </div>
+            <div class="form-group">
+              <label for="brevo-select-client">Ver Correo de Cliente:</label>
+              <select id="brevo-select-client">
+                <!-- Loaded dynamically by app.js -->
+              </select>
+            </div>
+            <hr class="card-divider">
+            <div class="variable-list">
+              <h4>Parámetros Disponibles (Brevo Payload)</h4>
+              <div class="var-item"><code>{{contact.NAME}}</code> <span class="var-val" id="var-contact-name">-</span></div>
+              <div class="var-item"><code>{{contact.EMAIL}}</code> <span class="var-val" id="var-contact-email">-</span></div>
+              <div class="var-item"><code>{{params.ZONA}}</code> <span class="var-val" id="var-params-zone">-</span></div>
+              <div class="var-item"><code>{{params.TIPO}}</code> <span class="var-val" id="var-params-type">-</span></div>
+              <div class="var-item"><code>{{params.CANTIDAD}}</code> <span class="var-val" id="var-params-count">-</span></div>
+              <div class="var-item"><code>{{params.LINK_PORTAL}}</code> <span class="var-val">https://caliskystores.com/portal</span></div>
+            </div>
+            <div class="alert-box note-box margin-t-md">
+              <i class="fa-solid fa-info-circle text-glow-cyan"></i>
+              <p>Estas variables se inyectan dinámicamente desde el flujo de n8n al llamar a la API de Brevo con la clave transaccional.</p>
+            </div>
+          </div>
+
+          <!-- Live HTML Email Preview Frame -->
+          <div class="glass-panel admin-subcard">
+            <div class="subcard-header">
+              <h3><i class="fa-solid fa-laptop-code text-glow-gold"></i> Vista Previa del Correo</h3>
+              <span class="badge-status-brevo"><i class="fa-solid fa-check-double text-glow-cyan"></i> Brevo Ready</span>
+            </div>
+            <div class="email-mockup-frame">
+              <div class="email-mock-header">
+                <div><strong>De:</strong> Cali Sky Stores AI &lt;alertas@caliskystores.com&gt;</div>
+                <div><strong>Para:</strong> <span id="email-mock-to">juan@email.com</span></div>
+                <div><strong>Asunto:</strong> <span id="email-mock-subject">Hola Juan, hoy encontré 3 opciones de Apartamento en El Ingenio para ti</span></div>
+              </div>
+              <div class="email-mock-body" id="email-mock-html-content">
+                <!-- HTML email output render dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <div class="footer-branding">
+        <div class="logo-area">
+          <div class="logo-icon"><i class="fa-solid fa-cloud-bolt text-glow-cyan"></i></div>
+          <span class="brand-sky">CALI SKY</span><span class="brand-stores">STORES</span>
+        </div>
+        <p>
+          Buscador inmobiliario inteligente de alta velocidad para clientes selectos en Cali. 
+          100% optimizado para la nube libre de costos fijos.
+        </p>
+      </div>
+      <div class="footer-links">
+        <h4>Enlaces Rápidos</h4>
+        <a href="#hero-section">Inicio</a>
+        <a href="#showcase-section">Vitrina Pública</a>
+        <a href="#portal-section">Acceso Clientes</a>
+        <a href="#admin-section">Consola de Automatización</a>
+      </div>
+      <div class="footer-tech">
+        <h4>Stack Integrado</h4>
+        <div class="tech-labels">
+          <span class="badge bg-wp"><i class="fa-brands fa-wordpress"></i> WordPress</span>
+          <span class="badge bg-n8n"><i class="fa-solid fa-route"></i> n8n.io</span>
+          <span class="badge bg-groq"><i class="fa-solid fa-brain"></i> Groq AI</span>
+          <span class="badge bg-brevo"><i class="fa-solid fa-paper-plane"></i> Brevo</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      &copy; 2026 Cali Sky Stores. Todos los derechos reservados. Diseñado bajo estándares de ultra-alto rendimiento y diseño Premium.
+    </div>
+  </footer>
+
+  <!-- App Javascript -->
+  <script src="app.js"></script>
+</body>
+</html>

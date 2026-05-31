@@ -1,0 +1,14 @@
+{
+  "name": "bot-cali-sky",
+  "version": "1.0.0",
+  "description": "Bot de WhatsApp para Cali Sky Store",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "^7.0.0-rc11",
+    "axios": "^1.6.0",
+    "fs": "0.0.1-security",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
