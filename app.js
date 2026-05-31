@@ -4,22 +4,22 @@
 
 // 1. ZONING DATA STRUCTURE
 const ZONES_AND_BARRIOS = {
-  Sur: ["Todos los barrios", "El Ingenio", "Ciudad Jardín", "Pance", "Valle del Lili", "El Caney", "La Hacienda", "Meléndez"],
-  Norte: ["Todos los barrios", "La Flora", "Chipichape", "Versalles", "Vipasa", "San Vicente", "Santa Mónica", "Menga"],
-  Oeste: ["Todos los barrios", "Normandía", "Juanambú", "Santa Rita", "Santa Teresita", "El Peñón", "San Antonio", "Cristales"],
-  Centro: ["Todos los barrios", "Avenida Colombia", "Centenario", "San Fernando", "Miraflores", "Tequendama"],
-  Oriente: ["Todos los barrios", "Ciudad Córdoba", "Aguablanca", "Mariano Ramos", "Antonio Nariño"]
+  Sur: ["El Ingenio", "Ciudad Jardín", "Pance", "Valle del Lili", "El Caney", "La Hacienda", "Meléndez"],
+  Norte: ["La Flora", "Chipichape", "Versalles", "Vipasa", "San Vicente", "Santa Mónica", "Menga"],
+  Oeste: ["Normandía", "Juanambú", "Santa Rita", "Santa Teresita", "El Peñón", "San Antonio", "Cristales"],
+  Centro: ["Avenida Colombia", "Centenario", "San Fernando", "Miraflores", "Tequendama"],
+  Oriente: ["Ciudad Córdoba", "Aguablanca", "Mariano Ramos", "Antonio Nariño"]
 };
 
-// 2. DEFAULT DATASETS WITH DETAILED SPECIFICATIONS
+// 2. DEFAULT DATASETS WITH MULTI-ZONE SUPPORT (ARRAYS)
 const DEFAULT_CLIENTS = [
   {
     id: "client-1",
     name: "Juan Pérez",
     email: "juan@email.com",
     type: "apartamento",
-    zone: "Sur",
-    barrio: "El Ingenio",
+    zone: ["Sur"],
+    barrio: ["El Ingenio"],
     minPrice: 100000000,
     maxPrice: 350000000,
     beds: 3,
@@ -35,8 +35,8 @@ const DEFAULT_CLIENTS = [
     name: "Sophia Gómez",
     email: "sophia@email.com",
     type: "casa",
-    zone: "Sur",
-    barrio: "Ciudad Jardín",
+    zone: ["Sur"],
+    barrio: ["Ciudad Jardín"],
     minPrice: 300000000,
     maxPrice: 900000000,
     beds: 4,
@@ -52,8 +52,8 @@ const DEFAULT_CLIENTS = [
     name: "Andrés Delgado",
     email: "andres@email.com",
     type: "local",
-    zone: "Centro",
-    barrio: "Avenida Colombia",
+    zone: ["Centro"],
+    barrio: ["Avenida Colombia"],
     minPrice: 500000000,
     maxPrice: 1200000000,
     beds: 1,
@@ -219,7 +219,7 @@ const DEFAULT_PROPERTIES = [
     source: "Fincaraiz",
     sourceLink: "https://fincaraiz.com.co/inmueble/110022",
     grokAnalysis: "Apartamento en conjunto cerrado con piscina, zonas verdes, gimnasio y seguridad 24/7. Excelente distribución interna con balcón social.",
-    advisorNote: "Muy buena administración del conjunto. El apartamento está listo para escriturar, no posee hipotecas ni deudas pendientes."
+    advisorNote: "Muy buena administración del conjunto. El apartamento está listo para escriturar, no posee hipotecas ni deudas."
   },
   {
     id: "prop-8",
@@ -263,7 +263,7 @@ const DEFAULT_PROPERTIES = [
     source: "OLX Cali",
     sourceLink: "https://olx.com.co/item/casa-colonial-normandia-29",
     grokAnalysis: "Clásica casona de Normandía restaurada. Conserva patio central andaluz, techos altos de madera y frescura inigualable por brisa del oeste.",
-    advisorNote: "Sector residencial histórico, de muy alta alcurnia y valorización sostenida. Cuenta con seguridad vecinal integral privada."
+    advisorNote: "Sector residencial histórico, de muy alta alcurnia y valorización sostenida. Cuenta con seguridad vecinal privada."
   }
 ];
 
@@ -448,7 +448,7 @@ function renderPublicProperties(filter = "all") {
   });
 }
 
-// Rich Match Algorithm
+// Rich Match Algorithm supporting multi-zone & multi-barrio arrays
 function filterClientMatches(user) {
   return state.properties.filter(p => {
     // 1. Transaction Type (Compra / Arriendo)
@@ -457,11 +457,17 @@ function filterClientMatches(user) {
     // 2. Property Type
     if (p.type.toLowerCase() !== user.type.toLowerCase()) return false;
     
-    // 3. Zone Match
-    if (p.zone.toLowerCase() !== user.zone.toLowerCase()) return false;
+    // 3. Zone Match (supporting arrays)
+    if (user.zone && user.zone.length > 0) {
+      if (!user.zone.includes(p.zone)) return false;
+    }
     
-    // 4. Barrio Match (if not "Todos los barrios")
-    if (user.barrio && user.barrio !== "Todos los barrios" && p.barrio.toLowerCase() !== user.barrio.toLowerCase()) return false;
+    // 4. Barrio Match (supporting arrays)
+    if (user.barrio && user.barrio.length > 0) {
+      const allowedBySpecificBarrio = user.barrio.includes(p.barrio);
+      const allowedByAllInZone = user.barrio.includes(`Todos los barrios de ${p.zone}`);
+      if (!allowedBySpecificBarrio && !allowedByAllInZone) return false;
+    }
     
     // 5. Price Range
     if (p.price < user.minPrice || p.price > user.maxPrice) return false;
@@ -505,7 +511,7 @@ function renderPrivateProperties() {
         <i class="fa-solid fa-magnifying-glass-chart text-glow-gold" style="font-size: 40px; margin-bottom: 16px; display: block;"></i>
         <h3>Buscando coincidencias personalizadas...</h3>
         <p class="section-desc margin-center">
-          Actualmente no hay inmuebles en la base de datos que cumplan al 100% tus criterios específicos en la **Zona ${user.zone}** (${user.barrio}) por un rango de **${formatCOP(user.minPrice)} - ${formatCOP(user.maxPrice)}** y con mínimo **${user.beds} Hab / ${user.baths} Baños**.
+          Actualmente no hay inmuebles en la base de datos que cumplan con tus criterios específicos en las zonas de **${user.zone.join(", ")}** (${user.barrio.join(", ")}) por un rango de **${formatCOP(user.minPrice)} - ${formatCOP(user.maxPrice)}**.
         </p>
         <div class="alert-box note-box margin-t-md max-w-md margin-center">
           <i class="fa-solid fa-cloud-bolt text-glow-cyan"></i>
@@ -522,7 +528,6 @@ function renderPrivateProperties() {
     card.style.borderColor = "var(--accent-gold)";
     card.id = `priv-${p.id}`;
     
-    // Compile amenities list
     const amenitiesText = p.features.map(f => {
       if (f === "piscina") return "Piscina";
       if (f === "balcon") return "Balcón/Terraza";
@@ -611,14 +616,17 @@ function renderClientsTable() {
     const tr = document.createElement("tr");
     tr.id = `row-${c.id}`;
     
-    // Parse specs for summary column
     const specsSummary = `${c.beds}H / ${c.baths}B / ${c.minArea}m²${c.parking !== 'cualquiera' ? ` / Pkg` : ''}`;
     
+    // Format dynamic array outputs
+    const zonesJoined = c.zone ? c.zone.join(", ") : "N/A";
+    const barriosShortened = c.barrio ? c.barrio.map(b => b.replace("Todos los barrios", "Todos")).join(", ") : "N/A";
+
     tr.innerHTML = `
       <td><strong>${c.name}</strong></td>
       <td><code>${c.email}</code></td>
       <td><span class="deal-type-badge">${c.type}</span></td>
-      <td>Zona ${c.zone} (${c.barrio})</td>
+      <td>Zonas: ${zonesJoined} (${barriosShortened})</td>
       <td><strong>${formatCOP(c.minPrice)} - ${formatCOP(c.maxPrice)}</strong></td>
       <td>${specsSummary}</td>
       <td>${c.deal}</td>
@@ -673,7 +681,7 @@ function generateBrevoEmailHtml(client, matches) {
   if (matches.length === 0) {
     matchesHtml = `
       <div style="padding: 20px; text-align: center; border: 1px dashed #cbd5e1; border-radius: 6px;">
-        <p style="color: #64748b; font-size: 14px; margin: 0;">Estamos monitoreando activamente la <strong>Zona ${client.zone}</strong> (${client.barrio}). Aún no se han reportado nuevas publicaciones del rango solicitado, te notificaremos tan pronto como Groq detecte una.</p>
+        <p style="color: #64748b; font-size: 14px; margin: 0;">Estamos monitoreando activamente las zonas de <strong>${client.zone.join(", ")}</strong> (${client.barrio.join(", ")}). Aún no se han reportado nuevas publicaciones del rango solicitado, te notificaremos tan pronto como Groq detecte una.</p>
       </div>
     `;
   } else {
@@ -712,7 +720,7 @@ function generateBrevoEmailHtml(client, matches) {
                 <p>Nuestro radar inteligente en la nube ejecutó la búsqueda nocturna a las 2:00 AM sobre las bases de datos de inmuebles en Cali.</p>
                 
                 <p style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 12px; border-radius: 0 6px 6px 0; color: #065f46; font-size: 13px;">
-                  <strong>Estado:</strong> Filtro completado exitosamente. Encontramos <strong>${matchesCount} propiedad(es)</strong> en <strong>${client.barrio}</strong> que encajan perfectamente con tus especificaciones y presupuesto.
+                  <strong>Estado:</strong> Filtro completado exitosamente. Encontramos <strong>${matchesCount} propiedad(es)</strong> en las áreas solicitadas que encajan perfectamente con tus especificaciones y presupuesto.
                 </p>
                 
                 <div style="margin: 24px 0 10px 0;">
@@ -762,16 +770,19 @@ function updateBrevoPreview() {
   // Find matches using rich criteria
   const matches = filterClientMatches(client);
 
+  const zonesJoined = client.zone ? client.zone.join(", ") : "N/A";
+  const barriosJoined = client.barrio ? client.barrio.join(", ") : "N/A";
+
   // Populate dynamic payload metrics variables on sidecard
   document.getElementById("var-contact-name").textContent = client.name;
   document.getElementById("var-contact-email").textContent = client.email;
-  document.getElementById("var-params-zone").textContent = `${client.zone} (${client.barrio})`;
+  document.getElementById("var-params-zone").textContent = `Zonas: ${zonesJoined} (${barriosJoined})`;
   document.getElementById("var-params-type").textContent = client.type;
   document.getElementById("var-params-count").textContent = matches.length;
 
   // Mock header fields in preview
   document.getElementById("email-mock-to").textContent = `${client.name} <${client.email}>`;
-  document.getElementById("email-mock-subject").textContent = `Hola ${client.name}, hoy encontré ${matches.length} opciones de ${client.type} en ${client.barrio} para ti`;
+  document.getElementById("email-mock-subject").textContent = `Hola ${client.name}, hoy encontré ${matches.length} opciones de ${client.type} en tus zonas de interés para ti`;
 
   // Render HTML in preview area
   const renderArea = document.getElementById("email-mock-html-content");
@@ -784,8 +795,12 @@ function handleAddClient(e) {
   const name = document.getElementById("client-name").value.trim();
   const email = document.getElementById("client-email").value.trim();
   const type = document.getElementById("client-type").value;
-  const zone = document.getElementById("client-zone-select").value;
-  const barrio = document.getElementById("client-barrio-select").value;
+  const deal = document.getElementById("client-deal").value;
+
+  // Get arrays of selected checkboxes for Zones and Barrios
+  const selectedZones = Array.from(document.querySelectorAll('input[name="client-zone"]:checked')).map(cb => cb.value);
+  const selectedBarrios = Array.from(document.querySelectorAll('input[name="client-barrio"]:checked')).map(cb => cb.value);
+
   const minPrice = parseInt(document.getElementById("client-min-price").value) || 0;
   const maxPrice = parseInt(document.getElementById("client-max-price").value);
   const beds = parseInt(document.getElementById("client-beds").value);
@@ -793,9 +808,16 @@ function handleAddClient(e) {
   const parking = document.getElementById("client-parking").value;
   const minArea = parseInt(document.getElementById("client-min-area").value) || 20;
   const features = document.getElementById("client-features").value;
-  const deal = document.getElementById("client-deal").value;
 
   if (!name || !email || isNaN(maxPrice) || isNaN(beds)) return;
+  if (selectedZones.length === 0) {
+    alert("Por favor selecciona al menos una Zona de Cali.");
+    return;
+  }
+  if (selectedBarrios.length === 0) {
+    alert("Por favor selecciona al menos un Barrio.");
+    return;
+  }
 
   if (state.clients.some(c => c.email.toLowerCase() === email.toLowerCase())) {
     alert("Este correo electrónico ya está registrado con otro cliente.");
@@ -803,33 +825,79 @@ function handleAddClient(e) {
   }
 
   state.addClient({ 
-    name, email, type, zone, barrio, minPrice, maxPrice, 
+    name, email, type, zone: selectedZones, barrio: selectedBarrios, minPrice, maxPrice, 
     beds, baths, parking, minArea, features, deal 
   });
   
+  // Reset Form
   document.getElementById("add-client-form").reset();
-  loadBarriosForSelectedZone(); // Reset barrio options
+  
+  // Keep default zone Sur checked and rebuild barrio checkboxes
+  document.querySelectorAll('input[name="client-zone"]').forEach(cb => {
+    cb.checked = (cb.value === "Sur");
+  });
+  loadBarriosForSelectedZones(); 
 
   renderClientsTable();
   populateBrevoClientSelector();
   alert(`¡Cliente ${name} registrado con éxito! Puedes iniciar sesión usando su email en el portal privado.`);
 }
 
-// Dynamic barrio dropdown filler
-function loadBarriosForSelectedZone() {
-  const zoneSelect = document.getElementById("client-zone-select");
-  const barrioSelect = document.getElementById("client-barrio-select");
-  if (!zoneSelect || !barrioSelect) return;
+// Dynamic barrio checkboxes generator supporting MULTIPLE active zones
+function loadBarriosForSelectedZones() {
+  const container = document.getElementById("client-barrios-checkbox-container");
+  if (!container) return;
 
-  const selectedZone = zoneSelect.value;
-  const barrios = ZONES_AND_BARRIOS[selectedZone] || [];
+  // Find all currently checked zones in the checkboxes grid
+  const checkedZones = Array.from(document.querySelectorAll('input[name="client-zone"]:checked')).map(cb => cb.value);
+  
+  container.innerHTML = "";
 
-  barrioSelect.innerHTML = "";
-  barrios.forEach(b => {
-    const opt = document.createElement("option");
-    opt.value = b;
-    opt.textContent = b;
-    barrioSelect.appendChild(opt);
+  if (checkedZones.length === 0) {
+    container.innerHTML = `<span style="font-size: 12px; color: var(--text-muted); grid-column: 1 / -1;">Selecciona una zona arriba para cargar sus barrios...</span>`;
+    return;
+  }
+
+  checkedZones.forEach(zone => {
+    const barrios = ZONES_AND_BARRIOS[zone] || [];
+    
+    // Add a helper header or separator for visual grouping of zones
+    const groupHeader = document.createElement("div");
+    groupHeader.style.gridColumn = "1 / -1";
+    groupHeader.style.fontSize = "11px";
+    groupHeader.style.fontWeight = "700";
+    groupHeader.style.color = "var(--accent-gold)";
+    groupHeader.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+    groupHeader.style.paddingBottom = "4px";
+    groupHeader.style.marginTop = "8px";
+    groupHeader.innerHTML = `<i class="fa-solid fa-map"></i> Barrios en Zona ${zone}`;
+    container.appendChild(groupHeader);
+
+    // "Todos los barrios" option for this zone
+    const allLabel = document.createElement("label");
+    allLabel.className = "custom-checkbox-wrap";
+    allLabel.innerHTML = `
+      <input type="checkbox" name="client-barrio" value="Todos los barrios de ${zone}" checked>
+      <span>Todos (Zona ${zone})</span>
+    `;
+    container.appendChild(allLabel);
+
+    barrios.forEach(b => {
+      const label = document.createElement("label");
+      label.className = "custom-checkbox-wrap";
+      label.innerHTML = `
+        <input type="checkbox" name="client-barrio" value="${b}">
+        <span>${b}</span>
+      `;
+      container.appendChild(label);
+    });
+  });
+
+  // Bind change events to dynamic checkboxes so their appearance glows instantly when clicked
+  document.querySelectorAll('input[name="client-barrio"]').forEach(cb => {
+    cb.addEventListener("change", () => {
+      // Toggle has-checked visual indicator parent styling if needed
+    });
   });
 }
 
@@ -846,9 +914,12 @@ function loginUser(email) {
     document.getElementById("portal-fallback-wrapper").classList.add("hidden");
     document.getElementById("portal-section-wrapper").classList.remove("hidden");
     
+    const zonesJoined = user.zone ? user.zone.join(", ") : "N/A";
+    const barriosJoined = user.barrio ? user.barrio.map(b => b.replace("Todos los barrios de ", "Todos ")).join(", ") : "N/A";
+
     document.getElementById("portal-welcome-name").textContent = `Hola, ${user.name}`;
     document.getElementById("portal-search-type").textContent = user.type.charAt(0).toUpperCase() + user.type.slice(1);
-    document.getElementById("portal-search-zone").textContent = `Zona ${user.zone} (${user.barrio})`;
+    document.getElementById("portal-search-zone").textContent = `Zonas: ${zonesJoined} (${barriosJoined})`;
     document.getElementById("portal-search-budget").textContent = `${formatCOP(user.minPrice)} - ${formatCOP(user.maxPrice)}`;
     document.getElementById("portal-search-beds").textContent = `${user.beds} habs / ${user.baths} baños`;
 
@@ -943,12 +1014,12 @@ function runNightlyWorkflow() {
     document.getElementById(c).classList.remove("active-link");
   });
 
-  addTerminalLog("INICIANDO AUTOMATIZACIÓN NOCTURNA (Simulando ejecución programada a las 2:00 AM)...", "cron");
+  addTerminalLog("INICIANDO AUTOMATIZACIÓN NOCTURNA (Simulando ejecución programada en n8n)...", "cron");
 
   setTimeout(() => {
     // 1. Cron Node
     document.getElementById("node-trigger").classList.add("active-node");
-    addTerminalLog("Node 'Cron Trigger': Disparado por temporizador diario a las 2:00:00 AM.", "cron");
+    addTerminalLog("Node 'Cron Trigger': Disparado por temporizador programado.", "cron");
     
     setTimeout(() => {
       document.getElementById("node-trigger").classList.add("done-node");
@@ -961,7 +1032,7 @@ function runNightlyWorkflow() {
       
       setTimeout(() => {
         const activeCount = state.clients.filter(c => c.status === 'active').length;
-        addTerminalLog(`Node 'WP Get Profiles': Obtenidos ${activeCount} perfiles de búsqueda activos de Cali Sky.`, "wp");
+        addTerminalLog(`Node 'WP Get Profiles': Obtenidos ${activeCount} perfiles de búsqueda activos con múltiples zonas asociadas.`, "wp");
         document.getElementById("node-read-db").classList.add("done-node");
         document.getElementById("node-read-db").classList.remove("active-node");
         document.getElementById("connector-1").classList.remove("active-link");
@@ -972,7 +1043,7 @@ function runNightlyWorkflow() {
         addTerminalLog("Node 'Prompt Builder': Armando instrucciones detalladas para la API de Groq Cloud...", "system");
         
         setTimeout(() => {
-          addTerminalLog("Node 'Prompt Builder': Inyectando variables personalizadas (Zona, Barrio, Rango Presupuesto, Habitaciones, Parqueadero, Extras).", "system");
+          addTerminalLog("Node 'Prompt Builder': Inyectando arrays de Zonas y Barrios en el prompt para Groq Llama-3...", "system");
           document.getElementById("node-prompt").classList.add("done-node");
           document.getElementById("node-prompt").classList.remove("active-node");
           document.getElementById("connector-2").classList.remove("active-link");
@@ -983,12 +1054,11 @@ function runNightlyWorkflow() {
           addTerminalLog("Node 'Groq Cloud': Conectando a Groq API Llama-3-70B de alta velocidad...", "groq");
           
           setTimeout(() => {
-            addTerminalLog("Node 'Groq Cloud': Llama-3 escaneando Fincaraiz, Metrocuadrado, OLX y grupos de Whatsapp en Cali...", "groq");
+            addTerminalLog("Node 'Groq Cloud': Llama-3 escaneando Fincaraiz, Metrocuadrado, OLX y grupos de Whatsapp en múltiples sectores de Cali...", "groq");
             
             setTimeout(() => {
-              addTerminalLog("Node 'Groq Cloud': Groq completó análisis de 28 listados y detectó nuevas coincidencias óptimas en el sur de Cali.", "groq");
+              addTerminalLog("Node 'Groq Cloud': Groq filtró con éxito coincidiendo propiedades en las áreas solicitadas.", "groq");
               
-              // Add simulated matches to store
               state.addProperties(SIMULATED_NEW_PROPERTIES);
               
               document.getElementById("node-groq").classList.add("done-node");
@@ -1001,8 +1071,8 @@ function runNightlyWorkflow() {
               addTerminalLog("Node 'WP Publish': Creando posts privados en WordPress visibles únicamente para sus respectivos clientes...", "wp");
               
               setTimeout(() => {
-                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50921 para Juan Pérez (Zona Sur / El Ingenio).", "wp");
-                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50922 para Sophia Gómez (Zona Sur / Ciudad Jardín).", "wp");
+                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50921 para Juan Pérez (Zonas: Sur / Barrio: El Ingenio).", "wp");
+                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50922 para Sophia Gómez (Zonas: Sur / Barrio: Ciudad Jardín).", "wp");
                 document.getElementById("node-publish").classList.add("done-node");
                 document.getElementById("node-publish").classList.remove("active-node");
                 document.getElementById("connector-4").classList.remove("active-link");
@@ -1034,7 +1104,7 @@ function runNightlyWorkflow() {
                   }
                   updateBrevoPreview();
                   
-                  alert("¡Simulación completada con éxito! El flujo de n8n ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
+                  alert("¡Simulación completada con éxito! El flujo de n8n ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados multi-zona. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
                   
                 }, 2000);
               }, 2000);
@@ -1049,12 +1119,13 @@ function runNightlyWorkflow() {
 // 6. APP ENGINE INITS & DOM BINDINGS
 document.addEventListener("DOMContentLoaded", () => {
   
-  // Dynamic Barrio Dropdown initial load
-  loadBarriosForSelectedZone();
-  const zoneSelect = document.getElementById("client-zone-select");
-  if (zoneSelect) {
-    zoneSelect.addEventListener("change", loadBarriosForSelectedZone);
-  }
+  // Dynamic Barrio Checkboxes initial load
+  loadBarriosForSelectedZones();
+  
+  // Bind change events to Zone checkboxes to rebuild barrios checklist dynamic grid
+  document.querySelectorAll('input[name="client-zone"]').forEach(cb => {
+    cb.addEventListener("change", loadBarriosForSelectedZones);
+  });
 
   // Render initial layouts
   renderPublicProperties();
@@ -1204,7 +1275,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cronTimeInput.value = savedCronSettings.timeVal;
     
     const cronDetails = updateCronExpressionText();
-    // Update Cron Trigger node visual subtitle on load
     const nodeSpan = document.querySelector("#node-trigger .node-meta span");
     if (nodeSpan) {
       if (cronDetails.freq === "diario") {
@@ -1224,13 +1294,11 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSaveCron.addEventListener("click", () => {
       const details = updateCronExpressionText();
       
-      // Save state to localStorage
       localStorage.setItem("calisky_cron_settings", JSON.stringify({
         freq: details.freq,
         timeVal: details.timeVal
       }));
 
-      // Update visual flowchart Cron Trigger node subtitle
       const nodeSpan = document.querySelector("#node-trigger .node-meta span");
       if (nodeSpan) {
         if (details.freq === "diario") {
@@ -1240,7 +1308,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Add retro terminal log entry
       addTerminalLog(`Programador de n8n actualizado con éxito. Expresión cron activa: "${details.expression}". Próxima ejecución programada.`, "success");
 
       alert(`¡Disparador de n8n configurado exitosamente!\n\nFrecuencia: ${details.summaryText}\nCron Expression: ${details.expression}\n\nLos cambios se han guardado de forma permanente en la base de datos local y se han reflejado en el nodo visual de n8n.`);

@@ -1680,3 +1680,36 @@ body {
   color: #64748b;
   border-top: 1px solid #e2e8f0;
 }
+
+/* Custom Checkbox Group Styling */
+.custom-checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-light);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  font-size: 13px;
+  user-select: none;
+}
+.custom-checkbox-wrap:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.custom-checkbox-wrap input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-cyan);
+  cursor: pointer;
+}
+.custom-checkbox-wrap:has(input[type="checkbox"]:checked) {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 243, 255, 0.06);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.15), inset 0 0 5px rgba(0, 243, 255, 0.05);
+  color: #fff;
+  font-weight: 600;
+}
+
