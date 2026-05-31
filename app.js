@@ -2069,9 +2069,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!fnBtn || !fbBtn || !mcBtn || !mlBtn || !goBtn) return;
 
     const tipo = client.type || "Apartamento";
-    const barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
+    let barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
       ? client.barrio[0].replace("Todos los barrios de ", "") 
       : (typeof client.barrio === "string" ? client.barrio : "Cali");
+
+    if (barrio.toLowerCase().includes("todos los barrios")) {
+      barrio = client.zone && client.zone.length > 0 ? client.zone[0] : "Cali";
+    }
     
     const budget = client.maxPrice || 500000000;
 
@@ -2112,9 +2116,13 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     const tipo = client.type || "Apartamento";
-    const barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
+    let barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
       ? client.barrio[0].replace("Todos los barrios de ", "") 
       : (typeof client.barrio === "string" ? client.barrio : "Cali");
+
+    if (barrio.toLowerCase().includes("todos los barrios")) {
+      barrio = client.zone && client.zone.length > 0 ? client.zone[0] : "Cali";
+    }
     
     const budget = client.maxPrice || 500000000;
 
