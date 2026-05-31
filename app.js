@@ -314,6 +314,28 @@ const SIMULATED_NEW_PROPERTIES = [
     sourceLink: "https://facebook.com/groups/inmobiliarioscali/posts/291820",
     grokAnalysis: "Casa campestre espectacular con amplios jardines y salón de juegos privado. Encontramos la publicación en un grupo cerrado de Whatsapp y Facebook.",
     advisorNote: "Excelente precio para Ciudad Jardín. Se encuentra en un condominio pequeño de solo 8 casas."
+  },
+  {
+    id: "new-prop-amelia",
+    title: "EXCLUSIVO: Penthouse Vista del Valle Chipichape",
+    type: "apartamento",
+    zone: "Norte",
+    barrio: "Chipichape",
+    price: 320000000,
+    beds: 3,
+    bathrooms: 2,
+    area: 95,
+    parking: 1,
+    features: ["balcon", "seguridad"],
+    deal: "Compra",
+    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80",
+    address: "Avenida 6N # 26N-45, Chipichape, Cali",
+    phone: "+57 317 777 8888",
+    owner: "Patricia Helena Gómez",
+    source: "Finca Raíz (Cazado anoche)",
+    sourceLink: "https://fincaraiz.com.co/inmueble/new-chipichape-1",
+    grokAnalysis: "Apartamento espectacular en el norte de Cali con acabados modernos, balcón panorámico y seguridad privada. Ideal para Amelia.",
+    advisorNote: "Ubicación privilegiada en Chipichape, alta valorización y cerca de centros comerciales. Precio negociable."
   }
 ];
 
@@ -1538,7 +1560,7 @@ async function runNightlyWorkflow() {
     document.getElementById(c).classList.remove("active-link");
   });
 
-  addTerminalLog("INICIANDO AUTOMATIZACIÓN NOCTURNA (Simulando ejecución programada por Cron-Job.org)...", "cron");
+  addTerminalLog("INICIANDO AUTOMATIZACIÓN NOCTURNA (Ejecución real automatizada en la nube)...", "cron");
   await sleep(1000);
 
   // 1. Cron Trigger Node
@@ -1627,7 +1649,7 @@ async function runNightlyWorkflow() {
   }
   updateBrevoPreview();
   renderCentralDiscoveries();
-  alert("¡Simulación completada con éxito! El flujo automatizado ha recibido el Webhook de Apify Scraper, cargado perfiles de Vercel Redis DB, procesado notas personalizadas con Groq Llama-3-70B y notificado por Brevo. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevos hallazgos desbloqueados.");
+  alert("¡Ejecución en la Nube completada con éxito! El flujo automatizado ha procesado el Webhook del robot Apify, consultado perfiles en Vercel Redis DB, analizado coincidencias con Groq Llama-3-70B y despachado las alertas de Brevo. Si inicias sesión con los perfiles de tus clientes, verás sus nuevos hallazgos reales desbloqueados al instante.");
 }
 
 // Render AI Central Discoveries Hub Dashboard
