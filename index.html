@@ -419,6 +419,46 @@
 
       <!-- Tab Content 2: n8n Flow Simulator -->
       <div class="tab-content" id="tab-workflow">
+        
+        <!-- Trigger Automation Configuration Panel -->
+        <div class="glass-panel admin-subcard" style="margin-bottom: 24px; padding: 24px;">
+          <div class="subcard-header" style="margin-bottom: 16px;">
+            <h3><i class="fa-solid fa-clock text-glow-gold"></i> Configuración del Disparador Automático (n8n Cron Trigger)</h3>
+            <span class="badge-status-brevo" id="cron-active-badge"><i class="fa-solid fa-circle-check text-glow-cyan"></i> Programador Activo</span>
+          </div>
+          <div class="admin-form">
+            <div class="form-row-3">
+              <div class="form-group">
+                <label for="cron-frequency">Frecuencia del Rastreo</label>
+                <select id="cron-frequency">
+                  <option value="diario">Diario (Cada 24 horas)</option>
+                  <option value="12horas">Cada 12 horas (2 veces al día)</option>
+                  <option value="6horas">Cada 6 horas (4 veces al día)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="cron-time">Hora del Rastreo Automático</label>
+                <input type="time" id="cron-time" value="02:00">
+              </div>
+              <div class="form-group">
+                <label>Expresión Cron en n8n</label>
+                <div style="font-family: var(--font-code); background: rgba(0,0,0,0.5); padding: 11px 14px; border-radius: 8px; border: 1px solid var(--border-light); font-size: 13px; text-align: center; color: var(--accent-cyan); font-weight: 500;" id="cron-expression-display">
+                  0 2 * * *
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 15px;">
+              <button type="button" class="btn btn-glow-gold" id="btn-save-cron" style="min-width: 250px;">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Cron de n8n
+              </button>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label class="pulse-dot" style="margin: 0; background-color: var(--accent-green);" id="cron-indicator"></label>
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);" id="cron-indicator-text">Cron Activo (Todos los días)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="glass-panel workflow-simulator-card">
           <div class="workflow-actions-bar">
             <div class="wf-title">

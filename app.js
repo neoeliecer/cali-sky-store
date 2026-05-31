@@ -1158,4 +1158,92 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Brevo Client Selector change trigger
   document.getElementById("brevo-select-client").addEventListener("change", updateBrevoPreview);
+
+  // --- N8N CRON AUTOMATION TRIGGER LOGIC ---
+  const cronFreqSelect = document.getElementById("cron-frequency");
+  const cronTimeInput = document.getElementById("cron-time");
+  const cronExpressionDisplay = document.getElementById("cron-expression-display");
+  const cronIndicatorText = document.getElementById("cron-indicator-text");
+  const btnSaveCron = document.getElementById("btn-save-cron");
+
+  // Helper to generate Cron Expression
+  function updateCronExpressionText() {
+    const freq = cronFreqSelect.value;
+    const timeVal = cronTimeInput.value || "02:00";
+    const [hour, minute] = timeVal.split(":");
+    
+    let expression = "0 2 * * *";
+    let summaryText = "Cron Activo (Todos los días)";
+
+    if (freq === "diario") {
+      expression = `${parseInt(minute)} ${parseInt(hour)} * * *`;
+      summaryText = `Cron Activo (Todos los días a las ${timeVal})`;
+    } else if (freq === "12horas") {
+      expression = `0 */12 * * *`;
+      summaryText = `Cron Activo (Cada 12 horas - 2 veces al día)`;
+    } else if (freq === "6horas") {
+      expression = `0 */6 * * *`;
+      summaryText = `Cron Activo (Cada 6 horas - 4 veces al día)`;
+    }
+
+    cronExpressionDisplay.textContent = expression;
+    cronIndicatorText.textContent = summaryText;
+
+    return { expression, summaryText, freq, timeVal };
+  }
+
+  // Load saved Cron Settings
+  const savedCronSettings = JSON.parse(localStorage.getItem("calisky_cron_settings")) || {
+    freq: "diario",
+    timeVal: "02:00"
+  };
+
+  // Pre-fill fields
+  if (cronFreqSelect && cronTimeInput) {
+    cronFreqSelect.value = savedCronSettings.freq;
+    cronTimeInput.value = savedCronSettings.timeVal;
+    
+    const cronDetails = updateCronExpressionText();
+    // Update Cron Trigger node visual subtitle on load
+    const nodeSpan = document.querySelector("#node-trigger .node-meta span");
+    if (nodeSpan) {
+      if (cronDetails.freq === "diario") {
+        nodeSpan.textContent = `Cada día ${cronDetails.timeVal}`;
+      } else {
+        nodeSpan.textContent = cronDetails.freq === "12horas" ? "Cada 12 horas" : "Cada 6 horas";
+      }
+    }
+  }
+
+  // Bind change events to dynamically update expression
+  if (cronFreqSelect) cronFreqSelect.addEventListener("change", updateCronExpressionText);
+  if (cronTimeInput) cronTimeInput.addEventListener("input", updateCronExpressionText);
+
+  // Save Cron Settings button handler
+  if (btnSaveCron) {
+    btnSaveCron.addEventListener("click", () => {
+      const details = updateCronExpressionText();
+      
+      // Save state to localStorage
+      localStorage.setItem("calisky_cron_settings", JSON.stringify({
+        freq: details.freq,
+        timeVal: details.timeVal
+      }));
+
+      // Update visual flowchart Cron Trigger node subtitle
+      const nodeSpan = document.querySelector("#node-trigger .node-meta span");
+      if (nodeSpan) {
+        if (details.freq === "diario") {
+          nodeSpan.textContent = `Cada día ${details.timeVal}`;
+        } else {
+          nodeSpan.textContent = details.freq === "12horas" ? "Cada 12 horas" : "Cada 6 horas";
+        }
+      }
+
+      // Add retro terminal log entry
+      addTerminalLog(`Programador de n8n actualizado con éxito. Expresión cron activa: "${details.expression}". Próxima ejecución programada.`, "success");
+
+      alert(`¡Disparador de n8n configurado exitosamente!\n\nFrecuencia: ${details.summaryText}\nCron Expression: ${details.expression}\n\nLos cambios se han guardado de forma permanente en la base de datos local y se han reflejado en el nodo visual de n8n.`);
+    });
+  }
 });
