@@ -705,40 +705,124 @@
         <!-- Trigger Automation Configuration Panel -->
         <div class="glass-panel admin-subcard" style="margin-bottom: 24px; padding: 24px;">
           <div class="subcard-header" style="margin-bottom: 16px;">
-            <h3><i class="fa-solid fa-clock text-glow-gold"></i> Configuración del Disparador Automático (Cron-Job.org Webhook)</h3>
-            <span class="badge-status-brevo" id="cron-active-badge"><i class="fa-solid fa-circle-check text-glow-cyan"></i> Programador Activo</span>
+            <h3><i class="fa-solid fa-network-wired text-glow-gold"></i> Centro de Control de Motores de Búsqueda en la Nube (Apify + Cron)</h3>
+            <span class="badge-status-brevo" id="cron-active-badge"><i class="fa-solid fa-circle-check text-glow-cyan"></i> Servidores Activos</span>
           </div>
-          <div class="admin-form">
-            <div class="form-row-3">
-              <div class="form-group">
-                <label for="cron-frequency">Frecuencia del Rastreo</label>
-                <select id="cron-frequency">
-                  <option value="diario">Diario (Cada 24 horas)</option>
-                  <option value="12horas">Cada 12 horas (2 veces al día)</option>
-                  <option value="6horas">Cada 6 horas (4 veces al día)</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="cron-time">Hora del Rastreo Automático</label>
-                <input type="time" id="cron-time" value="02:00">
-              </div>
-              <div class="form-group">
-                <label>Expresión Cron en Cron-Job.org</label>
-                <div style="font-family: var(--font-code); background: rgba(0,0,0,0.5); padding: 11px 14px; border-radius: 8px; border: 1px solid var(--border-light); font-size: 13px; text-align: center; color: var(--accent-cyan); font-weight: 500;" id="cron-expression-display">
-                  0 2 * * *
+
+          <!-- Description -->
+          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">
+            Administra tus motores de recolección en tiempo real. Copia los Webhooks para tus Actors de Apify, ejecuta rastreos de prueba o reprograma el disparador nocturno de respaldo.
+          </p>
+
+          <!-- 3 Columns for 3 Engines -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            
+            <!-- Column 1: Finca Raíz (Apify) -->
+            <div class="glass-panel" style="background: rgba(255,136,0,0.02); border: 1px solid rgba(255,136,0,0.15); padding: 18px; border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <h4 style="font-size: 14.5px; font-weight: 700; color: #fff; margin: 0;"><i class="fa-solid fa-house-circle-exclamation" style="color: #ffa726;"></i> Finca Raíz (Apify)</h4>
+                  <span style="font-size: 11px; padding: 3px 8px; border-radius: 10px; background: rgba(255,136,0,0.1); border: 1px solid #ffa726; color: #ffa726; font-weight: 600;">2 Tareas Activas</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 11.5px; line-height: 1.5; margin-bottom: 14px;">
+                  Robot de extracción masiva en Finca Raíz Colombia. Envía coincidencias a compradores y arrendatarios de Cali.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                  <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-light); padding: 8px; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                      <span style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">Webhook Ventas:</span>
+                      <button type="button" onclick="navigator.clipboard.writeText('https://cali-sky-store.vercel.app/api/cron-harvest?deal=Compra'); alert('Webhook Ventas copiado al portapapeles!');" style="background: none; border: none; color: var(--accent-gold); cursor: pointer; font-size: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 0;"><i class="fa-solid fa-copy"></i> Copiar</button>
+                    </div>
+                    <code style="font-size: 9.5px; color: #fff; word-break: break-all;">.../api/cron-harvest?deal=Compra</code>
+                  </div>
+                  <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-light); padding: 8px; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                      <span style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">Webhook Arriendos:</span>
+                      <button type="button" onclick="navigator.clipboard.writeText('https://cali-sky-store.vercel.app/api/cron-harvest?deal=Arriendo'); alert('Webhook Arriendos copiado al portapapeles!');" style="background: none; border: none; color: var(--accent-cyan); cursor: pointer; font-size: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 0;"><i class="fa-solid fa-copy"></i> Copiar</button>
+                    </div>
+                    <code style="font-size: 9.5px; color: #fff; word-break: break-all;">.../api/cron-harvest?deal=Arriendo</code>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 15px;">
-              <button type="button" class="btn btn-glow-gold" id="btn-save-cron" style="min-width: 250px;">
-                <i class="fa-solid fa-floppy-disk"></i> Guardar Cron-Job
+              <button type="button" class="btn btn-glow-gold" onclick="window.open('https://console.apify.com/actors/tasks', '_blank')" style="font-size: 11px; padding: 8px; width: 100%; border-radius: 6px; margin: 0; font-weight: 700; text-transform: uppercase;">
+                <i class="fa-solid fa-up-right-from-square"></i> Abrir en Apify
               </button>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <label class="pulse-dot" style="margin: 0; background-color: var(--accent-green);" id="cron-indicator"></label>
-                <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);" id="cron-indicator-text">Cron Activo (Todos los días)</span>
-              </div>
             </div>
+
+            <!-- Column 2: Facebook Marketplace (Apify) -->
+            <div class="glass-panel" style="background: rgba(24,119,242,0.02); border: 1px solid rgba(24,119,242,0.15); padding: 18px; border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <h4 style="font-size: 14.5px; font-weight: 700; color: #fff; margin: 0;"><i class="fa-brands fa-facebook" style="color: #1877f2;"></i> Marketplace (Apify)</h4>
+                  <span style="font-size: 11px; padding: 3px 8px; border-radius: 10px; background: rgba(24,119,242,0.1); border: 1px solid #1877f2; color: #1877f2; font-weight: 600;">2 Tareas Activas</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 11.5px; line-height: 1.5; margin-bottom: 14px;">
+                  Robot de extracción masiva en Facebook Marketplace. Recolecta oportunidades directas en Cali sin intermediarios.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                  <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-light); padding: 8px; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                      <span style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">Webhook Ventas:</span>
+                      <button type="button" onclick="navigator.clipboard.writeText('https://cali-sky-store.vercel.app/api/cron-harvest?deal=Compra'); alert('Webhook Ventas copiado al portapapeles!');" style="background: none; border: none; color: var(--accent-gold); cursor: pointer; font-size: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 0;"><i class="fa-solid fa-copy"></i> Copiar</button>
+                    </div>
+                    <code style="font-size: 9.5px; color: #fff; word-break: break-all;">.../api/cron-harvest?deal=Compra</code>
+                  </div>
+                  <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-light); padding: 8px; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                      <span style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">Webhook Arriendos:</span>
+                      <button type="button" onclick="navigator.clipboard.writeText('https://cali-sky-store.vercel.app/api/cron-harvest?deal=Arriendo'); alert('Webhook Arriendos copiado al portapapeles!');" style="background: none; border: none; color: var(--accent-cyan); cursor: pointer; font-size: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 0;"><i class="fa-solid fa-copy"></i> Copiar</button>
+                    </div>
+                    <code style="font-size: 9.5px; color: #fff; word-break: break-all;">.../api/cron-harvest?deal=Arriendo</code>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-glow-cyan" onclick="window.open('https://console.apify.com/actors/tasks', '_blank')" style="font-size: 11px; padding: 8px; width: 100%; border-radius: 6px; margin: 0; font-weight: 700; text-transform: uppercase; background: #1877f2; border-color: #1877f2;">
+                <i class="fa-solid fa-up-right-from-square"></i> Abrir en Apify
+              </button>
+            </div>
+
+            <!-- Column 3: Cron-Job.org (Respaldo) -->
+            <div class="glass-panel" style="background: rgba(239,68,68,0.02); border: 1px solid rgba(239,68,68,0.15); padding: 18px; border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <h4 style="font-size: 14.5px; font-weight: 700; color: #fff; margin: 0;"><i class="fa-solid fa-clock" style="color: #ef5350;"></i> Cron-Job (Respaldo)</h4>
+                  <span style="font-size: 11px; padding: 3px 8px; border-radius: 10px; background: rgba(239,68,68,0.1); border: 1px solid #ef5350; color: #ef5350; font-weight: 600;" id="cron-indicator-text">Cron Activo</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 11.5px; line-height: 1.5; margin-bottom: 14px;">
+                  Disparador nocturno de respaldo para Mercado Libre. Llama a la API serverless directamente cada madrugada.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                  <div class="form-group" style="margin: 0;">
+                    <label for="cron-frequency" style="font-size: 10.5px; color: var(--text-secondary); margin-bottom: 4px; display: block; text-align: left;">Frecuencia del Respaldo</label>
+                    <select id="cron-frequency" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); border-radius: 6px; padding: 6px; font-size: 12px; color: #fff; font-family: var(--font-body); font-weight: 600;">
+                      <option value="diario">Diario (Cada 24 horas)</option>
+                      <option value="12horas">Cada 12 horas</option>
+                      <option value="6horas">Cada 6 horas</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label for="cron-time" style="font-size: 10.5px; color: var(--text-secondary); margin-bottom: 4px; display: block; text-align: left;">Hora de Ejecución</label>
+                    <input type="time" id="cron-time" value="02:00" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); border-radius: 6px; padding: 5px; font-size: 12px; color: #fff; font-family: var(--font-body); font-weight: 600;">
+                  </div>
+                  <div style="display: none;">
+                    <div id="cron-expression-display">0 2 * * *</div>
+                    <label id="cron-indicator"></label>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-glow-gold" id="btn-save-cron" style="font-size: 11px; padding: 8px; width: 100%; border-radius: 6px; margin: 0; font-weight: 700; text-transform: uppercase;">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Frecuencia
+              </button>
+            </div>
+
           </div>
+
+          <!-- Bottom quick details -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-light); flex-wrap: wrap; gap: 10px;">
+            <span style="font-size: 11.5px; color: var(--text-secondary);"><i class="fa-solid fa-circle-info"></i> Endpoint Base Serverless: <code style="color: var(--accent-cyan);">https://cali-sky-store.vercel.app/api/cron-harvest</code></span>
+            <button type="button" onclick="navigator.clipboard.writeText('https://cali-sky-store.vercel.app/api/cron-harvest'); alert('Endpoint Base copiado al portapapeles!');" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 4px; padding: 4px 10px; color: #fff; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-copy"></i> Copiar Base</button>
+          </div>
+
         </div>
 
         <div class="glass-panel workflow-simulator-card">
