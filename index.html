@@ -226,9 +226,14 @@
           <div class="summary-chip"><i class="fa-solid fa-tags"></i> <span id="portal-search-budget">Máx $350M</span></div>
           <div class="summary-chip"><i class="fa-solid fa-bed"></i> <span id="portal-search-beds">3 habs</span></div>
         </div>
-        <button class="btn btn-outline-danger" id="logout-btn">
-          <i class="fa-solid fa-right-from-bracket"></i> Salir
-        </button>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-glow-gold" id="btn-portal-run-search" style="font-size: 11.5px; padding: 6px 12px; border-radius: 6px; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-wand-magic-sparkles text-glow-gold"></i> Buscar Ahora
+          </button>
+          <button class="btn btn-outline-danger" id="logout-btn" style="margin: 0;">
+            <i class="fa-solid fa-right-from-bracket"></i> Salir
+          </button>
+        </div>
       </div>
 
       <div class="portal-main-content">
@@ -316,9 +321,14 @@
             <i class="fa-solid fa-envelope-open-text"></i> Plantilla Brevo
           </button>
         </div>
-        <button class="btn btn-outline-danger" id="btn-lock-admin" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
-          <i class="fa-solid fa-lock"></i> Bloquear Consola
-        </button>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button class="btn btn-glow-gold" id="btn-run-manual-search-admin-header" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; text-transform: uppercase;">
+            <i class="fa-solid fa-play"></i> Buscar Ahora (Manual)
+          </button>
+          <button class="btn btn-outline-danger" id="btn-lock-admin" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-lock"></i> Bloquear Consola
+          </button>
+        </div>
       </div>
 
       <!-- Tab Content 1: Client Profiles Manager -->

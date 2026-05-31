@@ -1379,20 +1379,61 @@ document.addEventListener("DOMContentLoaded", () => {
   // Run automated workflow simulator
   document.getElementById("btn-run-workflow").addEventListener("click", runNightlyWorkflow);
 
-  // Bind manual search button in discoveries hub to trigger the main workflow simulation
+  // Trigger main workflow simulator helper
+  const triggerWorkflowSimulation = () => {
+    // Switch tab to Workflow so the user can see the visual execution flowchart
+    const wfTabBtn = document.querySelector('button[data-tab="tab-workflow"]');
+    if (wfTabBtn) {
+      wfTabBtn.click();
+    }
+    
+    // Smooth scroll to the workflow visualizer
+    const adminSection = document.getElementById("admin-section");
+    if (adminSection) {
+      adminSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Trigger the main workflow simulator
+    const btnRunWF = document.getElementById("btn-run-workflow");
+    if (btnRunWF && !btnRunWF.disabled) {
+      btnRunWF.click();
+    }
+  };
+
+  // 1. Bind manual search button in discoveries hub
   const btnRunManualSearch = document.getElementById("btn-run-manual-search");
   if (btnRunManualSearch) {
-    btnRunManualSearch.addEventListener("click", () => {
-      // Switch tab to Workflow so the user can see the visual execution flowchart
-      const wfTabBtn = document.querySelector('button[data-tab="tab-workflow"]');
-      if (wfTabBtn) {
-        wfTabBtn.click();
+    btnRunManualSearch.addEventListener("click", triggerWorkflowSimulation);
+  }
+
+  // 2. Bind manual search button in the Admin tabs navigation header (always visible)
+  const btnRunManualSearchHeader = document.getElementById("btn-run-manual-search-admin-header");
+  if (btnRunManualSearchHeader) {
+    btnRunManualSearchHeader.addEventListener("click", triggerWorkflowSimulation);
+  }
+
+  // 3. Bind manual search button inside the client's Private Portal user bar
+  const btnPortalRunSearch = document.getElementById("btn-portal-run-search");
+  if (btnPortalRunSearch) {
+    btnPortalRunSearch.addEventListener("click", () => {
+      alert("Iniciando la búsqueda inteligente de IA en segundo plano. Te desplazaremos a la consola visual de automatización para que puedas ver el escaneo de nodos en tiempo real...");
+      
+      // Since they clicked from the client dashboard, programmatically unlock the admin panel
+      // so they can see the n8n nodes light up and pulse.
+      sessionStorage.setItem("calisky_admin_unlocked", "true");
+      
+      const adminLockScreen = document.getElementById("admin-lock-screen");
+      const adminContentWrapper = document.getElementById("admin-content-wrapper");
+      if (adminLockScreen) adminLockScreen.style.display = "none";
+      if (adminContentWrapper) adminContentWrapper.classList.remove("hidden");
+      
+      // Also update the UI state using the check state helper
+      if (typeof checkAdminUnlockState === "function") {
+        checkAdminUnlockState();
       }
-      // Trigger the main workflow simulator
-      const btnRunWF = document.getElementById("btn-run-workflow");
-      if (btnRunWF && !btnRunWF.disabled) {
-        btnRunWF.click();
-      }
+
+      // Trigger the workflow simulation
+      triggerWorkflowSimulation();
     });
   }
 
