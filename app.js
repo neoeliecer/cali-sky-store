@@ -988,6 +988,12 @@ function loginUser(email, password) {
       fetchAndRenderRealProperties(user);
     }
     
+    // Hide Admin Section and Navigation Link when a client is logged in
+    const navAdmin = document.getElementById("nav-admin");
+    const adminSec = document.getElementById("admin-section");
+    if (navAdmin) navAdmin.style.display = "none";
+    if (adminSec) adminSec.classList.add("hidden");
+    
     document.getElementById("portal-section-wrapper").scrollIntoView({ behavior: 'smooth' });
     return true;
   } else {
@@ -1005,6 +1011,13 @@ function logoutUser() {
   
   document.getElementById("portal-fallback-wrapper").classList.remove("hidden");
   document.getElementById("portal-section-wrapper").classList.add("hidden");
+  
+  // Show Admin Section and Navigation Link again when logged out
+  const navAdmin = document.getElementById("nav-admin");
+  const adminSec = document.getElementById("admin-section");
+  if (navAdmin) navAdmin.style.display = "inline-flex";
+  if (adminSec) adminSec.classList.remove("hidden");
+
   renderPrivateProperties();
 }
 
