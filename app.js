@@ -1843,6 +1843,99 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Run automated workflow simulator
   document.getElementById("btn-run-workflow").addEventListener("click", runNightlyWorkflow);
 
+  // Handle Select All/Deselect All Apify Tasks
+  const btnSelectAllApify = document.getElementById("btn-select-all-apify");
+  if (btnSelectAllApify) {
+    let allChecked = false;
+    btnSelectAllApify.addEventListener("click", () => {
+      const checkboxes = document.querySelectorAll(".apify-task-chk");
+      allChecked = !allChecked;
+      checkboxes.forEach(chk => chk.checked = allChecked);
+      btnSelectAllApify.innerHTML = allChecked 
+        ? `<i class="fa-solid fa-square"></i> Deseleccionar Todos` 
+        : `<i class="fa-solid fa-check-double"></i> Seleccionar Todos`;
+    });
+  }
+
+  // Handle Trigger Selected Apify Tasks Remotely
+  const btnTriggerApify = document.getElementById("btn-trigger-apify");
+  if (btnTriggerApify) {
+    btnTriggerApify.addEventListener("click", async () => {
+      const checkedBoxes = document.querySelectorAll(".apify-task-chk:checked");
+      if (checkedBoxes.length === 0) {
+        alert("⚠️ Por favor selecciona al menos un robot de la lista para lanzar.");
+        return;
+      }
+
+      const tasks = Array.from(checkedBoxes).map(chk => chk.value);
+      
+      // Update UI Status
+      btnTriggerApify.disabled = true;
+      btnTriggerApify.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Lanzando Motores...`;
+      const statusBadge = document.getElementById("apify-cloud-status");
+      if (statusBadge) {
+        statusBadge.style.background = "rgba(255, 167, 38, 0.1)";
+        statusBadge.style.borderColor = "#ffa726";
+        statusBadge.style.color = "#ffa726";
+        statusBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Conectando con la Nube...`;
+      }
+
+      // Add retro logs in the workflow simulator
+      addTerminalLog("===================================================", "system");
+      addTerminalLog("INICIANDO DISPARO REMOTO DE ROBOTS (Apify Cloud API)...", "cron");
+      addTerminalLog(`Motores seleccionados para lanzamiento: ${tasks.join(", ")}`, "system");
+      
+      try {
+        const response = await fetch("/api/trigger-apify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ tasks })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          addTerminalLog(`¡Lanzamiento exitoso! La API de Apify respondió positivamente.`, "success");
+          
+          if (data.triggered && data.triggered.length > 0) {
+            data.triggered.forEach(t => {
+              addTerminalLog(`- Robot: ${t.task} | Run ID: ${t.runId} | Estado: ${t.status}`, "success");
+            });
+          }
+
+          if (data.errors && data.errors.length > 0) {
+            data.errors.forEach(e => {
+              addTerminalLog(`⚠️ Error en ${e.task}: ${e.error}`, "error");
+            });
+            alert(`Motores lanzados parcialmente. Revisa la consola de logs del workflow para ver los detalles.`);
+          } else {
+            alert(`🚀 ¡Éxito! Se han disparado ${data.triggered.length} robots en tu cuenta de Apify de forma remota.`);
+          }
+        } else {
+          const errorMsg = data.error || "Error desconocido al invocar la API.";
+          addTerminalLog(`❌ Error del Servidor Vercel Proxy: ${errorMsg}`, "error");
+          alert(`❌ Error al lanzar: ${errorMsg}`);
+        }
+      } catch (err) {
+        addTerminalLog(`❌ Fallo de Conexión de Red: ${err.message}`, "error");
+        alert(`❌ Error de red: No se pudo conectar con el endpoint serverless.`);
+      } finally {
+        // Reset UI Status
+        btnTriggerApify.disabled = false;
+        btnTriggerApify.innerHTML = `<i class="fa-solid fa-rocket text-glow-cyan"></i> Lanzar Scrapers Seleccionados`;
+        if (statusBadge) {
+          statusBadge.style.background = "rgba(0, 242, 254, 0.1)";
+          statusBadge.style.borderColor = "var(--accent-cyan)";
+          statusBadge.style.color = "var(--accent-cyan)";
+          statusBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-glow-cyan"></i> Listo para Ejecutar`;
+        }
+        addTerminalLog("===================================================", "system");
+      }
+    });
+  }
+
   // Trigger main workflow simulator helper
   const triggerWorkflowSimulation = () => {
     // Switch tab to Workflow so the user can see the visual execution flowchart

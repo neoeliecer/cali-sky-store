@@ -420,13 +420,13 @@
               <thead>
                 <tr>
                   <th>Cliente</th>
-                  <th>Email</th>
+                  <th>Contacto / Operación</th>
                   <th>Búsqueda</th>
-                  <th>Zona</th>
+                  <th>Zonas y Barrios</th>
                   <th>Presupuesto</th>
-                  <th>Hab.</th>
-                  <th>Favoritos</th>
-                  <th>Operación</th>
+                  <th>Interacciones (⭐ / 👍)</th>
+                  <th>Hallazgos / Envíos</th>
+                  <th>Notificar Clientes</th>
                   <th>Estado</th>
                   <th>Acción</th>
                 </tr>
@@ -744,9 +744,6 @@
                   </div>
                 </div>
               </div>
-              <button type="button" class="btn btn-glow-gold" onclick="window.open('https://console.apify.com/actors/tasks', '_blank')" style="font-size: 11px; padding: 8px; width: 100%; border-radius: 6px; margin: 0; font-weight: 700; text-transform: uppercase;">
-                <i class="fa-solid fa-up-right-from-square"></i> Abrir en Apify
-              </button>
             </div>
 
             <!-- Column 2: Facebook Marketplace (Apify) -->
@@ -776,9 +773,6 @@
                   </div>
                 </div>
               </div>
-              <button type="button" class="btn btn-glow-cyan" onclick="window.open('https://console.apify.com/actors/tasks', '_blank')" style="font-size: 11px; padding: 8px; width: 100%; border-radius: 6px; margin: 0; font-weight: 700; text-transform: uppercase; background: #1877f2; border-color: #1877f2;">
-                <i class="fa-solid fa-up-right-from-square"></i> Abrir en Apify
-              </button>
             </div>
 
             <!-- Column 3: Cron-Job.org (Respaldo) -->
@@ -815,6 +809,84 @@
               </button>
             </div>
 
+          </div>
+
+          <!-- Divider -->
+          <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 24px 0 20px 0;">
+
+          <!-- Lanzador Remoto Apify (Checklist) -->
+          <div style="background: rgba(0, 242, 254, 0.02); border: 1px solid rgba(0, 242, 254, 0.12); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-square-check" style="color: var(--accent-cyan);"></i> Lanzador de Robots Directo (Checklist Apify Cloud)
+                </h4>
+                <p style="color: var(--text-secondary); font-size: 12px; margin: 4px 0 0 0; line-height: 1.5;">
+                  Marca los scrapers que deseas lanzar y ejecútalos de forma remota y segura en tu cuenta de Apify con un solo clic.
+                </p>
+              </div>
+              <span class="badge-status-brevo" id="apify-cloud-status" style="background: rgba(0,242,254,0.1); border-color: var(--accent-cyan); color: var(--accent-cyan); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-cloud-arrow-up text-glow-cyan"></i> Listo para Ejecutar</span>
+            </div>
+
+            <!-- The Checklist Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 20px;">
+              
+              <!-- Item 1: Finca Raíz Ventas -->
+              <label class="glass-panel" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin: 0; transition: all 0.2s;">
+                <input type="checkbox" name="apify-task" value="finca-raiz-ventas" class="apify-task-chk" style="width: 18px; height: 18px; accent-color: var(--accent-gold); cursor: pointer;">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-house" style="color: #ffa726; font-size: 11px;"></i> Finca Raíz - Ventas
+                  </div>
+                  <code style="font-size: 9.5px; color: var(--text-muted); display: block; margin-top: 2px;">finca-raiz-ventas-cali</code>
+                </div>
+              </label>
+
+              <!-- Item 2: Finca Raíz Arriendos -->
+              <label class="glass-panel" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin: 0; transition: all 0.2s;">
+                <input type="checkbox" name="apify-task" value="finca-raiz-arriendos" class="apify-task-chk" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer;">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-key" style="color: #00f2fe; font-size: 11px;"></i> Finca Raíz - Arriendos
+                  </div>
+                  <code style="font-size: 9.5px; color: var(--text-muted); display: block; margin-top: 2px;">finca-raiz-arriendos-cali</code>
+                </div>
+              </label>
+
+              <!-- Item 3: Facebook Ventas -->
+              <label class="glass-panel" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin: 0; transition: all 0.2s;">
+                <input type="checkbox" name="apify-task" value="facebook-ventas" class="apify-task-chk" style="width: 18px; height: 18px; accent-color: var(--accent-gold); cursor: pointer;">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-brands fa-facebook" style="color: #1877f2; font-size: 11px;"></i> FB Marketplace - Ventas
+                  </div>
+                  <code style="font-size: 9.5px; color: var(--text-muted); display: block; margin-top: 2px;">marketplace-ventas</code>
+                </div>
+              </label>
+
+              <!-- Item 4: Facebook Arriendos -->
+              <label class="glass-panel" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin: 0; transition: all 0.2s;">
+                <input type="checkbox" name="apify-task" value="facebook-arriendos" class="apify-task-chk" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer;">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-brands fa-facebook" style="color: #1877f2; font-size: 11px;"></i> FB Marketplace - Alquiler
+                  </div>
+                  <code style="font-size: 9.5px; color: var(--text-muted); display: block; margin-top: 2px;">marketplace-alquiler</code>
+                </div>
+              </label>
+
+            </div>
+
+            <!-- Action Controls -->
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;">
+              <button type="button" class="btn" id="btn-select-all-apify" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; color: #fff; font-weight: 600; cursor: pointer;">
+                <i class="fa-solid fa-check-double"></i> Seleccionar Todos
+              </button>
+
+              <button type="button" class="btn btn-glow-cyan" id="btn-trigger-apify" style="font-size: 12px; padding: 10px 24px; border-radius: 8px; margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-rocket text-glow-cyan"></i> Lanzar Scrapers Seleccionados
+              </button>
+            </div>
           </div>
 
           <!-- Bottom quick details -->
