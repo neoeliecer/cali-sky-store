@@ -7,7 +7,7 @@ const ZONES_AND_BARRIOS = {
   Sur: ["El Ingenio", "Ciudad Jardín", "Pance", "Valle del Lili", "El Caney", "La Hacienda", "Meléndez"],
   Norte: ["La Flora", "Chipichape", "Versalles", "Vipasa", "San Vicente", "Santa Mónica", "Menga"],
   Oeste: ["Normandía", "Juanambú", "Santa Rita", "Santa Teresita", "El Peñón", "San Antonio", "Cristales"],
-  Centro: ["Avenida Colombia", "Centenario", "San Fernando", "Miraflores", "Tequendama"],
+  Centro: ["Avenida Colombia", "Centenario", "San Fernando", "Miraflores", "Tequendama", "Junín"],
   Oriente: ["Ciudad Córdoba", "Aguablanca", "Mariano Ramos", "Antonio Nariño"]
 };
 
