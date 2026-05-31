@@ -737,6 +737,15 @@ function generateBrevoEmailHtml(client, matches) {
                   ${matchesHtml}
                 </div>
                 
+                <!-- Access Credentials Info Panel -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin: 18px 0; font-family: 'Outfit', sans-serif;">
+                  <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-lock"></i> Credenciales de tu Portal Privado</h4>
+                  <div style="font-size: 12.5px; color: #334155; line-height: 1.6;">
+                    <strong>Usuario (Email):</strong> <code style="background: #e2e8f0; padding: 2px 5px; border-radius: 4px; font-size: 12px; color: #0f172a;">${client.email}</code><br>
+                    <strong>Contraseña de Acceso:</strong> <code style="background: #e2e8f0; padding: 2px 5px; border-radius: 4px; font-size: 12px; color: #0f172a; font-weight: bold;">${client.password || "calisky123"}</code>
+                  </div>
+                </div>
+
                 <p style="font-size: 13px; color: #64748b;">
                   * Nota comercial: Para ver las direcciones exactas, números telefónicos directos de los propietarios y las ligas de origen en Fincaraiz/Metrocuadrado, debes iniciar sesión en tu portal de cliente con tu clave privada.
                 </p>
