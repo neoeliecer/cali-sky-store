@@ -354,7 +354,17 @@ class AppState {
     try {
       const clientsRes = await fetch("/api/clients");
       if (clientsRes.ok) {
-        this.clients = await clientsRes.json();
+        const cloudClients = await clientsRes.json();
+        if (cloudClients && Array.isArray(cloudClients)) {
+          // Defensive merge: preserve local custom clients (like Amelia) and combine them with cloud clients
+          const mergedClients = [...this.clients];
+          cloudClients.forEach(cc => {
+            if (!mergedClients.some(mc => mc.email.toLowerCase() === cc.email.toLowerCase())) {
+              mergedClients.push(cc);
+            }
+          });
+          this.clients = mergedClients;
+        }
       }
     } catch (e) {
       console.warn("Failed to fetch clients from cloud API, using local storage backup.", e);
@@ -364,8 +374,15 @@ class AppState {
       const propsRes = await fetch("/api/properties");
       if (propsRes.ok) {
         const cloudProps = await propsRes.json();
-        if (cloudProps && cloudProps.length > 0) {
-          this.properties = cloudProps;
+        if (cloudProps && Array.isArray(cloudProps) && cloudProps.length > 0) {
+          // Merge local properties with cloud properties
+          const mergedProps = [...this.properties];
+          cloudProps.forEach(cp => {
+            if (!mergedProps.some(mp => mp.id === cp.id || mp.title === cp.title)) {
+              mergedProps.push(cp);
+            }
+          });
+          this.properties = mergedProps;
         }
       }
     } catch (e) {
@@ -375,11 +392,24 @@ class AppState {
     try {
       const inquiriesRes = await fetch("/api/inquiries");
       if (inquiriesRes.ok) {
-        this.inquiries = await inquiriesRes.json();
+        const cloudInquiries = await inquiriesRes.json();
+        if (cloudInquiries && Array.isArray(cloudInquiries)) {
+          // Merge local inquiries with cloud inquiries
+          const mergedInq = [...this.inquiries];
+          cloudInquiries.forEach(ci => {
+            if (!mergedInq.some(mi => mi.id === ci.id || (mi.clientEmail === ci.clientEmail && mi.propertyName === ci.propertyName))) {
+              mergedInq.push(ci);
+            }
+          });
+          this.inquiries = mergedInq;
+        }
       }
     } catch (e) {
       console.warn("Failed to fetch inquiries from cloud API.", e);
     }
+
+    // Persist the combined state back to local storage and sync in the background
+    this.save();
 
     // Sanitize and migrate formats
     this.clients = this.clients.map(c => {
