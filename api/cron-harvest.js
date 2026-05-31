@@ -192,7 +192,7 @@ module.exports = async (req, res) => {
           return matchesDeal && matchesType && matchesPrice && (matchesBarrio || matchesZone) && matchesSource;
         });
 
-        listings = listings.slice(0, 2);
+        listings = listings.slice(0, 8);
         console.log(`[MATCH-APIFY] Encontradas ${listings.length} coincidencias de Apify para ${client.name}.`);
       } else {
         // Fallback: Query Mercado Libre API
@@ -211,7 +211,7 @@ module.exports = async (req, res) => {
             : ["Finca Raíz", "Facebook Marketplace", "Metro Cuadrado", "Mercado Libre"];
             
           if (allowedSources.includes("Mercado Libre")) {
-            listings = listings.slice(0, 2);
+            listings = listings.slice(0, 8);
           } else {
             listings = [];
           }

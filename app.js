@@ -777,9 +777,15 @@ function renderPrivateProperties() {
           </div>
         </div>
 
-        <button class="btn btn-glow-gold btn-block btn-request-appointment" data-id="${p.id}" style="margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-          <i class="fa-brands fa-whatsapp"></i> Agendar Visita Inmediata →
-        </button>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button class="btn btn-glow-gold btn-request-appointment" data-id="${p.id}" style="flex: 1; margin: 0; padding: 10px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; font-weight: 700; border-radius: 6px;">
+            <i class="fa-brands fa-whatsapp"></i> Agendar Visita
+          </button>
+          
+          <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Mira esta espectacular propiedad exclusiva que encontré en Cali Sky Stores! 🚀\n\n🏡 *${p.title}*\n📍 Barrio: ${p.barrio} (Zona ${p.zone})\n💵 Precio: ${formatCOP(p.price)}\n🛌 Habitaciones: ${p.beds} | 🛁 Baños: ${p.bathrooms}\n\n✨ Ver detalles exclusivos desbloqueados aquí: https://cali-sky-store-neoeliecercolombia-gmailcoms-projects.vercel.app/`)}" target="_blank" class="btn" style="flex: 1; margin: 0; padding: 10px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; font-weight: 700; background: rgba(0, 243, 255, 0.05); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); text-decoration: none; border-radius: 6px; transition: all 0.2s;">
+            <i class="fa-solid fa-share-nodes"></i> Compartir
+          </a>
+        </div>
       </div>
     `;
 
@@ -2284,8 +2290,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Filter by max budget
       results = results.filter(item => item.price <= budget);
 
-      // Limit to 4 results
-      results = results.slice(0, 4);
+      // Limit to 8 results
+      results = results.slice(0, 8);
 
       addTerminalLog(`[REAL-SEARCH] ¡Conexión exitosa! Obtenidos ${results.length} listados reales de Mercado Libre.`, "success");
       addTerminalLog(`[REAL-SEARCH] Escaneando Finca Raíz Cali y Metro Cuadrado en vivo...`, "wp");
