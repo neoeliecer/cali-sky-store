@@ -17,6 +17,7 @@ const DEFAULT_CLIENTS = [
     id: "client-1",
     name: "Juan Pérez",
     email: "juan@email.com",
+    phone: "3004567890",
     type: "apartamento",
     zone: ["Sur"],
     barrio: ["El Ingenio"],
@@ -34,6 +35,7 @@ const DEFAULT_CLIENTS = [
     id: "client-2",
     name: "Sophia Gómez",
     email: "sophia@email.com",
+    phone: "3159876543",
     type: "casa",
     zone: ["Sur"],
     barrio: ["Ciudad Jardín"],
@@ -51,6 +53,7 @@ const DEFAULT_CLIENTS = [
     id: "client-3",
     name: "Andrés Delgado",
     email: "andres@email.com",
+    phone: "3101112233",
     type: "local",
     zone: ["Centro"],
     barrio: ["Avenida Colombia"],
@@ -794,6 +797,7 @@ function handleAddClient(e) {
   e.preventDefault();
   const name = document.getElementById("client-name").value.trim();
   const email = document.getElementById("client-email").value.trim();
+  const phone = document.getElementById("client-phone").value.trim() || "3004567890";
   const type = document.getElementById("client-type").value;
   const deal = document.getElementById("client-deal").value;
 
@@ -825,7 +829,7 @@ function handleAddClient(e) {
   }
 
   state.addClient({ 
-    name, email, type, zone: selectedZones, barrio: selectedBarrios, minPrice, maxPrice, 
+    name, email, phone, type, zone: selectedZones, barrio: selectedBarrios, minPrice, maxPrice, 
     beds, baths, parking, minArea, features, deal 
   });
   
@@ -840,6 +844,7 @@ function handleAddClient(e) {
 
   renderClientsTable();
   populateBrevoClientSelector();
+  renderCentralDiscoveries();
   alert(`¡Cliente ${name} registrado con éxito! Puedes iniciar sesión usando su email en el portal privado.`);
 }
 
@@ -1103,6 +1108,7 @@ function runNightlyWorkflow() {
                     renderPrivateProperties();
                   }
                   updateBrevoPreview();
+                  renderCentralDiscoveries();
                   
                   alert("¡Simulación completada con éxito! El flujo de n8n ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados multi-zona. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
                   
@@ -1114,6 +1120,108 @@ function runNightlyWorkflow() {
       }, 1500);
     }, 1500);
   }, 1000);
+}
+
+// Render AI Central Discoveries Hub Dashboard
+function renderCentralDiscoveries() {
+  const container = document.getElementById("admin-discoveries-grid");
+  const badge = document.getElementById("discoveries-total-badge");
+  if (!container || !badge) return;
+
+  container.innerHTML = "";
+
+  const discoveries = [];
+
+  // Gather matches for all clients
+  state.clients.forEach(client => {
+    if (client.status !== 'active') return; // only active clients
+
+    const clientMatches = filterClientMatches(client);
+    clientMatches.forEach(p => {
+      // Avoid duplicate matches showing up for the same client
+      if (!discoveries.some(d => d.client.id === client.id && d.property.id === p.id)) {
+        discoveries.push({ client, property: p });
+      }
+    });
+  });
+
+  badge.textContent = `${discoveries.length} Hallazgos`;
+
+  if (discoveries.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-muted);">
+        <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 40px; margin-bottom: 12px; color: var(--accent-gold); display: block; text-shadow: 0 0 10px rgba(249,168,37,0.3);"></i>
+        <p style="font-size: 15px; font-weight: 600; color: #fff; margin-top: 10px;">No hay hallazgos activos en este momento.</p>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.4;">
+          Asegúrate de tener perfiles de búsqueda de clientes activos y ejecuta la simulación nocturna en la pestaña "Flujo n8n" para buscar nuevas ofertas en Cali.
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  // Render each discovery
+  discoveries.forEach(({ client, property: p }) => {
+    const card = document.createElement("div");
+    card.className = "glass-panel property-card";
+    card.style.position = "relative";
+    card.style.display = "flex";
+    card.style.flexDirection = "column";
+    card.style.border = "1px solid var(--border-light)";
+    card.style.borderRadius = "12px";
+    card.style.overflow = "hidden";
+    card.style.background = "rgba(10, 10, 20, 0.4)";
+    card.style.backdropFilter = "blur(20px)";
+    card.style.transition = "transform 0.3s ease, border-color 0.3s ease";
+    
+    // Compute dynamic match percent based on specs (simulate high premium matching)
+    let matchScore = 95;
+    if (p.beds === client.beds) matchScore += 2;
+    if (p.price <= (client.minPrice + client.maxPrice)/2) matchScore += 2;
+    matchScore = Math.min(matchScore, 99);
+
+    // Dynamic WhatsApp message text
+    const wsMessage = `Hola ${client.name}, te escribe tu asesor de Cali Sky Stores. Encontré una propiedad de alto interés para tu perfil (${client.type} en ${p.barrio}). Cuenta con ${p.beds} habs, ${p.bathrooms} baños y un precio de ${formatCOP(p.price)}. Puedes ver los detalles confidenciales (dirección y contacto del vendedor) ingresando a tu portal privado con tu correo: ${client.email}. Quedo atento a tus comentarios!`;
+    const encodedMsg = encodeURIComponent(wsMessage);
+    const clientPhone = client.phone ? client.phone.replace(/\D/g, '') : "3004567890";
+    const waUrl = `https://api.whatsapp.com/send?phone=57${clientPhone}&text=${encodedMsg}`;
+
+    card.innerHTML = `
+      <div class="card-image-wrap" style="height: 170px; position: relative; overflow: hidden;">
+        <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;">
+        <div style="position: absolute; top: 10px; left: 10px; background: rgba(121, 40, 202, 0.95); backdrop-filter: blur(5px); border: 1px solid var(--accent-purple); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+          <i class="fa-solid fa-crown text-glow-gold"></i> Para: ${client.name}
+        </div>
+        <div style="position: absolute; top: 10px; right: 10px; background: rgba(0, 243, 255, 0.95); backdrop-filter: blur(5px); border: 1px solid var(--accent-cyan); color: #020206; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800;">
+          <i class="fa-solid fa-heart-pulse"></i> ${matchScore}% Match
+        </div>
+      </div>
+      <div class="card-body" style="padding: 16px; display: flex; flex-direction: column; flex-grow: 1;">
+        <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.3;">${p.title}</h4>
+        
+        <div style="display: flex; gap: 8px; font-size: 11px; color: var(--accent-gold); font-weight: 600; margin-bottom: 10px;">
+          <span><i class="fa-solid fa-location-dot"></i> ${p.barrio} (Zona ${p.zone})</span>
+          <span>•</span>
+          <span style="color: var(--accent-cyan);"><i class="fa-solid fa-tag"></i> ${p.deal}</span>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 12px; line-height: 1.4; margin-bottom: 12px; flex-grow: 1;">
+          <strong>Criterio buscado:</strong> ${client.type.charAt(0).toUpperCase() + client.type.slice(1)} de ${client.beds}+ habs hasta ${formatCOP(client.maxPrice)}.
+        </p>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; margin-top: auto;">
+          <div style="font-size: 15px; font-weight: 800; color: var(--accent-gold);">
+            ${formatCOP(p.price)}
+          </div>
+          <a href="${waUrl}" target="_blank" class="btn btn-glow-purple" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; width: auto; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-brands fa-whatsapp"></i> Notificar
+          </a>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
 }
 
 // 6. APP ENGINE INITS & DOM BINDINGS
@@ -1131,6 +1239,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPublicProperties();
   renderClientsTable();
   populateBrevoClientSelector();
+  renderCentralDiscoveries();
 
   if (state.currentUser) {
     loginUser(state.currentUser.email);

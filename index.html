@@ -279,6 +279,9 @@
         <button class="tab-btn active" data-tab="tab-clients">
           <i class="fa-solid fa-users-gear"></i> Perfiles de Clientes
         </button>
+        <button class="tab-btn" data-tab="tab-discoveries">
+          <i class="fa-solid fa-wand-magic-sparkles text-glow-gold"></i> Últimos Hallazgos
+        </button>
         <button class="tab-btn" data-tab="tab-workflow">
           <i class="fa-solid fa-network-wired"></i> Flujo n8n + Groq
         </button>
@@ -322,7 +325,7 @@
               <h3><i class="fa-solid fa-user-plus text-glow-purple"></i> Registrar Nuevo Cliente</h3>
             </div>
             <form id="add-client-form" class="admin-form">
-              <div class="form-row-2">
+              <div class="form-row-3">
                 <div class="form-group">
                   <label for="client-name">Nombre Completo</label>
                   <input type="text" id="client-name" required placeholder="Juan Pérez">
@@ -330,6 +333,10 @@
                 <div class="form-group">
                   <label for="client-email">Email</label>
                   <input type="email" id="client-email" required placeholder="juan@email.com">
+                </div>
+                <div class="form-group">
+                  <label for="client-phone">Celular / WhatsApp</label>
+                  <input type="tel" id="client-phone" required placeholder="3004567890" value="3004567890">
                 </div>
               </div>
               <div class="form-row-2">
@@ -431,6 +438,28 @@
                 <i class="fa-solid fa-floppy-disk"></i> Guardar Perfil de Cliente
               </button>
             </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: AI Central Discoveries Hub -->
+      <div class="tab-content" id="tab-discoveries">
+        <div class="glass-panel admin-subcard" style="padding: 24px;">
+          <div class="subcard-header" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3 style="font-size: 20px;"><i class="fa-solid fa-wand-magic-sparkles text-glow-gold"></i> Panel Central de Hallazgos por IA</h3>
+              <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">
+                Monitorea en tiempo real todas las propiedades encontradas por el rastreador de IA (n8n + Groq) para cada uno de tus clientes. Puedes contactar al cliente por WhatsApp directamente para notificarle de inmediato.
+              </p>
+            </div>
+            <div class="stats-panel-pills" style="display: flex; gap: 10px;">
+              <span class="table-count" id="discoveries-total-badge" style="background: rgba(249, 168, 37, 0.15); border-color: var(--accent-gold); color: var(--accent-gold); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-gold);">0 Hallazgos</span>
+            </div>
+          </div>
+
+          <!-- Discoveries Grid Feed -->
+          <div class="showcase-grid" id="admin-discoveries-grid" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+            <!-- Loaded dynamically in app.js -->
           </div>
         </div>
       </div>
