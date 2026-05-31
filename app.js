@@ -1347,8 +1347,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add Client Submit Form
   document.getElementById("add-client-form").addEventListener("submit", handleAddClient);
 
-  // Run n8n automated workflow simulator
+  // Run automated workflow simulator
   document.getElementById("btn-run-workflow").addEventListener("click", runNightlyWorkflow);
+
+  // Bind manual search button in discoveries hub to trigger the main workflow simulation
+  const btnRunManualSearch = document.getElementById("btn-run-manual-search");
+  if (btnRunManualSearch) {
+    btnRunManualSearch.addEventListener("click", () => {
+      // Switch tab to Workflow so the user can see the visual execution flowchart
+      const wfTabBtn = document.querySelector('button[data-tab="tab-workflow"]');
+      if (wfTabBtn) {
+        wfTabBtn.click();
+      }
+      // Trigger the main workflow simulator
+      const btnRunWF = document.getElementById("btn-run-workflow");
+      if (btnRunWF && !btnRunWF.disabled) {
+        btnRunWF.click();
+      }
+    });
+  }
 
   // Clear Terminal Output log panel
   document.getElementById("btn-clear-terminal").addEventListener("click", () => {
