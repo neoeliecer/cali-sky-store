@@ -2,3 +2,4 @@ node_modules/
 auth-cali/
 .DS_Store
 *.log
+.env
