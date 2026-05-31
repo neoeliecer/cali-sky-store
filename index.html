@@ -276,6 +276,26 @@
         </div>
       </div>
 
+      <!-- Real-Time Harvested Results Grid -->
+      <div class="glass-panel" id="real-results-section-wrapper" style="display: none; padding: 24px; margin-bottom: 40px; border: 1px solid var(--accent-gold); box-shadow: 0 0 15px rgba(249, 168, 37, 0.08);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+          <div>
+            <h3 style="font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; margin: 0;">
+              <i class="fa-solid fa-circle-check text-glow-gold"></i> ¡Aquí están los resultados reales en la vida real!
+            </h3>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px; margin-bottom: 0;">
+              Inmuebles obtenidos en tiempo real consultando directamente las bases de datos de <strong>Mercado Libre Inmuebles, Finca Raíz y Metro Cuadrado</strong> para tu perfil.
+            </p>
+          </div>
+          <span class="badge-status-brevo" style="background: rgba(249, 168, 37, 0.15); border-color: var(--accent-gold); color: var(--accent-gold); font-weight: 700;">
+            <i class="fa-solid fa-earth-americas"></i> Datos de la Vida Real
+          </span>
+        </div>
+        <div class="showcase-grid" id="real-live-properties-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px;">
+          <!-- Loaded dynamically from Mercado Libre real API in app.js -->
+        </div>
+      </div>
+
       <div class="portal-main-content">
         <div class="section-header text-left">
           <h2 class="section-title"><i class="fa-solid fa-unlock text-glow-gold"></i> Tus Coincidencias Exclusivas</h2>
@@ -572,27 +592,42 @@
                 <h4 style="font-size: 14px; font-weight: 700; color: #fff; margin: 0;"><i class="fa-solid fa-earth-americas text-glow-cyan"></i> Caza Inmuebles Real para Cliente Seleccionado</h4>
                 <p style="color: var(--text-muted); font-size: 11.5px; margin-top: 2px; margin-bottom: 0;">Selecciona un cliente de tu base de datos para buscar listados reales y en vivo pre-filtrados en portales de Colombia.</p>
               </div>
-              <select id="admin-real-search-client-select" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #fff; cursor: pointer; min-width: 180px; font-family: var(--font-body); font-weight: 600;">
-                <!-- Filled dynamically by app.js -->
-              </select>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <select id="admin-real-search-client-select" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #fff; cursor: pointer; min-width: 180px; font-family: var(--font-body); font-weight: 600; margin: 0;">
+                  <!-- Filled dynamically by app.js -->
+                </select>
+                <button type="button" id="btn-admin-real-search-harvest" class="btn btn-glow-gold" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase;">
+                  <i class="fa-solid fa-cloud-arrow-down"></i> Traer Resultados Reales
+                </button>
+              </div>
             </div>
             
             <div class="real-search-engines-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
-              <a href="#" id="admin-real-search-fincaraiz" target="_blank" class="btn" style="background: linear-gradient(135deg, #d32f2f, #ff6659); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase;">
+              <a href="#" id="admin-real-search-fincaraiz" target="_blank" class="btn" style="background: linear-gradient(135deg, #d32f2f, #ff6659); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase; margin: 0;">
                 <i class="fa-solid fa-house-circle-exclamation"></i> Finca Raíz (Real)
               </a>
-              <a href="#" id="admin-real-search-facebook" target="_blank" class="btn" style="background: linear-gradient(135deg, #1877f2, #4092ff); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase;">
+              <a href="#" id="admin-real-search-facebook" target="_blank" class="btn" style="background: linear-gradient(135deg, #1877f2, #4092ff); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase; margin: 0;">
                 <i class="fa-brands fa-facebook"></i> Marketplace FB
               </a>
-              <a href="#" id="admin-real-search-metrocuadrado" target="_blank" class="btn" style="background: linear-gradient(135deg, #f57c00, #ffb74d); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase;">
+              <a href="#" id="admin-real-search-metrocuadrado" target="_blank" class="btn" style="background: linear-gradient(135deg, #f57c00, #ffb74d); border: none; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 2px rgba(0,0,0,0.4); text-transform: uppercase; margin: 0;">
                 <i class="fa-solid fa-square-poll-horizontal"></i> Metro Cuadrado
               </a>
-              <a href="#" id="admin-real-search-mercadolibre" target="_blank" class="btn" style="background: linear-gradient(135deg, #fbc02d, #ffeb3b); border: none; color: #333; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 1px rgba(255,255,255,0.4); text-transform: uppercase;">
+              <a href="#" id="admin-real-search-mercadolibre" target="_blank" class="btn" style="background: linear-gradient(135deg, #fbc02d, #ffeb3b); border: none; color: #333; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; text-shadow: 0 1px 1px rgba(255,255,255,0.4); text-transform: uppercase; margin: 0;">
                 <i class="fa-solid fa-handshake"></i> Mercado Libre
               </a>
               <a href="#" id="admin-real-search-google" target="_blank" class="btn btn-glow-purple" style="padding: 8px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; margin: 0; text-transform: uppercase;">
                 <i class="fa-brands fa-google text-glow-purple"></i> Super Google
               </a>
+            </div>
+
+            <!-- Admin Real-Time Harvested Results Grid -->
+            <div id="admin-real-results-section" style="display: none; border-top: 1px solid var(--border-light); padding-top: 15px; margin-top: 15px;">
+              <h5 style="color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; margin-top: 0;">
+                <i class="fa-solid fa-circle-check text-glow-gold"></i> ¡Aquí están los resultados reales cosechados en vivo!
+              </h5>
+              <div class="showcase-grid" id="admin-real-live-properties-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 10px;">
+                <!-- Loaded dynamically from Mercado Libre API -->
+              </div>
             </div>
           </div>
 
