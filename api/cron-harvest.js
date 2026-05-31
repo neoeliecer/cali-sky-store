@@ -54,7 +54,10 @@ module.exports = async (req, res) => {
   const KV_REST_API_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
   const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  console.log("Iniciando cron harvest nocturno híbrido (Mercado Libre API / Apify Webhook)...");
+  // Determine transaction type (Compra/Venta vs Arriendo/Alquiler) of the batch
+  const batchDeal = req.query && req.query.deal ? req.query.deal : "Compra";
+
+  console.log(`Iniciando cron harvest nocturno híbrido para operación: ${batchDeal}...`);
 
   try {
     // 1. Ingest Scraped listings from POST payload (Apify Webhook or Direct JSON)
@@ -88,6 +91,12 @@ module.exports = async (req, res) => {
       const sourceRot = ["Finca Raíz", "Metro Cuadrado", "Facebook Marketplace", "Mercado Libre"];
       const computedSource = item.source || sourceRot[index % 4];
 
+      // Smart heuristic for deal type: if price is very low (e.g. < 20 million COP), it is likely a rental
+      let computedDeal = batchDeal;
+      if (item.price && Number(item.price) < 20000000) {
+        computedDeal = "Arriendo";
+      }
+
       return {
         title: item.title || "Propiedad Premium en Cali",
         price: Number(item.price) || 350000000,
@@ -99,7 +108,8 @@ module.exports = async (req, res) => {
         sourceLink: item.sourceLink || item.url || item.permalink || "https://fincaraiz.com.co",
         beds: Number(item.beds) || 3,
         baths: Number(item.baths) || 2,
-        area: Number(item.area || item.minArea) || 90
+        area: Number(item.area || item.minArea) || 90,
+        deal: item.deal || computedDeal
       };
     });
 
@@ -148,6 +158,15 @@ module.exports = async (req, res) => {
       if (usingWebhook) {
         // Match webhook items against the client profile
         listings = normalizedScraped.filter(item => {
+          // Normalize names: e.g. "compra", "venta", "arriendo", "alquiler"
+          const clientDeal = (client.deal || "Compra").toLowerCase();
+          const itemDeal = (item.deal || "Compra").toLowerCase();
+          
+          // Map Compra to Venta (purchase = sale in this context)
+          const isSaleMatch = (clientDeal === "compra" || clientDeal === "venta") && (itemDeal === "compra" || itemDeal === "venta");
+          const isRentMatch = (clientDeal === "arriendo" || clientDeal === "alquiler") && (itemDeal === "arriendo" || itemDeal === "alquiler");
+          const matchesDeal = isSaleMatch || isRentMatch;
+
           const matchesType = item.type.includes(tipo.toLowerCase()) || tipo.toLowerCase().includes(item.type);
           const matchesPrice = item.price <= maxBudget;
           
@@ -170,7 +189,7 @@ module.exports = async (req, res) => {
             : ["Finca Raíz", "Facebook Marketplace", "Metro Cuadrado", "Mercado Libre"];
           const matchesSource = allowedSources.includes(item.source);
 
-          return matchesType && matchesPrice && (matchesBarrio || matchesZone) && matchesSource;
+          return matchesDeal && matchesType && matchesPrice && (matchesBarrio || matchesZone) && matchesSource;
         });
 
         listings = listings.slice(0, 2);
@@ -259,7 +278,7 @@ module.exports = async (req, res) => {
           title: title,
           price: price,
           type: tipo,
-          deal: "Compra",
+          deal: client.deal || "Compra", // Keep the client's deal type
           zone: client.zone && client.zone.length > 0 ? client.zone[0] : "Sur",
           barrio: cleanBarrio,
           image: imgUrl,
