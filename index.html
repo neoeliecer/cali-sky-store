@@ -332,9 +332,9 @@
                   <input type="email" id="client-email" required placeholder="juan@email.com">
                 </div>
               </div>
-              <div class="form-row-2">
+              <div class="form-row-3">
                 <div class="form-group">
-                  <label for="client-type">Tipo de Inmueble</label>
+                  <label for="client-type">Tipo Inmueble</label>
                   <select id="client-type">
                     <option value="apartamento">Apartamento</option>
                     <option value="casa">Casa</option>
@@ -343,30 +343,69 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="client-zone">Zona / Barrio en Cali</label>
-                  <select id="client-zone">
-                    <option value="El Ingenio">El Ingenio</option>
-                    <option value="Ciudad Jardín">Ciudad Jardín</option>
-                    <option value="Av. Colombia">Avenida Colombia</option>
-                    <option value="Pance">Pance</option>
-                    <option value="Normandía">Normandía</option>
+                  <label for="client-zone-select">Zona de Cali</label>
+                  <select id="client-zone-select">
+                    <option value="Sur">Zona Sur</option>
+                    <option value="Norte">Zona Norte</option>
+                    <option value="Oeste">Zona Oeste</option>
+                    <option value="Centro">Zona Centro</option>
+                    <option value="Oriente">Zona Oriente</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="client-barrio-select">Barrio Específico</label>
+                  <select id="client-barrio-select">
+                    <!-- Loaded dynamically in app.js -->
                   </select>
                 </div>
               </div>
               <div class="form-row-3">
                 <div class="form-group">
-                  <label for="client-max-price">Presupuesto Máximo (COP)</label>
-                  <input type="number" id="client-max-price" required placeholder="350000000" min="50000000">
+                  <label for="client-min-price">Presupuesto Mín. (COP)</label>
+                  <input type="number" id="client-min-price" required value="100000000" min="10000000">
                 </div>
                 <div class="form-group">
-                  <label for="client-beds">Habitaciones Mín.</label>
-                  <input type="number" id="client-beds" required value="3" min="1" max="10">
+                  <label for="client-max-price">Presupuesto Máx. (COP)</label>
+                  <input type="number" id="client-max-price" required value="400000000" min="20000000">
                 </div>
                 <div class="form-group">
                   <label for="client-deal">Tipo Negocio</label>
                   <select id="client-deal">
                     <option value="Compra">Compra</option>
                     <option value="Arriendo">Arriendo</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label for="client-beds">Habitaciones Mín.</label>
+                  <input type="number" id="client-beds" required value="3" min="1" max="10">
+                </div>
+                <div class="form-group">
+                  <label for="client-baths">Baños Mín.</label>
+                  <input type="number" id="client-baths" required value="2" min="1" max="10">
+                </div>
+                <div class="form-group">
+                  <label for="client-parking">Parqueadero</label>
+                  <select id="client-parking">
+                    <option value="cualquiera">Cualquiera</option>
+                    <option value="requerido">Requerido (1+)</option>
+                    <option value="doble">Doble (2+)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="client-min-area">Área Mínima (m²)</label>
+                  <input type="number" id="client-min-area" required value="80" min="10" max="2000">
+                </div>
+                <div class="form-group">
+                  <label for="client-features">Extra Requerido</label>
+                  <select id="client-features">
+                    <option value="ninguno">Ninguno</option>
+                    <option value="piscina">Con Piscina</option>
+                    <option value="balcon">Con Balcón / Terraza</option>
+                    <option value="seguridad">Seguridad Club House</option>
                   </select>
                 </div>
               </div>

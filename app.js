@@ -2,16 +2,31 @@
    CALI SKY STORES - CLIENT LOGIC, N8N SIMULATOR & BREVO PARSER ENGINE
    ========================================================================== */
 
-// 1. DEFAULT DATASETS
+// 1. ZONING DATA STRUCTURE
+const ZONES_AND_BARRIOS = {
+  Sur: ["Todos los barrios", "El Ingenio", "Ciudad Jardín", "Pance", "Valle del Lili", "El Caney", "La Hacienda", "Meléndez"],
+  Norte: ["Todos los barrios", "La Flora", "Chipichape", "Versalles", "Vipasa", "San Vicente", "Santa Mónica", "Menga"],
+  Oeste: ["Todos los barrios", "Normandía", "Juanambú", "Santa Rita", "Santa Teresita", "El Peñón", "San Antonio", "Cristales"],
+  Centro: ["Todos los barrios", "Avenida Colombia", "Centenario", "San Fernando", "Miraflores", "Tequendama"],
+  Oriente: ["Todos los barrios", "Ciudad Córdoba", "Aguablanca", "Mariano Ramos", "Antonio Nariño"]
+};
+
+// 2. DEFAULT DATASETS WITH DETAILED SPECIFICATIONS
 const DEFAULT_CLIENTS = [
   {
     id: "client-1",
     name: "Juan Pérez",
     email: "juan@email.com",
     type: "apartamento",
-    zone: "El Ingenio",
+    zone: "Sur",
+    barrio: "El Ingenio",
+    minPrice: 100000000,
     maxPrice: 350000000,
     beds: 3,
+    baths: 2,
+    parking: "cualquiera",
+    minArea: 80,
+    features: "ninguno",
     deal: "Compra",
     status: "active"
   },
@@ -20,9 +35,15 @@ const DEFAULT_CLIENTS = [
     name: "Sophia Gómez",
     email: "sophia@email.com",
     type: "casa",
-    zone: "Ciudad Jardín",
-    maxPrice: 850000000,
+    zone: "Sur",
+    barrio: "Ciudad Jardín",
+    minPrice: 300000000,
+    maxPrice: 900000000,
     beds: 4,
+    baths: 4,
+    parking: "doble",
+    minArea: 200,
+    features: "piscina",
     deal: "Compra",
     status: "active"
   },
@@ -31,9 +52,15 @@ const DEFAULT_CLIENTS = [
     name: "Andrés Delgado",
     email: "andres@email.com",
     type: "local",
-    zone: "Av. Colombia",
+    zone: "Centro",
+    barrio: "Avenida Colombia",
+    minPrice: 500000000,
     maxPrice: 1200000000,
-    beds: 2,
+    beds: 1,
+    baths: 2,
+    parking: "requerido",
+    minArea: 100,
+    features: "ninguno",
     deal: "Compra",
     status: "paused"
   }
@@ -44,11 +71,14 @@ const DEFAULT_PROPERTIES = [
     id: "prop-1",
     title: "Penthouse de Lujo en El Ingenio",
     type: "apartamento",
-    zone: "El Ingenio",
+    zone: "Sur",
+    barrio: "El Ingenio",
     price: 340000000,
     beds: 3,
     bathrooms: 3,
     area: 124,
+    parking: 1,
+    features: ["balcon", "seguridad"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80",
     address: "Calle 14 # 85-30, Apt 802, Cali",
@@ -63,11 +93,14 @@ const DEFAULT_PROPERTIES = [
     id: "prop-2",
     title: "Apartamento Vista Río Av. Colombia",
     type: "apartamento",
-    zone: "Av. Colombia",
+    zone: "Centro",
+    barrio: "Avenida Colombia",
     price: 380000000,
     beds: 2,
     bathrooms: 2,
     area: 95,
+    parking: 1,
+    features: ["balcon", "seguridad"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80",
     address: "Av. Colombia # 3-45, Apt 1404, Cali",
@@ -82,11 +115,14 @@ const DEFAULT_PROPERTIES = [
     id: "prop-3",
     title: "Mansión Contemporánea Ciudad Jardín",
     type: "casa",
-    zone: "Ciudad Jardín",
+    zone: "Sur",
+    barrio: "Ciudad Jardín",
     price: 820000000,
     beds: 4,
     bathrooms: 5,
     area: 340,
+    parking: 4,
+    features: ["piscina", "balcon", "seguridad"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80",
     address: "Calle 18 # 112-45, Casa 12, Condominio La Ceiba",
@@ -100,12 +136,15 @@ const DEFAULT_PROPERTIES = [
   {
     id: "prop-4",
     title: "Lote Urbanizable Pance Exclusivo",
-    type: "local", // Category local/lotes mapping
-    zone: "Pance",
+    type: "lote",
+    zone: "Sur",
+    barrio: "Pance",
     price: 950000000,
     beds: 1,
     bathrooms: 1,
     area: 1200,
+    parking: 0,
+    features: ["ninguno"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80",
     address: "Vía Pance, Km 4, Sector La Vorágine",
@@ -120,11 +159,14 @@ const DEFAULT_PROPERTIES = [
     id: "prop-5",
     title: "Casa de Tres Niveles en El Ingenio",
     type: "casa",
-    zone: "El Ingenio",
+    zone: "Sur",
+    barrio: "El Ingenio",
     price: 620000000,
     beds: 4,
     bathrooms: 4,
     area: 220,
+    parking: 2,
+    features: ["balcon"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80",
     address: "Carrera 83C # 15-22, Cali",
@@ -139,11 +181,14 @@ const DEFAULT_PROPERTIES = [
     id: "prop-6",
     title: "Local Comercial Centro Av. Colombia",
     type: "local",
-    zone: "Av. Colombia",
+    zone: "Centro",
+    barrio: "Avenida Colombia",
     price: 1100000000,
-    beds: 2,
+    beds: 1,
     bathrooms: 2,
     area: 180,
+    parking: 2,
+    features: ["seguridad"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80",
     address: "Av. Colombia # 7-15, Cali",
@@ -158,11 +203,14 @@ const DEFAULT_PROPERTIES = [
     id: "prop-7",
     title: "Apartamento Familiar El Ingenio",
     type: "apartamento",
-    zone: "El Ingenio",
+    zone: "Sur",
+    barrio: "El Ingenio",
     price: 320000000,
     beds: 3,
     bathrooms: 2,
     area: 104,
+    parking: 1,
+    features: ["balcon", "seguridad"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=600&q=80",
     address: "Carrera 84 # 13B-60, Apt 304, Cali",
@@ -171,17 +219,20 @@ const DEFAULT_PROPERTIES = [
     source: "Fincaraiz",
     sourceLink: "https://fincaraiz.com.co/inmueble/110022",
     grokAnalysis: "Apartamento en conjunto cerrado con piscina, zonas verdes, gimnasio y seguridad 24/7. Excelente distribución interna con balcón social.",
-    advisorNote: "Muy buena administración del conjunto. El apartamento está listo para escriturar, no posee hipotecas ni deudas pendientes de predial."
+    advisorNote: "Muy buena administración del conjunto. El apartamento está listo para escriturar, no posee hipotecas ni deudas pendientes."
   },
   {
     id: "prop-8",
     title: "Loft Moderno Ciudad Jardín",
     type: "apartamento",
-    zone: "Ciudad Jardín",
+    zone: "Sur",
+    barrio: "Ciudad Jardín",
     price: 390000000,
     beds: 2,
     bathrooms: 2,
     area: 88,
+    parking: 1,
+    features: ["balcon", "piscina", "seguridad"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80",
     address: "Av. Cañasgordas # 120-10, Cali",
@@ -194,13 +245,16 @@ const DEFAULT_PROPERTIES = [
   },
   {
     id: "prop-9",
-    title: "Casa Campestre Normandía Premium",
+    title: "Casa Colonial Normandía Premium",
     type: "casa",
-    zone: "Normandía",
+    zone: "Oeste",
+    barrio: "Normandía",
     price: 980000000,
     beds: 5,
     bathrooms: 5,
     area: 410,
+    parking: 3,
+    features: ["balcon", "seguridad"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80",
     address: "Calle Oeste # 3-18, Normandía, Cali",
@@ -213,17 +267,19 @@ const DEFAULT_PROPERTIES = [
   }
 ];
 
-// New Properties found dynamically during simulation
 const SIMULATED_NEW_PROPERTIES = [
   {
     id: "new-prop-1",
     title: "EXCLUSIVO: Apartamento Club House El Ingenio",
     type: "apartamento",
-    zone: "El Ingenio",
+    zone: "Sur",
+    barrio: "El Ingenio",
     price: 335000000,
     beds: 3,
     bathrooms: 3,
     area: 112,
+    parking: 2,
+    features: ["balcon", "seguridad", "piscina"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80",
     address: "Carrera 85 # 14-40, Apt 502, Cali",
@@ -238,11 +294,14 @@ const SIMULATED_NEW_PROPERTIES = [
     id: "new-prop-2",
     title: "EXCLUSIVO: Casa Quinta Ciudad Jardín Pinos",
     type: "casa",
-    zone: "Ciudad Jardín",
+    zone: "Sur",
+    barrio: "Ciudad Jardín",
     price: 840000000,
     beds: 4,
     bathrooms: 4,
     area: 310,
+    parking: 3,
+    features: ["piscina", "balcon", "seguridad"],
     deal: "Compra",
     image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80",
     address: "Calle 15 # 105-30, Casa Campestre, Cali",
@@ -255,7 +314,7 @@ const SIMULATED_NEW_PROPERTIES = [
   }
 ];
 
-// 2. STATE MANAGER
+// 3. STATE MANAGER
 class AppState {
   constructor() {
     this.clients = JSON.parse(localStorage.getItem("calisky_clients")) || DEFAULT_CLIENTS;
@@ -298,10 +357,9 @@ class AppState {
   }
 
   addProperties(newProps) {
-    // Avoid duplicates
     newProps.forEach(np => {
       if (!this.properties.some(p => p.id === np.id)) {
-        this.properties.unshift(np); // Put on top
+        this.properties.unshift(np);
       }
     });
     this.save();
@@ -310,9 +368,7 @@ class AppState {
 
 const state = new AppState();
 
-// 3. UI RENDERING ENGINES
-
-// Utility to format currency COP
+// 4. UI RENDERING ENGINES
 function formatCOP(num) {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
@@ -331,6 +387,7 @@ function renderPublicProperties(filter = "all") {
   
   const filtered = state.properties.filter(p => {
     if (filter === "all") return true;
+    if (filter === "local") return p.type === "local" || p.type === "lote";
     return p.type === filter;
   });
 
@@ -340,7 +397,6 @@ function renderPublicProperties(filter = "all") {
   }
 
   filtered.forEach(p => {
-    // Generate public price range
     const minRange = formatCOP(p.price * 0.95);
     const maxRange = formatCOP(p.price * 1.05);
 
@@ -350,7 +406,7 @@ function renderPublicProperties(filter = "all") {
     card.innerHTML = `
       <div class="card-image-wrap">
         <img src="${p.image}" alt="${p.title}" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80'">
-        <div class="card-badge-zone"><i class="fa-solid fa-location-dot"></i> ${p.zone}</div>
+        <div class="card-badge-zone"><i class="fa-solid fa-location-dot"></i> ${p.barrio} (Zona ${p.zone})</div>
         <div class="card-badge-type">${p.type}</div>
       </div>
       <div class="card-info-content">
@@ -384,12 +440,51 @@ function renderPublicProperties(filter = "all") {
     container.appendChild(card);
   });
 
-  // Attach event listeners to buttons
   document.querySelectorAll(".btn-request-info").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const id = btn.getAttribute("data-id");
       openContactModal(id);
     });
+  });
+}
+
+// Rich Match Algorithm
+function filterClientMatches(user) {
+  return state.properties.filter(p => {
+    // 1. Transaction Type (Compra / Arriendo)
+    if (p.deal.toLowerCase() !== user.deal.toLowerCase()) return false;
+    
+    // 2. Property Type
+    if (p.type.toLowerCase() !== user.type.toLowerCase()) return false;
+    
+    // 3. Zone Match
+    if (p.zone.toLowerCase() !== user.zone.toLowerCase()) return false;
+    
+    // 4. Barrio Match (if not "Todos los barrios")
+    if (user.barrio && user.barrio !== "Todos los barrios" && p.barrio.toLowerCase() !== user.barrio.toLowerCase()) return false;
+    
+    // 5. Price Range
+    if (p.price < user.minPrice || p.price > user.maxPrice) return false;
+    
+    // 6. Minimum Beds
+    if (p.beds < user.beds) return false;
+    
+    // 7. Minimum Baths
+    if (user.baths && p.bathrooms < user.baths) return false;
+    
+    // 8. Minimum Area
+    if (user.minArea && p.area < user.minArea) return false;
+    
+    // 9. Parking
+    if (user.parking === "requerido" && p.parking < 1) return false;
+    if (user.parking === "doble" && p.parking < 2) return false;
+    
+    // 10. Extras Requeridos
+    if (user.features && user.features !== "ninguno") {
+      if (!p.features.includes(user.features)) return false;
+    }
+    
+    return true;
   });
 }
 
@@ -401,26 +496,20 @@ function renderPrivateProperties() {
   container.innerHTML = "";
   const user = state.currentUser;
 
-  // Search logic that matches client parameters: Zone and Type are critical. Price is max threshold, beds is minimum.
-  const matches = state.properties.filter(p => {
-    const zoneMatch = p.zone.toLowerCase() === user.zone.toLowerCase();
-    const typeMatch = p.type.toLowerCase() === user.type.toLowerCase();
-    const priceMatch = p.price <= user.maxPrice;
-    const bedMatch = p.beds >= user.beds;
-    return zoneMatch && typeMatch && priceMatch && bedMatch;
-  });
+  // Run the rich dynamic filtering
+  const matches = filterClientMatches(user);
 
   if (matches.length === 0) {
     container.innerHTML = `
       <div class="glass-panel text-center pad-xl" style="grid-column: 1/-1;">
         <i class="fa-solid fa-magnifying-glass-chart text-glow-gold" style="font-size: 40px; margin-bottom: 16px; display: block;"></i>
-        <h3>Buscando coincidencias perfectas...</h3>
+        <h3>Buscando coincidencias personalizadas...</h3>
         <p class="section-desc margin-center">
-          Actualmente no hay inmuebles en la base de datos que cumplan al 100% tus criterios específicos en <strong>${user.zone}</strong> por un precio menor a <strong>${formatCOP(user.maxPrice)}</strong>.
+          Actualmente no hay inmuebles en la base de datos que cumplan al 100% tus criterios específicos en la **Zona ${user.zone}** (${user.barrio}) por un rango de **${formatCOP(user.minPrice)} - ${formatCOP(user.maxPrice)}** y con mínimo **${user.beds} Hab / ${user.baths} Baños**.
         </p>
         <div class="alert-box note-box margin-t-md max-w-md margin-center">
           <i class="fa-solid fa-cloud-bolt text-glow-cyan"></i>
-          <p>Ve a la <strong>Consola Admin</strong> y haz clic en <strong>"Ejecutar Búsqueda Nocturna"</strong> en la pestaña n8n para simular el rastreador nocturno Groq Llama-3 encontrando una nueva propiedad que encaje contigo!</p>
+          <p>Ve a la **Consola Admin** y haz clic en **"Ejecutar Búsqueda Nocturna"** en la pestaña n8n para simular que el rastreador encuentra una propiedad adaptada a tus gustos.</p>
         </div>
       </div>
     `;
@@ -432,10 +521,19 @@ function renderPrivateProperties() {
     card.className = "glass-panel property-card";
     card.style.borderColor = "var(--accent-gold)";
     card.id = `priv-${p.id}`;
+    
+    // Compile amenities list
+    const amenitiesText = p.features.map(f => {
+      if (f === "piscina") return "Piscina";
+      if (f === "balcon") return "Balcón/Terraza";
+      if (f === "seguridad") return "Club House/Seguridad";
+      return f;
+    }).join(", ");
+
     card.innerHTML = `
       <div class="card-image-wrap">
         <img src="${p.image}" alt="${p.title}">
-        <div class="card-badge-zone"><i class="fa-solid fa-location-dot"></i> ${p.zone}</div>
+        <div class="card-badge-zone"><i class="fa-solid fa-location-dot"></i> ${p.barrio} (Zona ${p.zone})</div>
         <div class="card-badge-type">${p.type}</div>
       </div>
       <div class="card-info-content">
@@ -466,6 +564,14 @@ function renderPrivateProperties() {
           <div class="unlocked-item">
             <strong>Dirección:</strong>
             <span><i class="fa-solid fa-map-pin"></i> ${p.address}</span>
+          </div>
+          <div class="unlocked-item">
+            <strong>Parqueos:</strong>
+            <span><i class="fa-solid fa-car"></i> ${p.parking > 0 ? `${p.parking} puesto(s)` : "Ninguno"}</span>
+          </div>
+          <div class="unlocked-item">
+            <strong>Extras:</strong>
+            <span><i class="fa-solid fa-circle-check"></i> ${amenitiesText || "Ninguno"}</span>
           </div>
           <div class="unlocked-item">
             <strong>Contacto:</strong>
@@ -504,13 +610,17 @@ function renderClientsTable() {
   state.clients.forEach(c => {
     const tr = document.createElement("tr");
     tr.id = `row-${c.id}`;
+    
+    // Parse specs for summary column
+    const specsSummary = `${c.beds}H / ${c.baths}B / ${c.minArea}m²${c.parking !== 'cualquiera' ? ` / Pkg` : ''}`;
+    
     tr.innerHTML = `
       <td><strong>${c.name}</strong></td>
       <td><code>${c.email}</code></td>
       <td><span class="deal-type-badge">${c.type}</span></td>
-      <td>${c.zone}</td>
-      <td><strong>${formatCOP(c.maxPrice)}</strong></td>
-      <td>${c.beds} hab.</td>
+      <td>Zona ${c.zone} (${c.barrio})</td>
+      <td><strong>${formatCOP(c.minPrice)} - ${formatCOP(c.maxPrice)}</strong></td>
+      <td>${specsSummary}</td>
       <td>${c.deal}</td>
       <td>
         <span class="status-badge ${c.status}">
@@ -527,7 +637,6 @@ function renderClientsTable() {
     tbody.appendChild(tr);
   });
 
-  // Attach delete click listeners
   document.querySelectorAll(".btn-delete-client").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
@@ -535,7 +644,6 @@ function renderClientsTable() {
         state.deleteClient(id);
         renderClientsTable();
         populateBrevoClientSelector();
-        // If current logged in client is deleted
         if (state.currentUser && state.currentUser.id === id) {
           logoutUser();
         }
@@ -544,7 +652,7 @@ function renderClientsTable() {
   });
 }
 
-// Render Brevo Selector dropdown list
+// Populate Brevo Selector dropdown list
 function populateBrevoClientSelector() {
   const select = document.getElementById("brevo-select-client");
   if (!select) return;
@@ -565,7 +673,7 @@ function generateBrevoEmailHtml(client, matches) {
   if (matches.length === 0) {
     matchesHtml = `
       <div style="padding: 20px; text-align: center; border: 1px dashed #cbd5e1; border-radius: 6px;">
-        <p style="color: #64748b; font-size: 14px; margin: 0;">Estamos monitoreando activamente el mercado de <strong>${client.zone}</strong>. Aún no se han reportado nuevas publicaciones del rango solicitado, te notificaremos tan pronto como Groq detecte una.</p>
+        <p style="color: #64748b; font-size: 14px; margin: 0;">Estamos monitoreando activamente la <strong>Zona ${client.zone}</strong> (${client.barrio}). Aún no se han reportado nuevas publicaciones del rango solicitado, te notificaremos tan pronto como Groq detecte una.</p>
       </div>
     `;
   } else {
@@ -576,7 +684,7 @@ function generateBrevoEmailHtml(client, matches) {
           <div style="flex-grow: 1;">
             <span style="font-size: 10px; font-weight: 700; background: #fffae6; color: #b7791f; border: 1px solid #fbd38d; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">${p.type}</span>
             <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 6px 0 4px 0; font-family: 'Outfit', sans-serif;">${p.title}</h4>
-            <span style="font-size: 11px; color: #64748b;"><i class="fa-solid fa-map-pin"></i> Cali, ${p.zone} • ${p.area}m² • ${p.beds} Hab.</span>
+            <span style="font-size: 11px; color: #64748b;"><i class="fa-solid fa-map-pin"></i> Cali, ${p.barrio} (Zona ${p.zone}) • ${p.area}m² • ${p.beds} Hab.</span>
             <div style="font-size: 13.5px; font-weight: 800; color: #059669; margin-top: 6px;">${formatCOP(p.price)}</div>
           </div>
         </div>
@@ -604,7 +712,7 @@ function generateBrevoEmailHtml(client, matches) {
                 <p>Nuestro radar inteligente en la nube ejecutó la búsqueda nocturna a las 2:00 AM sobre las bases de datos de inmuebles en Cali.</p>
                 
                 <p style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 12px; border-radius: 0 6px 6px 0; color: #065f46; font-size: 13px;">
-                  <strong>Estado:</strong> Filtro completado exitosamente. Encontramos <strong>${matchesCount} propiedad(es)</strong> en la zona de <strong>${client.zone}</strong> que encajan perfectamente con tus preferencias de ${client.type} y presupuesto.
+                  <strong>Estado:</strong> Filtro completado exitosamente. Encontramos <strong>${matchesCount} propiedad(es)</strong> en <strong>${client.barrio}</strong> que encajan perfectamente con tus especificaciones y presupuesto.
                 </p>
                 
                 <div style="margin: 24px 0 10px 0;">
@@ -651,61 +759,78 @@ function updateBrevoPreview() {
     return;
   }
 
-  // Find matches
-  const matches = state.properties.filter(p => {
-    return p.zone.toLowerCase() === client.zone.toLowerCase() &&
-           p.type.toLowerCase() === client.type.toLowerCase() &&
-           p.price <= client.maxPrice &&
-           p.beds >= client.beds;
-  });
+  // Find matches using rich criteria
+  const matches = filterClientMatches(client);
 
   // Populate dynamic payload metrics variables on sidecard
   document.getElementById("var-contact-name").textContent = client.name;
   document.getElementById("var-contact-email").textContent = client.email;
-  document.getElementById("var-params-zone").textContent = client.zone;
+  document.getElementById("var-params-zone").textContent = `${client.zone} (${client.barrio})`;
   document.getElementById("var-params-type").textContent = client.type;
   document.getElementById("var-params-count").textContent = matches.length;
 
   // Mock header fields in preview
   document.getElementById("email-mock-to").textContent = `${client.name} <${client.email}>`;
-  document.getElementById("email-mock-subject").textContent = `Hola ${client.name}, hoy encontré ${matches.length} opciones de ${client.type} en ${client.zone} para ti`;
+  document.getElementById("email-mock-subject").textContent = `Hola ${client.name}, hoy encontré ${matches.length} opciones de ${client.type} en ${client.barrio} para ti`;
 
   // Render HTML in preview area
   const renderArea = document.getElementById("email-mock-html-content");
   renderArea.innerHTML = generateBrevoEmailHtml(client, matches);
 }
 
-// 4. ACTION CONTROLLERS & WORKFLOW SIMULATOR
-
-// Add Client Controller
+// 5. ACTION CONTROLLERS & WORKFLOW SIMULATOR
 function handleAddClient(e) {
   e.preventDefault();
   const name = document.getElementById("client-name").value.trim();
   const email = document.getElementById("client-email").value.trim();
   const type = document.getElementById("client-type").value;
-  const zone = document.getElementById("client-zone").value;
+  const zone = document.getElementById("client-zone-select").value;
+  const barrio = document.getElementById("client-barrio-select").value;
+  const minPrice = parseInt(document.getElementById("client-min-price").value) || 0;
   const maxPrice = parseInt(document.getElementById("client-max-price").value);
   const beds = parseInt(document.getElementById("client-beds").value);
+  const baths = parseInt(document.getElementById("client-baths").value) || 1;
+  const parking = document.getElementById("client-parking").value;
+  const minArea = parseInt(document.getElementById("client-min-area").value) || 20;
+  const features = document.getElementById("client-features").value;
   const deal = document.getElementById("client-deal").value;
 
   if (!name || !email || isNaN(maxPrice) || isNaN(beds)) return;
 
-  // Check if email already registered
   if (state.clients.some(c => c.email.toLowerCase() === email.toLowerCase())) {
     alert("Este correo electrónico ya está registrado con otro cliente.");
     return;
   }
 
-  state.addClient({ name, email, type, zone, maxPrice, beds, deal });
+  state.addClient({ 
+    name, email, type, zone, barrio, minPrice, maxPrice, 
+    beds, baths, parking, minArea, features, deal 
+  });
   
-  // Reset Form
   document.getElementById("add-client-form").reset();
-  document.getElementById("client-beds").value = 3;
+  loadBarriosForSelectedZone(); // Reset barrio options
 
-  // Re-render
   renderClientsTable();
   populateBrevoClientSelector();
   alert(`¡Cliente ${name} registrado con éxito! Puedes iniciar sesión usando su email en el portal privado.`);
+}
+
+// Dynamic barrio dropdown filler
+function loadBarriosForSelectedZone() {
+  const zoneSelect = document.getElementById("client-zone-select");
+  const barrioSelect = document.getElementById("client-barrio-select");
+  if (!zoneSelect || !barrioSelect) return;
+
+  const selectedZone = zoneSelect.value;
+  const barrios = ZONES_AND_BARRIOS[selectedZone] || [];
+
+  barrioSelect.innerHTML = "";
+  barrios.forEach(b => {
+    const opt = document.createElement("option");
+    opt.value = b;
+    opt.textContent = b;
+    barrioSelect.appendChild(opt);
+  });
 }
 
 // User Authentication Operations
@@ -715,24 +840,20 @@ function loginUser(email) {
     state.currentUser = user;
     state.save();
     
-    // Toggle navigation layouts
     document.getElementById("login-btn-text").textContent = `Portal (${user.name})`;
     document.getElementById("login-toggle-btn").classList.add("btn-glow-purple");
     
     document.getElementById("portal-fallback-wrapper").classList.add("hidden");
     document.getElementById("portal-section-wrapper").classList.remove("hidden");
     
-    // Populate portal metadata info bar
     document.getElementById("portal-welcome-name").textContent = `Hola, ${user.name}`;
     document.getElementById("portal-search-type").textContent = user.type.charAt(0).toUpperCase() + user.type.slice(1);
-    document.getElementById("portal-search-zone").textContent = user.zone;
-    document.getElementById("portal-search-budget").textContent = `Máx ${formatCOP(user.maxPrice)}`;
-    document.getElementById("portal-search-beds").textContent = `${user.beds} habs.`;
+    document.getElementById("portal-search-zone").textContent = `Zona ${user.zone} (${user.barrio})`;
+    document.getElementById("portal-search-budget").textContent = `${formatCOP(user.minPrice)} - ${formatCOP(user.maxPrice)}`;
+    document.getElementById("portal-search-beds").textContent = `${user.beds} habs / ${user.baths} baños`;
 
-    // Render matches
     renderPrivateProperties();
     
-    // Scroll smoothly to user portal section
     document.getElementById("portal-section-wrapper").scrollIntoView({ behavior: 'smooth' });
     return true;
   }
@@ -759,14 +880,11 @@ function openContactModal(propId) {
     <img src="${prop.image}" alt="${prop.title}" class="preview-img">
     <div class="preview-info">
       <h4>${prop.title}</h4>
-      <span>Cali, ${prop.zone} • ${formatCOP(prop.price * 0.95)} - ${formatCOP(prop.price * 1.05)}</span>
+      <span>Cali, ${prop.barrio} • ${formatCOP(prop.price * 0.95)} - ${formatCOP(prop.price * 1.05)}</span>
     </div>
   `;
 
-  // Pre-fill text in contact form
-  document.getElementById("contact-message").value = `Hola Cali Sky Stores, estoy sumamente interesado en recibir la información completa de la propiedad "${prop.title}" en la zona de ${prop.zone}. Quedo atento a agendar una llamada.`;
-  
-  // Active contact modal
+  document.getElementById("contact-message").value = `Hola Cali Sky Stores, estoy sumamente interesado en recibir la información completa de la propiedad "${prop.title}" en la zona de ${prop.barrio}. Quedo atento a agendar una llamada.`;
   document.getElementById("contact-modal").classList.add("active");
 }
 
@@ -777,21 +895,18 @@ function handleContactFormSubmit(e) {
   const email = document.getElementById("contact-email").value.trim();
   const message = document.getElementById("contact-message").value.trim();
 
-  // Create Whatsapp Direct Link simulating agent connection
-  const whatsappNumber = "573000000000"; // Real agent phone number
+  const whatsappNumber = "573000000000";
   const encodedText = encodeURIComponent(`Hola Cali Sky Stores! Mi nombre es ${name}. Correo: ${email}, Celular: ${phone}. Estoy interesado en una propiedad de la vitrina pública. Mensaje: ${message}`);
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedText}`;
 
-  // Reset and Close
   document.getElementById("contact-form").reset();
   document.getElementById("contact-modal").classList.remove("active");
 
-  // Redirect to simulated whatsapp agent line
   alert("¡Solicitud enviada! Serás redirigido al WhatsApp directo de Cali Sky Stores para una atención inmediata.");
   window.open(whatsappUrl, "_blank");
 }
 
-// 5. N8N AUTOMATED WORKFLOW FLOWCHART SIMULATION
+// N8N AUTOMATED WORKFLOW FLOWCHART SIMULATION
 let isRunningWorkflow = false;
 
 function addTerminalLog(text, type = "system") {
@@ -804,7 +919,7 @@ function addTerminalLog(text, type = "system") {
   line.textContent = `[${time}] ${text}`;
   
   term.appendChild(line);
-  term.scrollTop = term.scrollHeight; // Scroll bottom
+  term.scrollTop = term.scrollHeight;
 }
 
 function runNightlyWorkflow() {
@@ -814,12 +929,10 @@ function runNightlyWorkflow() {
   const btn = document.getElementById("btn-run-workflow");
   const wfPulse = document.querySelector(".wf-pulse-light");
   
-  // Set UI state
   btn.disabled = true;
   btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Ejecutando...`;
   wfPulse.className = "wf-pulse-light orange-pulse";
 
-  // Reset all flowchart nodes classes to neutral before running
   const nodes = ["node-trigger", "node-read-db", "node-prompt", "node-groq", "node-publish", "node-brevo"];
   const connectors = ["connector-1", "connector-2", "connector-3", "connector-4", "connector-5"];
   
@@ -832,7 +945,6 @@ function runNightlyWorkflow() {
 
   addTerminalLog("INICIANDO AUTOMATIZACIÓN NOCTURNA (Simulando ejecución programada a las 2:00 AM)...", "cron");
 
-  // Timed Sequence simulating n8n step executions
   setTimeout(() => {
     // 1. Cron Node
     document.getElementById("node-trigger").classList.add("active-node");
@@ -849,7 +961,7 @@ function runNightlyWorkflow() {
       
       setTimeout(() => {
         const activeCount = state.clients.filter(c => c.status === 'active').length;
-        addTerminalLog(`Node 'WP Get Profiles': Obtenidos ${activeCount} perfiles de búsqueda activos.`, "wp");
+        addTerminalLog(`Node 'WP Get Profiles': Obtenidos ${activeCount} perfiles de búsqueda activos de Cali Sky.`, "wp");
         document.getElementById("node-read-db").classList.add("done-node");
         document.getElementById("node-read-db").classList.remove("active-node");
         document.getElementById("connector-1").classList.remove("active-link");
@@ -857,10 +969,10 @@ function runNightlyWorkflow() {
         
         // 3. Prompt Builder
         document.getElementById("node-prompt").classList.add("active-node");
-        addTerminalLog("Node 'Prompt Builder': Armando instrucciones estructuradas para la API de Groq Cloud...", "system");
+        addTerminalLog("Node 'Prompt Builder': Armando instrucciones detalladas para la API de Groq Cloud...", "system");
         
         setTimeout(() => {
-          addTerminalLog("Node 'Prompt Builder': Inyectando variables personalizadas (Presupuesto, Zona, Tipo, Habs).", "system");
+          addTerminalLog("Node 'Prompt Builder': Inyectando variables personalizadas (Zona, Barrio, Rango Presupuesto, Habitaciones, Parqueadero, Extras).", "system");
           document.getElementById("node-prompt").classList.add("done-node");
           document.getElementById("node-prompt").classList.remove("active-node");
           document.getElementById("connector-2").classList.remove("active-link");
@@ -871,12 +983,12 @@ function runNightlyWorkflow() {
           addTerminalLog("Node 'Groq Cloud': Conectando a Groq API Llama-3-70B de alta velocidad...", "groq");
           
           setTimeout(() => {
-            addTerminalLog("Node 'Groq Cloud': Llama-3 escaneando Fincaraiz, Metrocuadrado y grupos inmobiliarios...", "groq");
+            addTerminalLog("Node 'Groq Cloud': Llama-3 escaneando Fincaraiz, Metrocuadrado, OLX y grupos de Whatsapp en Cali...", "groq");
             
             setTimeout(() => {
-              addTerminalLog("Node 'Groq Cloud': Groq filtró con éxito 22 listados y detectó 2 coincidencias óptimas.", "groq");
+              addTerminalLog("Node 'Groq Cloud': Groq completó análisis de 28 listados y detectó nuevas coincidencias óptimas en el sur de Cali.", "groq");
               
-              // Inyectar nuevas propiedades a la base de datos simulando el scraping AI real
+              // Add simulated matches to store
               state.addProperties(SIMULATED_NEW_PROPERTIES);
               
               document.getElementById("node-groq").classList.add("done-node");
@@ -886,11 +998,11 @@ function runNightlyWorkflow() {
               
               // 5. Publish WP
               document.getElementById("node-publish").classList.add("active-node");
-              addTerminalLog("Node 'WP Publish': Creando posts privados en WordPress visibles únicamente para los clientes en correspondencia...", "wp");
+              addTerminalLog("Node 'WP Publish': Creando posts privados en WordPress visibles únicamente para sus respectivos clientes...", "wp");
               
               setTimeout(() => {
-                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50921 para Juan Pérez (El Ingenio).", "wp");
-                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50922 para Sophia Gómez (Ciudad Jardín).", "wp");
+                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50921 para Juan Pérez (Zona Sur / El Ingenio).", "wp");
+                addTerminalLog("Node 'WP Publish': Creado Post Privado ID 50922 para Sophia Gómez (Zona Sur / Ciudad Jardín).", "wp");
                 document.getElementById("node-publish").classList.add("done-node");
                 document.getElementById("node-publish").classList.remove("active-node");
                 document.getElementById("connector-4").classList.remove("active-link");
@@ -902,14 +1014,13 @@ function runNightlyWorkflow() {
                 
                 setTimeout(() => {
                   state.clients.filter(c => c.status === 'active').forEach(c => {
-                    addTerminalLog(`Node 'Brevo API': Email transaccional enviado a <${c.email}> con plantilla premium ID #4.`, "brevo");
+                    addTerminalLog(`Node 'Brevo API': Email transaccional enviado a <${c.email}> con plantilla premium de Cali Sky.`, "brevo");
                   });
                   
                   document.getElementById("node-brevo").classList.add("done-node");
                   document.getElementById("node-brevo").classList.remove("active-node");
                   document.getElementById("connector-5").classList.remove("active-link");
                   
-                  // Finish Workflow
                   isRunningWorkflow = false;
                   btn.disabled = false;
                   btn.innerHTML = `<i class="fa-solid fa-play"></i> Ejecutar Búsqueda Nocturna`;
@@ -917,14 +1028,13 @@ function runNightlyWorkflow() {
                   
                   addTerminalLog("PROCESO TERMINADO SATISFACTORIAMENTE. Base de datos e emails actualizados.", "success");
                   
-                  // Refresh previews and pages
                   renderPublicProperties();
                   if (state.currentUser) {
                     renderPrivateProperties();
                   }
                   updateBrevoPreview();
                   
-                  alert("¡Simulación completada! El flujo de n8n ha detectado y publicado nuevas propiedades. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com) verás sus nuevas propiedades de lujo desbloqueadas en el panel privado. También se ha actualizado el template de Brevo.");
+                  alert("¡Simulación completada con éxito! El flujo de n8n ha detectado y publicado nuevas propiedades utilizando los nuevos filtros avanzados. Si inicias sesión como Juan Pérez (juan@email.com) o Sophia Gómez (sophia@email.com), verás sus nuevas propiedades de lujo desbloqueadas en el panel privado.");
                   
                 }, 2000);
               }, 2000);
@@ -939,21 +1049,26 @@ function runNightlyWorkflow() {
 // 6. APP ENGINE INITS & DOM BINDINGS
 document.addEventListener("DOMContentLoaded", () => {
   
-  // Render views initial
+  // Dynamic Barrio Dropdown initial load
+  loadBarriosForSelectedZone();
+  const zoneSelect = document.getElementById("client-zone-select");
+  if (zoneSelect) {
+    zoneSelect.addEventListener("change", loadBarriosForSelectedZone);
+  }
+
+  // Render initial layouts
   renderPublicProperties();
   renderClientsTable();
   populateBrevoClientSelector();
 
-  // If already logged in on refresh
   if (state.currentUser) {
     loginUser(state.currentUser.email);
   }
 
-  // Navigation switching handler (Single Page Application smooth view changes)
+  // Navigation switching handler (SPA)
   const navLinks = document.querySelectorAll(".nav-link");
   navLinks.forEach(link => {
     link.addEventListener("click", (e) => {
-      // Toggle active link class
       navLinks.forEach(l => l.classList.remove("active"));
       link.classList.add("active");
     });
@@ -978,7 +1093,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const openLogin = () => {
     if (state.currentUser) {
-      // Log out directly if clicked when logged in
       logoutUser();
     } else {
       loginModal.classList.add("active");
