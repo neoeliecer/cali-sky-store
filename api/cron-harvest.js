@@ -55,14 +55,42 @@ module.exports = async (req, res) => {
   console.log("Iniciando cron harvest nocturno...");
 
   try {
-    const clients = DEFAULT_CLIENTS; // Under real production database, fetch from Supabase
+    let clients = DEFAULT_CLIENTS;
+    
+    // Retrieve credentials injected by Vercel Integration
+    const KV_REST_API_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+    const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+    if (KV_REST_API_URL && KV_REST_API_TOKEN) {
+      try {
+        const redisRes = await axios.get(`${KV_REST_API_URL}/get/clients`, {
+          headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
+        });
+        if (redisRes.data && redisRes.data.result) {
+          clients = JSON.parse(redisRes.data.result);
+          console.log(`Cargados ${clients.length} clientes desde la base de datos de Redis.`);
+        }
+      } catch (dbErr) {
+        console.error("Error al cargar clientes desde Redis en cron-harvest, usando fallback estático:", dbErr.message);
+      }
+    }
+
     const harvestedResults = [];
 
     for (const client of clients) {
       console.log(`Buscando propiedades para el cliente: ${client.name}...`);
 
       const tipo = client.type || "Apartamento";
-      const barrio = client.barrio[0] || "Cali";
+      
+      // Clean and map barrio
+      let barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
+        ? client.barrio[0].replace("Todos los barrios de ", "") 
+        : (typeof client.barrio === "string" ? client.barrio : "Cali");
+
+      if (barrio.toLowerCase().includes("todos los barrios")) {
+        barrio = client.zone && client.zone.length > 0 ? client.zone[0] : "Cali";
+      }
+
       const maxBudget = client.maxPrice || 500000000;
 
       // 1. Call Mercado Libre Colombia Real Estate API
