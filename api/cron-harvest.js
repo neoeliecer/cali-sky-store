@@ -192,34 +192,66 @@ module.exports = async (req, res) => {
           return matchesDeal && matchesType && matchesPrice && (matchesBarrio || matchesZone) && matchesSource;
         });
 
-        listings = listings.slice(0, 8);
         console.log(`[MATCH-APIFY] Encontradas ${listings.length} coincidencias de Apify para ${client.name}.`);
-      } else {
-        // Fallback: Query Mercado Libre API
+      }
+
+      // Restrict to allowed sources (Mercado Libre should be active)
+      const allowedSources = client.sources && client.sources.length > 0
+        ? client.sources
+        : ["Finca Raíz", "Facebook Marketplace", "Metro Cuadrado", "Mercado Libre"];
+
+      // Fallback/Enrichment: Query Mercado Libre API if we need more results and ML is allowed
+      if (listings.length < 8 && allowedSources.includes("Mercado Libre")) {
         try {
-          const searchQuery = encodeURIComponent(`${tipo} Cali ${barrio}`);
+          let queryBarrio = barrio;
+          if (queryBarrio.toLowerCase() === "norte") queryBarrio = "Norte";
+          else if (queryBarrio.toLowerCase() === "centro") queryBarrio = "Centro";
+          else if (queryBarrio.toLowerCase() === "oeste") queryBarrio = "Oeste";
+          else if (queryBarrio.toLowerCase() === "sur") queryBarrio = "Sur";
+          else if (queryBarrio.toLowerCase() === "oriente") queryBarrio = "Oriente";
+
+          const searchQuery = encodeURIComponent(`${tipo} Cali ${queryBarrio}`);
           const mlUrl = `https://api.mercadolibre.com/sites/MCO/search?category=MCO1459&q=${searchQuery}`;
           const mlResponse = await axios.get(mlUrl);
           let mlListings = mlResponse.data.results || [];
           
-          // Filter by budget and source
-          listings = mlListings.filter(item => item.price <= maxBudget);
+          // Filter by budget
+          let mlFiltered = mlListings.filter(item => item.price <= maxBudget);
           
-          // Restrict to allowed sources (Mercado Libre should be active)
-          const allowedSources = client.sources && client.sources.length > 0
-            ? client.sources
-            : ["Finca Raíz", "Facebook Marketplace", "Metro Cuadrado", "Mercado Libre"];
+          // Merge non-duplicate ML listings into our results
+          for (const item of mlFiltered) {
+            if (listings.length >= 8) break;
             
-          if (allowedSources.includes("Mercado Libre")) {
-            listings = listings.slice(0, 8);
-          } else {
-            listings = [];
+            // Check for duplicates based on title and price
+            const isDuplicate = listings.some(l => 
+              l.title.toLowerCase() === item.title.toLowerCase() && 
+              l.price === item.price
+            );
+            
+            if (!isDuplicate) {
+              listings.push({
+                title: item.title,
+                price: item.price,
+                barrio: item.address && item.address.neighborhood_name ? item.address.neighborhood_name : queryBarrio,
+                zone: client.zone && client.zone.length > 0 ? client.zone[0] : "Sur",
+                type: tipo.toLowerCase(),
+                image: item.thumbnail,
+                source: "Mercado Libre",
+                sourceLink: item.permalink,
+                beds: client.beds || 3,
+                baths: client.baths || 2,
+                area: client.minArea || 90,
+                deal: client.deal || "Compra"
+              });
+            }
           }
-          console.log(`[MATCH-ML] Encontrados ${listings.length} listados de Mercado Libre para ${client.name}.`);
+          console.log(`[MATCH-ML] Encontrados y combinados listados de Mercado Libre para ${client.name}. Total: ${listings.length}`);
         } catch (mlErr) {
           console.error("[ML-API] Error consultando API de Mercado Libre:", mlErr.message);
         }
       }
+
+      listings = listings.slice(0, 8);
 
       // Generate AI commentary with Groq Llama-3-70B for matches
       for (const item of listings) {

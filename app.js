@@ -2253,23 +2253,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (barrio.toLowerCase().includes("todos los barrios")) {
       barrio = client.zone && client.zone.length > 0 ? client.zone[0] : "Cali";
     }
+
+    // Map zone names to highly searched real neighborhoods
+    let queryBarrio = barrio;
+    if (queryBarrio.toLowerCase() === "norte") queryBarrio = "Norte";
+    else if (queryBarrio.toLowerCase() === "centro") queryBarrio = "Centro";
+    else if (queryBarrio.toLowerCase() === "oeste") queryBarrio = "Oeste";
+    else if (queryBarrio.toLowerCase() === "sur") queryBarrio = "Sur";
+    else if (queryBarrio.toLowerCase() === "oriente") queryBarrio = "Oriente";
     
     const budget = client.maxPrice || 500000000;
 
     // 1. Finca Raíz search link
-    const keywordFinca = encodeURIComponent(`${tipo} ${barrio} Cali`);
+    const keywordFinca = encodeURIComponent(`${tipo} ${queryBarrio} Cali`);
     fnBtn.href = `https://www.fincaraiz.com.co/buscar?keyword=${keywordFinca}`;
 
     // 2. Facebook Marketplace
-    const queryFB = encodeURIComponent(`${tipo} ${barrio}`);
+    const queryFB = encodeURIComponent(`${tipo} ${queryBarrio}`);
     fbBtn.href = `https://www.facebook.com/marketplace/cali/search/?query=${queryFB}`;
 
     // 3. Metro Cuadrado
-    const keywordMetro = encodeURIComponent(`${tipo} ${barrio} Cali`);
+    const keywordMetro = encodeURIComponent(`${tipo} ${queryBarrio} Cali`);
     mcBtn.href = `https://www.metrocuadrado.com/fincaraiz/buscar?keyword=${keywordMetro}`;
 
     // 4. Mercado Libre
-    const keywordML = encodeURIComponent(`${tipo} ${barrio}`);
+    const keywordML = encodeURIComponent(`${tipo} ${queryBarrio}`);
     mlBtn.href = `https://listado.mercadolibre.com.co/inmuebles/cali/${keywordML}`;
 
     // 5. Google Search (Anti-Blocks)
@@ -2300,16 +2308,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (barrio.toLowerCase().includes("todos los barrios")) {
       barrio = client.zone && client.zone.length > 0 ? client.zone[0] : "Cali";
     }
+
+    // Map zone names to highly searched real neighborhoods
+    let queryBarrio = barrio;
+    if (queryBarrio.toLowerCase() === "norte") queryBarrio = "Norte";
+    else if (queryBarrio.toLowerCase() === "centro") queryBarrio = "Centro";
+    else if (queryBarrio.toLowerCase() === "oeste") queryBarrio = "Oeste";
+    else if (queryBarrio.toLowerCase() === "sur") queryBarrio = "Sur";
+    else if (queryBarrio.toLowerCase() === "oriente") queryBarrio = "Oriente";
     
     const budget = client.maxPrice || 500000000;
 
     try {
       // Call Mercado Libre Colombia Real Estate API
-      const searchQuery = encodeURIComponent(`${tipo} Cali ${barrio}`);
+      const searchQuery = encodeURIComponent(`${tipo} Cali ${queryBarrio}`);
       const url = `https://api.mercadolibre.com/sites/MCO/search?category=MCO1459&q=${searchQuery}`;
       
       addTerminalLog(`[REAL-SEARCH] Conectando en vivo con la API de Mercado Libre Colombia...`, "success");
-      addTerminalLog(`[REAL-SEARCH] Buscando: ${tipo} en ${barrio} Cali (Presupuesto máx: ${formatCOP(budget)})...`, "wp");
+      addTerminalLog(`[REAL-SEARCH] Buscando: ${tipo} en ${queryBarrio} Cali (Presupuesto máx: ${formatCOP(budget)})...`, "wp");
       
       const response = await fetch(url);
       if (!response.ok) throw new Error("Error fetching ML API");
