@@ -344,14 +344,20 @@ class AppState {
     this.save();
   }
 
-  login(email) {
+  login(email, password) {
     const user = this.clients.find(c => c.email.toLowerCase() === email.toLowerCase());
     if (user) {
+      if (password !== undefined) {
+        const userPass = user.password || "calisky123";
+        if (userPass !== password) {
+          return { success: false, error: "Error: Contraseña incorrecta." };
+        }
+      }
       this.currentUser = user;
       this.save();
-      return user;
+      return { success: true, user };
     }
-    return null;
+    return { success: false, error: "Error: Correo electrónico no registrado como cliente premium." };
   }
 
   logout() {
@@ -798,6 +804,7 @@ function handleAddClient(e) {
   const name = document.getElementById("client-name").value.trim();
   const email = document.getElementById("client-email").value.trim();
   const phone = document.getElementById("client-phone").value.trim() || "3004567890";
+  const password = document.getElementById("client-password").value.trim() || "calisky123";
   const type = document.getElementById("client-type").value;
   const deal = document.getElementById("client-deal").value;
 
@@ -829,7 +836,7 @@ function handleAddClient(e) {
   }
 
   state.addClient({ 
-    name, email, phone, type, zone: selectedZones, barrio: selectedBarrios, minPrice, maxPrice, 
+    name, email, phone, password, type, zone: selectedZones, barrio: selectedBarrios, minPrice, maxPrice, 
     beds, baths, parking, minArea, features, deal 
   });
   
@@ -907,9 +914,10 @@ function loadBarriosForSelectedZones() {
 }
 
 // User Authentication Operations
-function loginUser(email) {
-  const user = state.login(email);
-  if (user) {
+function loginUser(email, password) {
+  const loginResult = state.login(email, password);
+  if (loginResult.success) {
+    const user = loginResult.user;
     state.currentUser = user;
     state.save();
     
@@ -932,8 +940,12 @@ function loginUser(email) {
     
     document.getElementById("portal-section-wrapper").scrollIntoView({ behavior: 'smooth' });
     return true;
+  } else {
+    if (password !== undefined) {
+      alert(loginResult.error);
+    }
+    return false;
   }
-  return false;
 }
 
 function logoutUser() {
@@ -1287,12 +1299,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const email = document.getElementById("login-email").value.trim();
-    const success = loginUser(email);
+    const password = document.getElementById("login-password").value.trim();
+    const success = loginUser(email, password);
     if (success) {
       loginModal.classList.remove("active");
       document.getElementById("login-form").reset();
-    } else {
-      alert("Error: El correo ingresado no coincide con ningún cliente registrado. Puedes usar los demo: juan@email.com o sophia@email.com");
     }
   });
 
