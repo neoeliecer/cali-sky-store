@@ -1431,6 +1431,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Pre-fill inline quick cron settings inside Central Discoveries Hub
+  const discFreq = document.getElementById("discoveries-cron-frequency");
+  const discTime = document.getElementById("discoveries-cron-time");
+  const discBadge = document.getElementById("discoveries-cron-status-badge");
+  const btnSaveDiscCron = document.getElementById("btn-save-discoveries-cron");
+
+  if (discFreq && discTime) {
+    discFreq.value = savedCronSettings.freq;
+    discTime.value = savedCronSettings.timeVal;
+    if (discBadge) {
+      discBadge.textContent = savedCronSettings.freq === "diario" ? `Diario a las ${savedCronSettings.timeVal}` : (savedCronSettings.freq === "12horas" ? "Cada 12 horas" : "Cada 6 horas");
+    }
+  }
+
   // Bind change events to dynamically update expression
   if (cronFreqSelect) cronFreqSelect.addEventListener("change", updateCronExpressionText);
   if (cronTimeInput) cronTimeInput.addEventListener("input", updateCronExpressionText);
@@ -1459,4 +1473,69 @@ document.addEventListener("DOMContentLoaded", () => {
       alert(`¡Disparador de Cron-Job.org configurado exitosamente!\n\nFrecuencia: ${details.summaryText}\nCron Expression: ${details.expression}\n\nLos cambios se han guardado de forma permanente en la base de datos local y se han reflejado en el nodo visual.`);
     });
   }
+
+  // Synchronize discoveries quick cron save click to trigger main save
+  if (btnSaveDiscCron) {
+    btnSaveDiscCron.addEventListener("click", () => {
+      const freqVal = discFreq.value;
+      const timeVal = discTime.value;
+      
+      // Update main selectors
+      if (cronFreqSelect && cronTimeInput) {
+        cronFreqSelect.value = freqVal;
+        cronTimeInput.value = timeVal;
+      }
+
+      // Trigger click on main Save button
+      if (btnSaveCron) {
+        btnSaveCron.click();
+      }
+
+      // Update badge status
+      if (discBadge) {
+        discBadge.textContent = freqVal === "diario" ? `Diario a las ${timeVal}` : (freqVal === "12horas" ? "Cada 12 horas" : "Cada 6 horas");
+      }
+    });
+  }
+
+  // --- SECURE ADMIN CONSOLE LOCK ENGINE ---
+  const adminLockScreen = document.getElementById("admin-lock-screen");
+  const adminContentWrapper = document.getElementById("admin-content-wrapper");
+  const adminUnlockForm = document.getElementById("admin-unlock-form");
+  const btnLockAdmin = document.getElementById("btn-lock-admin");
+
+  const checkAdminUnlockState = () => {
+    const isUnlocked = sessionStorage.getItem("calisky_admin_unlocked") === "true";
+    if (isUnlocked) {
+      if (adminLockScreen) adminLockScreen.style.display = "none";
+      if (adminContentWrapper) adminContentWrapper.classList.remove("hidden");
+    } else {
+      if (adminLockScreen) adminLockScreen.style.display = "flex";
+      if (adminContentWrapper) adminContentWrapper.classList.add("hidden");
+    }
+  };
+
+  if (adminUnlockForm) {
+    adminUnlockForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const passwordInput = document.getElementById("admin-pass-input").value;
+      if (passwordInput === "admin123") {
+        sessionStorage.setItem("calisky_admin_unlocked", "true");
+        checkAdminUnlockState();
+        document.getElementById("admin-pass-input").value = "";
+      } else {
+        alert("Error: Contraseña de Administrador incorrecta. Inténtalo de nuevo. Pista: admin123");
+      }
+    });
+  }
+
+  if (btnLockAdmin) {
+    btnLockAdmin.addEventListener("click", () => {
+      sessionStorage.setItem("calisky_admin_unlocked", "false");
+      checkAdminUnlockState();
+    });
+  }
+
+  // Run initial secure check
+  checkAdminUnlockState();
 });

@@ -270,23 +270,54 @@
       <div class="section-header text-center">
         <h2 class="section-title"><i class="fa-solid fa-screwdriver-wrench text-glow-cyan"></i> Consola de Administración</h2>
         <p class="section-desc">
-          Administra los perfiles de búsqueda de tus clientes, visualiza el flujo de trabajo de n8n, controla la IA de Groq y previsualiza las notificaciones de Brevo.
+          Administra los perfiles de búsqueda de tus clientes, visualiza el flujo de trabajo de Cron-Job.org, controla la IA de Groq y previsualiza las notificaciones de Brevo.
         </p>
       </div>
 
+      <!-- Admin Lock Screen -->
+      <div class="admin-lock-overlay" id="admin-lock-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; margin-top: 20px;">
+        <div class="fallback-glass glass-panel pad-xl" style="max-width: 450px; width: 100%; box-shadow: 0 0 30px rgba(0, 243, 255, 0.15); border: 1px solid var(--accent-cyan); background: rgba(5,5,15,0.4);">
+          <div class="fallback-icon-wrap" style="background: rgba(0, 243, 255, 0.08); border-color: var(--accent-cyan); color: var(--accent-cyan); margin: 0 auto 20px auto;">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <h2 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 8px;">Consola Protegida</h2>
+          <p style="color: var(--text-muted); font-size: 13.5px; line-height: 1.5; margin-bottom: 24px;">
+            Esta sección contiene la base de datos de clientes, perfiles de búsqueda confidenciales y programadores de Cron-Job.org. Ingresa la contraseña de administrador para desbloquear.
+          </p>
+          <form id="admin-unlock-form" style="display: flex; flex-direction: column; gap: 14px; text-align: left;">
+            <div class="form-group">
+              <label for="admin-pass-input"><i class="fa-solid fa-key text-glow-cyan"></i> Contraseña de Administrador</label>
+              <input type="password" id="admin-pass-input" required placeholder="Ingresa la clave..." style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); padding: 12px; border-radius: 8px; color: #fff; font-size: 14px; margin-top: 6px;">
+              <span class="input-helper">La clave por defecto es: <strong>admin123</strong></span>
+            </div>
+            <button type="submit" class="btn btn-glow-cyan btn-block" style="padding: 12px; width: 100%; margin: 0;">
+              <i class="fa-solid fa-unlock"></i> Desbloquear Consola
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Wrapper for secure admin content (hidden by default) -->
+      <div id="admin-content-wrapper" class="hidden">
+
       <!-- Admin Tabs Navigation -->
-      <div class="admin-tabs-row glass-panel">
-        <button class="tab-btn active" data-tab="tab-clients">
-          <i class="fa-solid fa-users-gear"></i> Perfiles de Clientes
-        </button>
-        <button class="tab-btn" data-tab="tab-discoveries">
-          <i class="fa-solid fa-wand-magic-sparkles text-glow-gold"></i> Últimos Hallazgos
-        </button>
-        <button class="tab-btn" data-tab="tab-workflow">
-          <i class="fa-solid fa-network-wired"></i> Flujo Cron-Job + Groq
-        </button>
-        <button class="tab-btn" data-tab="tab-brevo">
-          <i class="fa-solid fa-envelope-open-text"></i> Plantilla Brevo
+      <div class="admin-tabs-row glass-panel" style="display: flex; justify-content: space-between; align-items: center; padding-right: 15px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+          <button class="tab-btn active" data-tab="tab-clients">
+            <i class="fa-solid fa-users-gear"></i> Perfiles de Clientes
+          </button>
+          <button class="tab-btn" data-tab="tab-discoveries">
+            <i class="fa-solid fa-wand-magic-sparkles text-glow-gold"></i> Últimos Hallazgos
+          </button>
+          <button class="tab-btn" data-tab="tab-workflow">
+            <i class="fa-solid fa-network-wired"></i> Flujo Cron-Job + Groq
+          </button>
+          <button class="tab-btn" data-tab="tab-brevo">
+            <i class="fa-solid fa-envelope-open-text"></i> Plantilla Brevo
+          </button>
+        </div>
+        <button class="btn btn-outline-danger" id="btn-lock-admin" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-lock"></i> Bloquear Consola
         </button>
       </div>
 
@@ -461,6 +492,26 @@
                 <i class="fa-solid fa-play"></i> Buscar Ahora (Manual)
               </button>
               <span class="table-count" id="discoveries-total-badge" style="background: rgba(249, 168, 37, 0.15); border-color: var(--accent-gold); color: var(--accent-gold); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-gold); margin: 0;">0 Hallazgos</span>
+            </div>
+          </div>
+
+          <!-- Inline Cron Quick Config Widget -->
+          <div class="glass-panel" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-light); padding: 12px 18px; border-radius: 8px; margin-top: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-clock text-glow-gold" style="font-size: 16px;"></i>
+              <span style="font-size: 13px; font-weight: 600; color: #fff;">Frecuencia del Cron-Job Automático:</span>
+              <span class="badge-status-brevo" style="font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 600; background: rgba(0, 243, 255, 0.1); border: 1px solid var(--accent-cyan); color: var(--accent-cyan);" id="discoveries-cron-status-badge">Diario a las 02:00</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <select id="discoveries-cron-frequency" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); border-radius: 6px; padding: 5px 10px; font-size: 12px; color: #fff; cursor: pointer;">
+                <option value="diario">Diario (Cada 24h)</option>
+                <option value="12horas">Cada 12 horas</option>
+                <option value="6horas">Cada 6 horas</option>
+              </select>
+              <input type="time" id="discoveries-cron-time" value="02:00" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); border-radius: 6px; padding: 4px 8px; font-size: 12px; color: #fff; width: 85px;">
+              <button type="button" class="btn btn-glow-cyan" id="btn-save-discoveries-cron" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; margin: 0; font-weight: 700;">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Frecuencia
+              </button>
             </div>
           </div>
 
@@ -682,6 +733,7 @@
       </div>
 
     </div>
+    </div> <!-- Close admin-content-wrapper -->
   </section>
 
   <!-- Footer Section -->
