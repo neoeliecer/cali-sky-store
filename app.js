@@ -334,6 +334,7 @@ class AppState {
       if (c.minArea === undefined) c.minArea = 80;
       if (c.phone === undefined) c.phone = "3004567890";
       if (c.password === undefined) c.password = "calisky123";
+      if (c.favorites === undefined) c.favorites = [];
       return c;
     });
 
@@ -351,7 +352,10 @@ class AppState {
       if (this.currentUser.minArea === undefined) this.currentUser.minArea = 80;
       if (this.currentUser.phone === undefined) this.currentUser.phone = "3004567890";
       if (this.currentUser.password === undefined) this.currentUser.password = "calisky123";
+      if (this.currentUser.favorites === undefined) this.currentUser.favorites = [];
     }
+    
+    this.inquiries = JSON.parse(localStorage.getItem("calisky_inquiries")) || [];
     this.logs = [];
   }
 
@@ -359,11 +363,13 @@ class AppState {
     localStorage.setItem("calisky_clients", JSON.stringify(this.clients));
     localStorage.setItem("calisky_properties", JSON.stringify(this.properties));
     localStorage.setItem("calisky_current_user", JSON.stringify(this.currentUser));
+    localStorage.setItem("calisky_inquiries", JSON.stringify(this.inquiries));
   }
 
   addClient(client) {
     client.id = "client-" + Date.now();
     client.status = "active";
+    client.favorites = [];
     this.clients.push(client);
     this.save();
   }
@@ -371,6 +377,71 @@ class AppState {
   deleteClient(id) {
     this.clients = this.clients.filter(c => c.id !== id);
     this.save();
+  }
+
+  addInquiry(inquiry) {
+    inquiry.id = "inquiry-" + Date.now();
+    inquiry.timestamp = new Date().toLocaleString();
+    inquiry.status = "Pendiente";
+    this.inquiries.push(inquiry);
+    this.save();
+  }
+
+  toggleInquiryStatus(id) {
+    const inquiry = this.inquiries.find(inq => inq.id === id);
+    if (inquiry) {
+      inquiry.status = inquiry.status === "Pendiente" ? "Cita Programada" : "Pendiente";
+      this.save();
+    }
+  }
+
+  deleteInquiry(id) {
+    this.inquiries = this.inquiries.filter(inq => inq.id !== id);
+    this.save();
+  }
+
+  toggleFavorite(property) {
+    if (!this.currentUser) return false;
+    
+    const propertyId = typeof property === "object" ? property.id : property;
+    if (!this.currentUser.favorites) this.currentUser.favorites = [];
+    
+    const idx = this.currentUser.favorites.indexOf(propertyId);
+    let active = false;
+    
+    if (idx > -1) {
+      this.currentUser.favorites.splice(idx, 1);
+    } else {
+      this.currentUser.favorites.push(propertyId);
+      active = true;
+      
+      // If we passed the full property object and it's not in our catalog, add it permanently!
+      if (typeof property === "object" && !this.properties.some(p => p.id === propertyId)) {
+        property.grokAnalysis = "Inmueble cosechado en la vida real. Coincide con tu búsqueda.";
+        property.features = ["piscina", "balcon"];
+        property.address = property.address || "Cali";
+        property.area = property.area || 120;
+        property.beds = property.beds || 3;
+        property.bathrooms = property.bathrooms || 2;
+        property.parking = property.parking || 1;
+        property.owner = property.owner || "Cali Sky Admin";
+        property.phone = property.phone || "3151234567";
+        property.sourceLink = property.sourceLink || "#";
+        property.source = property.source || "Mercado Libre";
+        property.advisorNote = "Inmueble real detectado en la red. Altamente recomendado para coordinar visita inmediata.";
+        
+        this.properties.push(property);
+      }
+    }
+    
+    // Synchronize back to the clients list
+    const client = this.clients.find(c => c.id === this.currentUser.id);
+    if (client) {
+      client.favorites = this.currentUser.favorites;
+    }
+    
+    this.save();
+    return active;
   }
 
   login(email, password) {
@@ -566,6 +637,8 @@ function renderPrivateProperties() {
     card.style.borderColor = "var(--accent-gold)";
     card.id = `priv-${p.id}`;
     
+    const isFav = user.favorites ? user.favorites.includes(p.id) : false;
+    
     const amenitiesText = p.features.map(f => {
       if (f === "piscina") return "Piscina";
       if (f === "balcon") return "Balcón/Terraza";
@@ -578,6 +651,9 @@ function renderPrivateProperties() {
         <img src="${p.image}" alt="${p.title}">
         <div class="card-badge-zone"><i class="fa-solid fa-location-dot"></i> ${p.barrio} (Zona ${p.zone})</div>
         <div class="card-badge-type">${p.type}</div>
+        <button class="btn-favorite-heart" data-id="${p.id}" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); border: 1px solid ${isFav ? 'var(--accent-purple)' : 'var(--border-light)'}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: ${isFav ? 'var(--accent-purple)' : '#ccc'}; font-size: 14px; z-index: 10; transition: all 0.2s ease;">
+          <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+        </button>
       </div>
       <div class="card-info-content">
         <div class="card-price-row">
@@ -632,11 +708,53 @@ function renderPrivateProperties() {
           </div>
         </div>
 
-        <a href="https://wa.me/573000000000?text=Hola+Cali+Sky,+quiero+agendar+una+visita+al+inmueble+${p.title.replace(/\s/g, '+')}" target="_blank" class="btn btn-glow-gold btn-block">
+        <button class="btn btn-glow-gold btn-block btn-request-appointment" data-id="${p.id}" style="margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
           <i class="fa-brands fa-whatsapp"></i> Agendar Visita Inmediata →
-        </a>
+        </button>
       </div>
     `;
+
+    // Toggle click listener inside private properties
+    card.querySelector(".btn-favorite-heart").addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const active = state.toggleFavorite(p.id);
+      
+      const icon = card.querySelector(".btn-favorite-heart i");
+      const btn = card.querySelector(".btn-favorite-heart");
+      if (active) {
+        icon.className = "fa-solid fa-heart";
+        btn.style.color = "var(--accent-purple)";
+        btn.style.borderColor = "var(--accent-purple)";
+      } else {
+        icon.className = "fa-regular fa-heart";
+        btn.style.color = "#ccc";
+        btn.style.borderColor = "var(--border-light)";
+      }
+      
+      renderFavoritesSection();
+      renderClientsTable();
+    });
+
+    // Request appointment button listener
+    card.querySelector(".btn-request-appointment").addEventListener("click", () => {
+      state.addInquiry({
+        clientId: user.id,
+        clientName: user.name,
+        clientEmail: user.email,
+        clientPhone: user.phone || "3004567890",
+        propertyId: p.id,
+        propertyTitle: p.title,
+        propertyPrice: p.price
+      });
+      renderAdminInquiries();
+      
+      const text = encodeURIComponent(`Hola Cali Sky Stores, soy ${user.name} y acabo de solicitar información/visita para el inmueble: "${p.title}" en la zona de ${p.barrio}. Quedo atento a agendar la cita.`);
+      window.open(`https://wa.me/57${user.phone || "3004567890"}?text=${text}`, "_blank");
+      
+      alert("¡Tu solicitud de cita e información ha sido registrada y notificada al Panel de Control de la Agencia! Nuestro asesor principal te contactará en breve para confirmar.");
+    });
+
     container.appendChild(card);
   });
 }
@@ -667,6 +785,7 @@ function renderClientsTable() {
       <td>Zonas: ${zonesJoined} (${barriosShortened})</td>
       <td><strong>${formatCOP(c.minPrice)} - ${formatCOP(c.maxPrice)}</strong></td>
       <td>${specsSummary}</td>
+      <td><span style="color: var(--accent-purple); font-weight:700;"><i class="fa-solid fa-heart"></i> ${c.favorites ? c.favorites.length : 0} favs</span></td>
       <td>${c.deal}</td>
       <td>
         <span class="status-badge ${c.status}">
@@ -696,6 +815,247 @@ function renderClientsTable() {
         if (state.currentUser && state.currentUser.id === id) {
           logoutUser();
         }
+      }
+    });
+  });
+}
+
+// Render Favorites Showcase Gallery inside client portal
+function renderFavoritesSection() {
+  const wrapper = document.getElementById("client-favorites-section");
+  const grid = document.getElementById("client-favorites-grid");
+  const countBadge = document.getElementById("client-favorites-count");
+  if (!wrapper || !grid) return;
+
+  if (!state.currentUser || !state.currentUser.favorites || state.currentUser.favorites.length === 0) {
+    wrapper.style.display = "none";
+    grid.innerHTML = "";
+    if (countBadge) countBadge.textContent = "0";
+    return;
+  }
+
+  wrapper.style.display = "block";
+  grid.innerHTML = "";
+  
+  const favIds = state.currentUser.favorites;
+  // Get property objects matching favorite IDs
+  const favProperties = state.properties.filter(p => favIds.includes(p.id));
+  
+  if (countBadge) countBadge.textContent = favProperties.length;
+
+  favProperties.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "glass-panel property-card";
+    card.style.borderColor = "var(--accent-purple)"; // Special glow color for favorites!
+    card.style.boxShadow = "0 0 12px rgba(156, 39, 176, 0.1)";
+    card.id = `fav-${p.id}`;
+
+    const amenitiesText = p.features.map(f => {
+      if (f === "piscina") return "Piscina";
+      if (f === "balcon") return "Balcón/Terraza";
+      if (f === "seguridad") return "Club House/Seguridad";
+      return f;
+    }).join(", ");
+
+    card.innerHTML = `
+      <div class="card-image-wrap">
+        <img src="${p.image}" alt="${p.title}">
+        <div class="card-badge-zone" style="background: rgba(156, 39, 176, 0.85);"><i class="fa-solid fa-location-dot"></i> ${p.barrio} (Zona ${p.zone})</div>
+        <div class="card-badge-type">${p.type}</div>
+        <button class="btn-favorite-heart active" data-id="${p.id}" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); border: 1px solid var(--accent-purple); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--accent-purple); font-size: 14px; z-index: 10; transition: all 0.2s ease;">
+          <i class="fa-solid fa-heart"></i>
+        </button>
+      </div>
+      <div class="card-info-content">
+        <div class="card-price-row">
+          <span class="price-tag text-glow-purple" style="color: var(--accent-purple); text-shadow: 0 0 8px rgba(156, 39, 176, 0.4);">${formatCOP(p.price)}</span>
+          <span class="deal-type-badge">${p.deal}</span>
+        </div>
+        <h3>${p.title}</h3>
+        <p class="property-desc">${p.grokAnalysis}</p>
+        
+        <div class="card-specs-row">
+          <div class="spec-item">
+            <i class="fa-solid fa-maximize"></i>
+            <span>${p.area} m²</span>
+          </div>
+          <div class="spec-item">
+            <i class="fa-solid fa-bed"></i>
+            <span>${p.beds} Hab.</span>
+          </div>
+          <div class="spec-item">
+            <i class="fa-solid fa-bath"></i>
+            <span>${p.bathrooms} Baños</span>
+          </div>
+        </div>
+
+        <!-- Private Confidential Information Unlocked -->
+        <div class="private-unlocked-info">
+          <div class="unlocked-item">
+            <strong>Dirección:</strong>
+            <span><i class="fa-solid fa-map-pin"></i> ${p.address}</span>
+          </div>
+          <div class="unlocked-item">
+            <strong>Parqueos:</strong>
+            <span><i class="fa-solid fa-car"></i> ${p.parking > 0 ? `${p.parking} puesto(s)` : "Ninguno"}</span>
+          </div>
+          <div class="unlocked-item">
+            <strong>Extras:</strong>
+            <span><i class="fa-solid fa-circle-check"></i> ${amenitiesText || "Ninguno"}</span>
+          </div>
+          <div class="unlocked-item">
+            <strong>Contacto:</strong>
+            <span><i class="fa-solid fa-user"></i> ${p.owner} - <a href="https://wa.me/${p.phone.replace(/[\s\+]/g, '')}?text=Hola+${p.owner.replace(' ', '+')},+estoy+interesado+en+tu+propiedad+en+Cali+Sky+Stores" target="_blank">${p.phone}</a></span>
+          </div>
+          <div class="unlocked-item">
+            <strong>Fuente:</strong>
+            <span><a href="${p.sourceLink}" target="_blank"><i class="fa-solid fa-square-arrow-up-right"></i> Ver en ${p.source}</a></span>
+          </div>
+        </div>
+
+        <button class="btn btn-glow-gold btn-block btn-request-appointment" data-id="${p.id}" style="margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <i class="fa-brands fa-whatsapp"></i> Agendar Visita Inmediata →
+        </button>
+      </div>
+    `;
+
+    // Click heart to unfavorite inside Favorites grid too!
+    card.querySelector(".btn-favorite-heart").addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      state.toggleFavorite(p.id);
+      
+      // Re-render sections to reflect updates in both lists
+      renderFavoritesSection();
+      renderPrivateProperties();
+      renderClientsTable();
+    });
+
+    // Request appointment button listener
+    card.querySelector(".btn-request-appointment").addEventListener("click", () => {
+      state.addInquiry({
+        clientId: state.currentUser.id,
+        clientName: state.currentUser.name,
+        clientEmail: state.currentUser.email,
+        clientPhone: state.currentUser.phone || "3004567890",
+        propertyId: p.id,
+        propertyTitle: p.title,
+        propertyPrice: p.price
+      });
+      renderAdminInquiries();
+      
+      const text = encodeURIComponent(`Hola Cali Sky Stores, soy ${state.currentUser.name} y acabo de solicitar información/visita para el inmueble favorito: "${p.title}" en la zona de ${p.barrio}. Quedo atento a agendar la cita.`);
+      window.open(`https://wa.me/57${state.currentUser.phone || "3004567890"}?text=${text}`, "_blank");
+      
+      alert("¡Tu solicitud de cita e información ha sido registrada y notificada al Panel de Control de la Agencia! Nuestro asesor principal te contactará en breve para confirmar.");
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+// Render Admin Inquiries / Leads Inbox
+function renderAdminInquiries() {
+  const tbody = document.getElementById("admin-inquiries-table-body");
+  const countBadge = document.getElementById("admin-inquiries-count-badge");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+  const inquiries = state.inquiries || [];
+  
+  if (countBadge) {
+    countBadge.textContent = `${inquiries.length} Lead${inquiries.length !== 1 ? 's' : ''}`;
+  }
+
+  if (inquiries.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">
+          <i class="fa-solid fa-inbox" style="font-size: 24px; margin-bottom: 8px; display: block; color: var(--accent-purple);"></i>
+          Bandeja vacía. No hay solicitudes de cita o información registradas.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  // Sort inquiries: most recent first (based on id, which is based on Date.now())
+  const sortedInquiries = [...inquiries].sort((a, b) => b.id.localeCompare(a.id));
+
+  sortedInquiries.forEach(inq => {
+    const tr = document.createElement("tr");
+    tr.id = `inquiry-row-${inq.id}`;
+
+    const prop = state.properties.find(p => p.id === inq.propertyId);
+    const ownerPhone = prop ? prop.phone : "3151234567";
+    const sourceLink = prop ? prop.sourceLink : "#";
+    const sourceName = prop ? prop.source : "Web";
+    
+    // Status Badge
+    const isProgrammed = inq.status === "Cita Programada";
+    const statusHtml = `
+      <span class="status-badge ${isProgrammed ? 'active' : 'paused'}" style="cursor: pointer;" title="Haga clic para alternar estado" data-id="${inq.id}">
+        <span class="pulse-dot" style="background-color: ${isProgrammed ? '#10b981' : '#f9a825'}; box-shadow: 0 0 8px ${isProgrammed ? '#10b981' : '#f9a825'}"></span>
+        ${inq.status}
+      </span>
+    `;
+
+    // WhatsApp compiled message links
+    const clientWaText = encodeURIComponent(`Hola ${inq.clientName}, soy el asesor de Cali Sky Stores. Recibimos tu solicitud de información/visita para el inmueble "${inq.propertyTitle}". ¿Te gustaría programar la cita para esta semana?`);
+    const clientWaUrl = `https://wa.me/57${inq.clientPhone.replace(/[\s\+]/g, '')}?text=${clientWaText}`;
+
+    const ownerWaText = encodeURIComponent(`Hola, soy asesor de Cali Sky Stores. Tengo un cliente sumamente interesado en su propiedad "${inq.propertyTitle}". Me gustaría coordinar una visita.`);
+    const ownerWaUrl = `https://wa.me/57${ownerPhone.replace(/[\s\+]/g, '')}?text=${ownerWaText}`;
+
+    tr.innerHTML = `
+      <td><span style="font-size: 11.5px; color: var(--text-muted);">${inq.timestamp}</span></td>
+      <td>
+        <strong>${inq.clientName}</strong><br>
+        <code style="font-size: 10px;">${inq.clientEmail}</code><br>
+        <span style="font-size: 11px; color: var(--accent-cyan);"><i class="fa-solid fa-phone"></i> ${inq.clientPhone}</span>
+      </td>
+      <td>
+        <span style="font-weight: 600; color: #fff;">${inq.propertyTitle}</span>
+        ${prop ? `<br><span style="font-size:10.5px; color:var(--text-muted);"><i class="fa-solid fa-circle-info"></i> Encontrado en ${prop.source} (${prop.barrio})</span>` : ""}
+      </td>
+      <td><strong style="color: var(--accent-gold);">${formatCOP(inq.propertyPrice)}</strong></td>
+      <td>${statusHtml}</td>
+      <td>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <a href="${clientWaUrl}" target="_blank" class="action-icon-btn" title="Contactar Cliente (WhatsApp)" style="color: var(--accent-cyan);">
+            <i class="fa-brands fa-whatsapp"></i>
+          </a>
+          <a href="${ownerWaUrl}" target="_blank" class="action-icon-btn" title="Contactar Propietario Directo" style="color: var(--accent-gold);">
+            <i class="fa-solid fa-user-tie"></i>
+          </a>
+          <a href="${sourceLink}" target="_blank" class="action-icon-btn" title="Ver Fuente original (${sourceName})" style="color: var(--accent-purple);">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+          <button class="action-icon-btn btn-archive-inquiry" data-id="${inq.id}" title="Archivar/Eliminar Solicitud" style="color: #ef4444; cursor: pointer;">
+            <i class="fa-solid fa-box-archive"></i>
+          </button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Attach status toggle listeners
+  tbody.querySelectorAll(".status-badge").forEach(badge => {
+    badge.addEventListener("click", () => {
+      const id = badge.getAttribute("data-id");
+      state.toggleInquiryStatus(id);
+      renderAdminInquiries();
+    });
+  });
+
+  // Attach delete / archive listeners
+  tbody.querySelectorAll(".btn-archive-inquiry").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      if (confirm("¿Estás seguro de archivar esta solicitud de cita? Se eliminará de la bandeja en vivo.")) {
+        state.deleteInquiry(id);
+        renderAdminInquiries();
       }
     });
   });
@@ -981,6 +1341,7 @@ function loginUser(email, password) {
     document.getElementById("portal-search-beds").textContent = `${user.beds} habs / ${user.baths} baños`;
 
     renderPrivateProperties();
+    renderFavoritesSection();
     if (typeof updateRealSearchLinks === "function") {
       updateRealSearchLinks(user);
     }
@@ -1019,6 +1380,7 @@ function logoutUser() {
   if (adminSec) adminSec.classList.remove("hidden");
 
   renderPrivateProperties();
+  renderFavoritesSection();
 }
 
 // Contact Modal Handling
@@ -1036,6 +1398,10 @@ function openContactModal(propId) {
   `;
 
   document.getElementById("contact-message").value = `Hola Cali Sky Stores, estoy sumamente interesado en recibir la información completa de la propiedad "${prop.title}" en la zona de ${prop.barrio}. Quedo atento a agendar una llamada.`;
+  
+  // Save property ID into form attribute
+  document.getElementById("contact-form").setAttribute("data-prop-id", prop.id);
+  
   document.getElementById("contact-modal").classList.add("active");
 }
 
@@ -1046,11 +1412,29 @@ function handleContactFormSubmit(e) {
   const email = document.getElementById("contact-email").value.trim();
   const message = document.getElementById("contact-message").value.trim();
 
+  // Retrieve associated property ID
+  const propId = document.getElementById("contact-form").getAttribute("data-prop-id");
+  const prop = state.properties.find(p => p.id === propId);
+
+  if (prop) {
+    state.addInquiry({
+      clientId: "public-lead",
+      clientName: name,
+      clientEmail: email,
+      clientPhone: phone,
+      propertyId: prop.id,
+      propertyTitle: prop.title,
+      propertyPrice: prop.price
+    });
+    renderAdminInquiries();
+  }
+
   const whatsappNumber = "573000000000";
-  const encodedText = encodeURIComponent(`Hola Cali Sky Stores! Mi nombre es ${name}. Correo: ${email}, Celular: ${phone}. Estoy interesado en una propiedad de la vitrina pública. Mensaje: ${message}`);
+  const encodedText = encodeURIComponent(`Hola Cali Sky Stores! Mi nombre es ${name}. Correo: ${email}, Celular: ${phone}. Estoy interesado en la propiedad "${prop ? prop.title : 'vitrina pública'}". Mensaje: ${message}`);
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedText}`;
 
   document.getElementById("contact-form").reset();
+  document.getElementById("contact-form").removeAttribute("data-prop-id");
   document.getElementById("contact-modal").classList.remove("active");
 
   alert("¡Solicitud enviada! Serás redirigido al WhatsApp directo de Cali Sky Stores para una atención inmediata.");
@@ -1326,6 +1710,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderClientsTable();
   populateBrevoClientSelector();
   renderCentralDiscoveries();
+  renderAdminInquiries();
 
   if (state.currentUser) {
     loginUser(state.currentUser.email);

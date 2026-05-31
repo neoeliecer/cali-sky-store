@@ -307,6 +307,19 @@
         <div class="showcase-grid" id="private-properties-grid">
           <!-- Rendered dynamically by app.js when logged in -->
         </div>
+
+        <!-- Client Favorites Gallery Section -->
+        <div class="favorites-section-wrapper" id="client-favorites-section" style="margin-top: 45px; border-top: 1px dashed var(--border-light); padding-top: 35px; display: none;">
+          <div class="section-header text-left" style="margin-bottom: 20px;">
+            <h2 class="section-title" style="font-size: 22px; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-heart text-glow-purple"></i> Mis Inmuebles Favoritos (<span id="client-favorites-count">0</span>)</h2>
+            <p class="section-desc">
+              Tus inmuebles preferidos de lujo guardados. El agente Cali Sky Store tiene visibilidad de esta lista para coordinar tus visitas de inmediato.
+            </p>
+          </div>
+          <div class="showcase-grid" id="client-favorites-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            <!-- Loaded dynamically in app.js -->
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -409,6 +422,7 @@
                   <th>Zona</th>
                   <th>Presupuesto</th>
                   <th>Hab.</th>
+                  <th>Favoritos</th>
                   <th>Operación</th>
                   <th>Estado</th>
                   <th>Acción</th>
@@ -544,6 +558,29 @@
               </button>
             </form>
           </div>
+        </div>
+
+        <!-- Admin Inquiry Leads Inbox -->
+        <div class="glass-panel admin-subcard overflow-x" style="margin-top: 30px; border: 1px solid var(--accent-purple); box-shadow: 0 0 15px rgba(156, 39, 176, 0.08); grid-column: 1 / -1;">
+          <div class="subcard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3><i class="fa-solid fa-bell text-glow-purple"></i> Bandeja de Solicitudes de Cita e Información (Leads en Vivo)</h3>
+            <span class="table-count" id="admin-inquiries-count-badge" style="background: rgba(156, 39, 176, 0.15); border-color: var(--accent-purple); color: var(--accent-purple); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--accent-purple); margin: 0;">0 Leads</span>
+          </div>
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Fecha/Hora</th>
+                <th>Cliente</th>
+                <th>Inmueble Solicitado</th>
+                <th>Presupuesto / Precio</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="admin-inquiries-table-body">
+              <!-- Loaded dynamically in app.js -->
+            </tbody>
+          </table>
         </div>
       </div>
 
