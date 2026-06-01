@@ -2246,42 +2246,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!fnBtn || !fbBtn || !mcBtn || !mlBtn || !goBtn) return;
 
     const tipo = client.type || "Apartamento";
-    let barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
-      ? client.barrio[0].replace("Todos los barrios de ", "") 
-      : (typeof client.barrio === "string" ? client.barrio : "Cali");
-
-    if (barrio.toLowerCase().includes("todos los barrios")) {
-      barrio = client.zone && client.zone.length > 0 ? client.zone[0] : "Cali";
-    }
-
-    // Map zone names to highly searched real neighborhoods
-    let queryBarrio = barrio;
-    if (queryBarrio.toLowerCase() === "norte") queryBarrio = "Norte";
-    else if (queryBarrio.toLowerCase() === "centro") queryBarrio = "Centro";
-    else if (queryBarrio.toLowerCase() === "oeste") queryBarrio = "Oeste";
-    else if (queryBarrio.toLowerCase() === "sur") queryBarrio = "Sur";
-    else if (queryBarrio.toLowerCase() === "oriente") queryBarrio = "Oriente";
-    
     const budget = client.maxPrice || 500000000;
 
+    // Extract all unique query terms (barrios or zones)
+    let queryTerms = [];
+    if (Array.isArray(client.barrio) && client.barrio.length > 0) {
+      queryTerms = client.barrio.map(b => b.replace("Todos los barrios de ", ""));
+    } else if (typeof client.barrio === "string" && client.barrio) {
+      queryTerms = [client.barrio.replace("Todos los barrios de ", "")];
+    } else if (Array.isArray(client.zone) && client.zone.length > 0) {
+      queryTerms = [...client.zone];
+    } else if (typeof client.zone === "string" && client.zone) {
+      queryTerms = [client.zone];
+    } else {
+      queryTerms = ["Cali"];
+    }
+    const uniqueTerms = [...new Set(queryTerms)].slice(0, 4);
+    const joinedQuery = uniqueTerms.join(" ");
+
     // 1. Finca Raíz search link
-    const keywordFinca = encodeURIComponent(`${tipo} ${queryBarrio} Cali`);
+    const keywordFinca = encodeURIComponent(`${tipo} ${joinedQuery} Cali`);
     fnBtn.href = `https://www.fincaraiz.com.co/buscar?keyword=${keywordFinca}`;
 
     // 2. Facebook Marketplace
-    const queryFB = encodeURIComponent(`${tipo} ${queryBarrio}`);
+    const queryFB = encodeURIComponent(`${tipo} ${joinedQuery}`);
     fbBtn.href = `https://www.facebook.com/marketplace/cali/search/?query=${queryFB}`;
 
     // 3. Metro Cuadrado
-    const keywordMetro = encodeURIComponent(`${tipo} ${queryBarrio} Cali`);
+    const keywordMetro = encodeURIComponent(`${tipo} ${joinedQuery} Cali`);
     mcBtn.href = `https://www.metrocuadrado.com/fincaraiz/buscar?keyword=${keywordMetro}`;
 
     // 4. Mercado Libre
-    const keywordML = encodeURIComponent(`${tipo} ${queryBarrio}`);
+    const keywordML = encodeURIComponent(`${tipo} ${uniqueTerms[0] || "Cali"}`);
     mlBtn.href = `https://listado.mercadolibre.com.co/inmuebles/cali/${keywordML}`;
 
     // 5. Google Search (Anti-Blocks)
-    const googleQuery = encodeURIComponent(`site:fincaraiz.com.co OR site:metrocuadrado.com OR site:facebook.com/marketplace/cali Cali "${barrio}" ${tipo} "${budget}"`);
+    const termsOr = uniqueTerms.map(t => `"${t}"`).join(" OR ");
+    const googleQuery = encodeURIComponent(`site:fincaraiz.com.co OR site:metrocuadrado.com OR site:facebook.com/marketplace/cali Cali (${termsOr}) ${tipo} "${budget}"`);
     goBtn.href = `https://www.google.com/search?q=${googleQuery}`;
   }
 
@@ -2290,60 +2291,87 @@ document.addEventListener("DOMContentLoaded", async () => {
     const wrapper = document.getElementById(`${prefix}real-results-section-wrapper`) || document.getElementById(`${prefix}real-results-section`);
     if (!grid || !wrapper) return;
 
+    // Extract all unique query terms (barrios or zones)
+    let queryTerms = [];
+    if (Array.isArray(client.barrio) && client.barrio.length > 0) {
+      queryTerms = client.barrio.map(b => b.replace("Todos los barrios de ", ""));
+    } else if (typeof client.barrio === "string" && client.barrio) {
+      queryTerms = [client.barrio.replace("Todos los barrios de ", "")];
+    } else if (Array.isArray(client.zone) && client.zone.length > 0) {
+      queryTerms = [...client.zone];
+    } else if (typeof client.zone === "string" && client.zone) {
+      queryTerms = [client.zone];
+    } else {
+      queryTerms = ["Cali"];
+    }
+    const uniqueTerms = [...new Set(queryTerms)].slice(0, 4);
+
     // Show wrapper
     wrapper.style.display = "block";
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border-light);">
         <i class="fa-solid fa-spinner fa-spin text-glow-gold" style="font-size: 32px; color: var(--accent-gold);"></i>
         <h4 style="margin-top: 15px; font-weight: 700; color: #fff;">Conectando en vivo con motores reales de búsqueda...</h4>
-        <p style="color: var(--text-muted); font-size: 13px; margin-top: 6px;">Buscando propiedades reales en Cali - ${client.barrio && client.barrio.length > 0 ? client.barrio[0] : "El Ingenio"}...</p>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 6px;">Buscando propiedades reales en Cali - Sectores: ${uniqueTerms.join(", ")}...</p>
       </div>
     `;
 
     const tipo = client.type || "Apartamento";
-    let barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
-      ? client.barrio[0].replace("Todos los barrios de ", "") 
-      : (typeof client.barrio === "string" ? client.barrio : "Cali");
-
-    if (barrio.toLowerCase().includes("todos los barrios")) {
-      barrio = client.zone && client.zone.length > 0 ? client.zone[0] : "Cali";
-    }
-
-    // Map zone names to highly searched real neighborhoods
-    let queryBarrio = barrio;
-    if (queryBarrio.toLowerCase() === "norte") queryBarrio = "Norte";
-    else if (queryBarrio.toLowerCase() === "centro") queryBarrio = "Centro";
-    else if (queryBarrio.toLowerCase() === "oeste") queryBarrio = "Oeste";
-    else if (queryBarrio.toLowerCase() === "sur") queryBarrio = "Sur";
-    else if (queryBarrio.toLowerCase() === "oriente") queryBarrio = "Oriente";
-    
     const budget = client.maxPrice || 500000000;
 
     try {
-      // Call Mercado Libre Colombia Real Estate API
-      const searchQuery = encodeURIComponent(`${tipo} Cali ${queryBarrio}`);
-      const url = `https://api.mercadolibre.com/sites/MCO/search?category=MCO1459&q=${searchQuery}`;
-      
       addTerminalLog(`[REAL-SEARCH] Conectando en vivo con la API de Mercado Libre Colombia...`, "success");
-      addTerminalLog(`[REAL-SEARCH] Buscando: ${tipo} en ${queryBarrio} Cali (Presupuesto máx: ${formatCOP(budget)})...`, "wp");
       
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Error fetching ML API");
+      // Execute searches for each selected barrio/zone in parallel
+      const fetchPromises = uniqueTerms.map(async (qTerm) => {
+        let qBarrio = qTerm;
+        if (qBarrio.toLowerCase() === "norte") qBarrio = "Norte";
+        else if (qBarrio.toLowerCase() === "centro") qBarrio = "Centro";
+        else if (qBarrio.toLowerCase() === "oeste") qBarrio = "Oeste";
+        else if (qBarrio.toLowerCase() === "sur") qBarrio = "Sur";
+        else if (qBarrio.toLowerCase() === "oriente") qBarrio = "Oriente";
+
+        addTerminalLog(`[REAL-SEARCH] Buscando: ${tipo} en ${qBarrio} Cali (Presupuesto máx: ${formatCOP(budget)})...`, "wp");
+        const searchQuery = encodeURIComponent(`${tipo} Cali ${qBarrio}`);
+        const url = `https://api.mercadolibre.com/sites/MCO/search?category=MCO1459&q=${searchQuery}`;
+        
+        try {
+          const response = await fetch(url);
+          if (!response.ok) return [];
+          const data = await response.json();
+          return (data.results || []).map(item => ({ ...item, queryBarrio: qBarrio }));
+        } catch (e) {
+          console.error(`Error fetching ML for ${qBarrio}:`, e);
+          return [];
+        }
+      });
+
+      const allResultsArray = await Promise.all(fetchPromises);
       
-      const data = await response.json();
-      let results = data.results || [];
+      // Merge results and remove duplicates by listing ID
+      let mergedResults = [];
+      const seenIds = new Set();
       
+      for (const results of allResultsArray) {
+        for (const item of results) {
+          if (!seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            mergedResults.push(item);
+          }
+        }
+      }
+
       // Filter by max budget
-      results = results.filter(item => item.price <= budget);
+      let filteredResults = mergedResults.filter(item => item.price <= budget);
 
       // Limit to 8 results
-      results = results.slice(0, 8);
+      filteredResults = filteredResults.slice(0, 8);
 
-      addTerminalLog(`[REAL-SEARCH] ¡Conexión exitosa! Obtenidos ${results.length} listados reales de Mercado Libre.`, "success");
+      addTerminalLog(`[REAL-SEARCH] ¡Conexión exitosa! Obtenidos ${filteredResults.length} listados reales de Mercado Libre (Zonas: ${uniqueTerms.join(", ")}).`, "success");
       addTerminalLog(`[REAL-SEARCH] Escaneando Finca Raíz Cali y Metro Cuadrado en vivo...`, "wp");
       addTerminalLog(`[REAL-SEARCH] Consolidando resultados reales sin bloqueos de captchas.`, "success");
 
-      if (results.length === 0) {
+      if (filteredResults.length === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border-light);">
             <i class="fa-solid fa-circle-info text-glow-cyan" style="font-size: 32px; color: var(--accent-cyan);"></i>
@@ -2356,7 +2384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       grid.innerHTML = "";
 
-      results.forEach((item, index) => {
+      filteredResults.forEach((item, index) => {
         // Clean thumbnail
         let imgUrl = item.thumbnail;
         if (imgUrl.includes("-I.jpg")) {
@@ -2366,7 +2394,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           imgUrl = imgUrl.replace("http://", "https://");
         }
 
-        const realAddress = `Cali, Sector ${barrio}, dirección exacta provista en fuente original`;
+        const realAddress = `Cali, Sector ${item.queryBarrio}, dirección exacta provista en fuente original`;
         const ownerPhone = "315" + Math.floor(1000000 + Math.random() * 9000000);
         const originalSource = item.permalink;
         
