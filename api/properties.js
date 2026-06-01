@@ -1,4 +1,6 @@
 // Serverless function to manage dynamic properties catalog in Vercel Redis KV
+const axios = require('axios');
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -20,29 +22,45 @@ module.exports = async (req, res) => {
   try {
     // --- GET PROPERTIES ---
     if (req.method === 'GET') {
-      const redisRes = await fetch(`${KV_REST_API_URL}/get/properties`, {
+      const redisRes = await axios.get(`${KV_REST_API_URL}/get/properties`, {
         headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
       });
-      const data = await redisRes.json();
+      const data = redisRes.data;
       
       let properties = [];
-      if (data.result) {
-        properties = JSON.parse(data.result);
+      if (data && data.result) {
+        try {
+          properties = JSON.parse(data.result);
+        } catch (parseErr) {
+          console.error("Error parsing properties from Redis:", parseErr.message);
+          properties = [];
+        }
       }
       return res.status(200).json(properties);
     }
 
     // --- SAVE/POST PROPERTIES ---
     if (req.method === 'POST') {
-      const properties = req.body;
+      let properties = req.body;
+      
+      // Defensive parsing for string request bodies
+      if (typeof properties === 'string') {
+        try {
+          properties = JSON.parse(properties);
+        } catch (e) {
+          return res.status(400).json({ error: "Invalid JSON format in body" });
+        }
+      }
+
       if (!properties || !Array.isArray(properties)) {
         return res.status(400).json({ error: "Invalid properties array format" });
       }
 
-      await fetch(`${KV_REST_API_URL}/set/properties`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
-        body: JSON.stringify(JSON.stringify(properties))
+      await axios.post(`${KV_REST_API_URL}/set/properties`, JSON.stringify(JSON.stringify(properties)), {
+        headers: { 
+          Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
       });
 
       return res.status(200).json({ success: true, message: "Properties catalog database updated successfully" });

@@ -1,4 +1,6 @@
 // Serverless function to manage clients in Vercel Redis KV
+const axios = require('axios');
+
 const DEFAULT_CLIENTS = [
   {
     id: "client-1",
@@ -59,29 +61,49 @@ module.exports = async (req, res) => {
   try {
     // --- GET CLIENTS ---
     if (req.method === 'GET') {
-      const redisRes = await fetch(`${KV_REST_API_URL}/get/clients`, {
+      const redisRes = await axios.get(`${KV_REST_API_URL}/get/clients`, {
         headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
       });
-      const data = await redisRes.json();
+      const data = redisRes.data;
       
       let clients = [];
-      if (data.result) {
-        clients = JSON.parse(data.result);
+      if (data && data.result) {
+        try {
+          clients = JSON.parse(data.result);
+        } catch (parseErr) {
+          console.error("Error parsing clients from Redis GET:", parseErr.message);
+          clients = DEFAULT_CLIENTS;
+        }
       } else {
         // Preload default clients on first run
         clients = DEFAULT_CLIENTS;
-        await fetch(`${KV_REST_API_URL}/set/clients`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
-          body: JSON.stringify(JSON.stringify(clients)) // Redis expects stringified payload
+        await axios.post(`${KV_REST_API_URL}/set/clients`, JSON.stringify(JSON.stringify(clients)), {
+          headers: { 
+            Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+            'Content-Type': 'application/json'
+          }
         });
+      }
+      
+      if (!Array.isArray(clients)) {
+        clients = DEFAULT_CLIENTS;
       }
       return res.status(200).json(clients);
     }
 
     // --- SAVE/POST CLIENTS ---
     if (req.method === 'POST') {
-      const clients = req.body;
+      let clients = req.body;
+      
+      // Defensive parsing for string request bodies
+      if (typeof clients === 'string') {
+        try {
+          clients = JSON.parse(clients);
+        } catch (e) {
+          return res.status(400).json({ error: "Invalid JSON format in body" });
+        }
+      }
+
       if (!clients || !Array.isArray(clients)) {
         return res.status(400).json({ error: "Invalid client list array format" });
       }
@@ -89,12 +111,15 @@ module.exports = async (req, res) => {
       // Fetch old clients from Redis to check for new creations
       let oldClients = [];
       try {
-        const redisRes = await fetch(`${KV_REST_API_URL}/get/clients`, {
+        const redisRes = await axios.get(`${KV_REST_API_URL}/get/clients`, {
           headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
         });
-        const data = await redisRes.json();
-        if (data.result) {
-          oldClients = JSON.parse(data.result);
+        const data = redisRes.data;
+        if (data && data.result) {
+          const parsed = JSON.parse(data.result);
+          if (Array.isArray(parsed)) {
+            oldClients = parsed;
+          }
         }
       } catch (dbErr) {
         console.error("Error reading clients before save:", dbErr.message);
@@ -102,18 +127,26 @@ module.exports = async (req, res) => {
 
       // Check for new clients to send a Welcome Email using Brevo
       const BREVO_API_KEY = process.env.BREVO_API_KEY;
-      if (BREVO_API_KEY && oldClients.length > 0) {
+      if (BREVO_API_KEY && Array.isArray(oldClients) && oldClients.length > 0) {
         try {
-          const newClients = clients.filter(nc => !oldClients.some(oc => oc.email.toLowerCase() === nc.email.toLowerCase()));
-          const axios = require('axios'); // Load axios for Brevo SMTP email request
+          // Robust filter: match emails safely, checking thatnc and oc and their emails exist
+          const newClients = clients.filter(nc => {
+            if (!nc || !nc.email) return false;
+            return !oldClients.some(oc => oc && oc.email && oc.email.toLowerCase() === nc.email.toLowerCase());
+          });
           
           for (const newC of newClients) {
             console.log(`[WELCOME-EMAIL] Detectado nuevo cliente: ${newC.name} (${newC.email}). Enviando correo de bienvenida...`);
             
+            // Defensively handle string properties and arrays
+            const typeStr = typeof newC.type === "string" && newC.type ? newC.type.charAt(0).toUpperCase() + newC.type.slice(1) : "Apartamento";
+            const zoneStr = Array.isArray(newC.zone) ? newC.zone.join(", ") : (typeof newC.zone === "string" ? newC.zone : "Cali");
+            const maxPriceStr = newC.maxPrice ? newC.maxPrice.toLocaleString() : "Sin límite";
+            
             const welcomeData = {
               sender: { name: "Cali Sky Stores", email: "advisory@caliskystores.com" },
-              to: [{ email: newC.email, name: newC.name }],
-              subject: `¡Bienvenido a Cali Sky Stores, ${newC.name}! | Tu Portal Premium Activo`,
+              to: [{ email: newC.email, name: newC.name || "Cliente" }],
+              subject: `¡Bienvenido a Cali Sky Stores, ${newC.name || "Cliente"}! | Tu Portal Premium Activo`,
               htmlContent: `
                 <html>
                   <body style="font-family: Arial, sans-serif; background-color: #020206; color: #ffffff; padding: 20px; line-height: 1.6;">
@@ -123,18 +156,18 @@ module.exports = async (req, res) => {
                         <span style="color: #f9a825; font-size: 12px; font-weight: bold; text-transform: uppercase;">Servicio de Asesoría Inmobiliaria VIP</span>
                       </div>
                       
-                      <h2 style="color: #ffffff; border-bottom: 1px solid #9c27b0; padding-bottom: 10px; font-size: 18px;">¡Bienvenido al Círculo Exclusivo, ${newC.name}!</h2>
+                      <h2 style="color: #ffffff; border-bottom: 1px solid #9c27b0; padding-bottom: 10px; font-size: 18px;">¡Bienvenido al Círculo Exclusivo, ${newC.name || "Cliente"}!</h2>
                       
                       <p style="color: #cccccc;">Es un placer darte la bienvenida a <strong>Cali Sky Stores</strong>. Tu cuenta de asesoría inmobiliaria de alta gama ha sido creada con éxito en nuestra plataforma.</p>
                       
                       <div style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 6px; margin: 20px 0;">
                         <h4 style="color: #00f3ff; margin: 0 0 10px 0; text-transform: uppercase; font-size: 12px;">Tus Criterios de Búsqueda Premium:</h4>
                         <ul style="color: #dddddd; margin: 0; padding-left: 20px; font-size: 13px;">
-                          <li><strong>Tipo de Inmueble:</strong> ${newC.type.charAt(0).toUpperCase() + newC.type.slice(1)}</li>
+                          <li><strong>Tipo de Inmueble:</strong> ${typeStr}</li>
                           <li><strong>Operación:</strong> ${newC.deal || "Compra"}</li>
-                          <li><strong>Zonas de Interés:</strong> ${newC.zone ? newC.zone.join(", ") : "Cali"}</li>
-                          <li><strong>Presupuesto Máximo:</strong> ${newC.maxPrice ? newC.maxPrice.toLocaleString() : "Sin límite"} COP</li>
-                          <li><strong>Exigencias:</strong> ${newC.beds}+ Habitaciones y ${newC.baths || 1}+ Baños</li>
+                          <li><strong>Zonas de Interés:</strong> ${zoneStr}</li>
+                          <li><strong>Presupuesto Máximo:</strong> ${maxPriceStr} COP</li>
+                          <li><strong>Exigencias:</strong> ${newC.beds || 1}+ Habitaciones y ${newC.baths || 1}+ Baños</li>
                         </ul>
                       </div>
 
@@ -174,10 +207,11 @@ module.exports = async (req, res) => {
         }
       }
 
-      await fetch(`${KV_REST_API_URL}/set/clients`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
-        body: JSON.stringify(JSON.stringify(clients))
+      await axios.post(`${KV_REST_API_URL}/set/clients`, JSON.stringify(JSON.stringify(clients)), {
+        headers: { 
+          Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
       });
 
       return res.status(200).json({ success: true, message: "Clients database updated successfully" });
