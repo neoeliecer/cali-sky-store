@@ -203,17 +203,30 @@ module.exports = async (req, res) => {
       // Fallback/Enrichment: Query Mercado Libre API if we need more results and ML is allowed
       if (listings.length < 8 && allowedSources.includes("Mercado Libre")) {
         try {
-          // Get all unique query terms (barrios or zones) selected by the client
+          let queryTipo = tipo || "Apartamento";
+          // Normalize type for search
+          queryTipo = queryTipo.toLowerCase();
+          if (queryTipo.endsWith("s")) queryTipo = queryTipo.slice(0, -1);
+          queryTipo = queryTipo.charAt(0).toUpperCase() + queryTipo.slice(1);
+
+          const dealTerm = (client.deal || "Compra").toLowerCase() === "arriendo" ? "arriendo" : "venta";
+
+          // Get all unique query terms (barrios AND zones) selected by the client to maximize results
           let queryTerms = [];
           if (Array.isArray(client.barrio) && client.barrio.length > 0) {
             queryTerms = client.barrio.map(b => b.replace("Todos los barrios de ", ""));
           } else if (typeof client.barrio === "string" && client.barrio) {
             queryTerms = [client.barrio.replace("Todos los barrios de ", "")];
-          } else if (Array.isArray(client.zone) && client.zone.length > 0) {
-            queryTerms = [...client.zone];
+          }
+
+          // Also inject zones to broaden search if barrios yield low results
+          if (Array.isArray(client.zone) && client.zone.length > 0) {
+            queryTerms = [...queryTerms, ...client.zone];
           } else if (typeof client.zone === "string" && client.zone) {
-            queryTerms = [client.zone];
-          } else {
+            queryTerms = [...queryTerms, client.zone];
+          }
+
+          if (queryTerms.length === 0) {
             queryTerms = ["Cali"];
           }
           const uniqueTerms = [...new Set(queryTerms)].slice(0, 4);
@@ -228,7 +241,7 @@ module.exports = async (req, res) => {
             else if (queryBarrio.toLowerCase() === "sur") queryBarrio = "Sur";
             else if (queryBarrio.toLowerCase() === "oriente") queryBarrio = "Oriente";
 
-            const searchQuery = encodeURIComponent(`${tipo} Cali ${queryBarrio}`);
+            const searchQuery = encodeURIComponent(`${queryTipo} ${dealTerm} Cali ${queryBarrio}`);
             const mlUrl = `https://api.mercadolibre.com/sites/MCO/search?category=MCO1459&q=${searchQuery}`;
             
             try {

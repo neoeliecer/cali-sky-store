@@ -2291,17 +2291,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     const wrapper = document.getElementById(`${prefix}real-results-section-wrapper`) || document.getElementById(`${prefix}real-results-section`);
     if (!grid || !wrapper) return;
 
-    // Extract all unique query terms (barrios or zones)
+    let tipo = client.type || "Apartamento";
+    // Normalize type for search
+    tipo = tipo.toLowerCase();
+    if (tipo.endsWith("s")) tipo = tipo.slice(0, -1); // e.g. apartamentos -> apartamento, casas -> casa
+    tipo = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+
+    const dealTerm = (client.deal || "Compra").toLowerCase() === "arriendo" ? "arriendo" : "venta";
+
+    // Extract all unique query terms (barrios AND zones) to guarantee rich results
     let queryTerms = [];
     if (Array.isArray(client.barrio) && client.barrio.length > 0) {
       queryTerms = client.barrio.map(b => b.replace("Todos los barrios de ", ""));
     } else if (typeof client.barrio === "string" && client.barrio) {
       queryTerms = [client.barrio.replace("Todos los barrios de ", "")];
-    } else if (Array.isArray(client.zone) && client.zone.length > 0) {
-      queryTerms = [...client.zone];
+    }
+    
+    // Also inject client's selected zones to widen search scope if specific barrios are scarce
+    if (Array.isArray(client.zone) && client.zone.length > 0) {
+      queryTerms = [...queryTerms, ...client.zone];
     } else if (typeof client.zone === "string" && client.zone) {
-      queryTerms = [client.zone];
-    } else {
+      queryTerms = [...queryTerms, client.zone];
+    }
+
+    if (queryTerms.length === 0) {
       queryTerms = ["Cali"];
     }
     const uniqueTerms = [...new Set(queryTerms)].slice(0, 4);
@@ -2312,11 +2325,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border-light);">
         <i class="fa-solid fa-spinner fa-spin text-glow-gold" style="font-size: 32px; color: var(--accent-gold);"></i>
         <h4 style="margin-top: 15px; font-weight: 700; color: #fff;">Conectando en vivo con motores reales de búsqueda...</h4>
-        <p style="color: var(--text-muted); font-size: 13px; margin-top: 6px;">Buscando propiedades reales en Cali - Sectores: ${uniqueTerms.join(", ")}...</p>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 6px;">Buscando propiedades en Cali para ${dealTerm} - Sectores: ${uniqueTerms.join(", ")}...</p>
       </div>
     `;
 
-    const tipo = client.type || "Apartamento";
     const budget = client.maxPrice || 500000000;
 
     try {
@@ -2331,8 +2343,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         else if (qBarrio.toLowerCase() === "sur") qBarrio = "Sur";
         else if (qBarrio.toLowerCase() === "oriente") qBarrio = "Oriente";
 
-        addTerminalLog(`[REAL-SEARCH] Buscando: ${tipo} en ${qBarrio} Cali (Presupuesto máx: ${formatCOP(budget)})...`, "wp");
-        const searchQuery = encodeURIComponent(`${tipo} Cali ${qBarrio}`);
+        addTerminalLog(`[REAL-SEARCH] Buscando: ${tipo} en ${dealTerm} Cali ${qBarrio} (Presupuesto máx: ${formatCOP(budget)})...`, "wp");
+        const searchQuery = encodeURIComponent(`${tipo} ${dealTerm} Cali ${qBarrio}`);
         const url = `https://api.mercadolibre.com/sites/MCO/search?category=MCO1459&q=${searchQuery}`;
         
         try {
