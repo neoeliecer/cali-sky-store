@@ -1898,6 +1898,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Add Client Submit Form
   document.getElementById("add-client-form").addEventListener("submit", handleAddClient);
 
+  // Dynamic budget ranges for Compra vs Arriendo
+  const clientDealSelect = document.getElementById("client-deal");
+  if (clientDealSelect) {
+    clientDealSelect.addEventListener("change", () => {
+      const deal = clientDealSelect.value;
+      const minInput = document.getElementById("client-min-price");
+      const maxInput = document.getElementById("client-max-price");
+      if (minInput && maxInput) {
+        if (deal === "Arriendo") {
+          minInput.min = "100000";
+          minInput.value = "800000";
+          maxInput.min = "200000";
+          maxInput.value = "3000000";
+        } else {
+          minInput.min = "10000000";
+          minInput.value = "100000000";
+          maxInput.min = "20000000";
+          maxInput.value = "400000000";
+        }
+      }
+    });
+  }
+
   // Run automated workflow simulator
   document.getElementById("btn-run-workflow").addEventListener("click", runNightlyWorkflow);
 
