@@ -1458,11 +1458,11 @@ function loginUser(email, password) {
 
     renderPrivateProperties();
     renderFavoritesSection();
-    if (typeof updateRealSearchLinks === "function") {
-      updateRealSearchLinks(user);
+    if (typeof window.updateRealSearchLinks === "function") {
+      window.updateRealSearchLinks(user);
     }
-    if (typeof fetchAndRenderRealProperties === "function") {
-      fetchAndRenderRealProperties(user);
+    if (typeof window.fetchAndRenderRealProperties === "function") {
+      window.fetchAndRenderRealProperties(user);
     }
     
     // Hide Admin Section and Navigation Link when a client is logged in
@@ -2582,6 +2582,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   }
+
+  // Expose these helpers globally so that loginUser (defined globally outside DOMContentLoaded) can access them
+  window.updateRealSearchLinks = updateRealSearchLinks;
+  window.fetchAndRenderRealProperties = fetchAndRenderRealProperties;
 
   // Hook populateAdminRealSearchSelector when rendering or loading
   populateAdminRealSearchSelector();
