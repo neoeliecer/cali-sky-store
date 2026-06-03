@@ -408,8 +408,9 @@ class AppState {
       console.warn("Failed to fetch inquiries from cloud API.", e);
     }
 
-    // Persist the combined state back to local storage and sync in the background
-    this.save();
+    // Persist the combined state back to local storage ONLY (no cloud POST during init
+    // to avoid accidentally overwriting newer cloud data with stale local state)
+    this.localSave();
 
     // Sanitize and migrate formats
     this.clients = this.clients.map(c => {
@@ -447,30 +448,60 @@ class AppState {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(this.clients)
-      }).catch(err => console.warn("Failed background clients sync:", err));
+      }).then(r => {
+        if (!r.ok) console.error("[SYNC] Cloud clients POST failed:", r.status, r.statusText);
+      }).catch(err => console.warn("[SYNC] Failed background clients sync:", err));
 
       fetch("/api/properties", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(this.properties)
-      }).catch(err => console.warn("Failed background properties sync:", err));
+      }).catch(err => console.warn("[SYNC] Failed background properties sync:", err));
 
       fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(this.inquiries)
-      }).catch(err => console.warn("Failed background inquiries sync:", err));
+      }).catch(err => console.warn("[SYNC] Failed background inquiries sync:", err));
     } catch (e) {
-      console.warn("Error triggering background cloud DB sync:", e);
+      console.warn("[SYNC] Error triggering background cloud DB sync:", e);
     }
   }
 
-  addClient(client) {
+  // Save to localStorage ONLY — used during init() to avoid overwriting cloud with stale local data
+  localSave() {
+    localStorage.setItem("calisky_clients", JSON.stringify(this.clients));
+    localStorage.setItem("calisky_properties", JSON.stringify(this.properties));
+    localStorage.setItem("calisky_current_user", JSON.stringify(this.currentUser));
+    localStorage.setItem("calisky_inquiries", JSON.stringify(this.inquiries));
+  }
+
+  async addClient(client) {
     client.id = "client-" + Date.now();
     client.status = "active";
     client.favorites = [];
     this.clients.push(client);
-    this.save();
+    // Save to localStorage immediately
+    this.localSave();
+    // Explicitly sync to cloud and wait for confirmation
+    try {
+      const res = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.clients)
+      });
+      if (res.ok) {
+        console.log(`[SYNC] ✅ Cliente '${client.name}' guardado en nube correctamente.`);
+        return true;
+      } else {
+        const txt = await res.text();
+        console.error(`[SYNC] ❌ Error guardando en nube (${res.status}):`, txt);
+        return false;
+      }
+    } catch (err) {
+      console.error("[SYNC] ❌ Fallo de red al guardar cliente en nube:", err);
+      return false;
+    }
   }
 
   deleteClient(id) {
@@ -925,7 +956,45 @@ function renderClientsTable() {
   });
 }
 
-// Render Favorites Showcase Gallery inside client portal
+// Manually reload clients from cloud and re-render admin table
+async function refreshClientsFromCloud() {
+  const btn = document.getElementById("btn-refresh-clients");
+  if (btn) { btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Recargando...`; btn.disabled = true; }
+
+  try {
+    const res = await fetch("/api/clients");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const cloudClients = await res.json();
+
+    if (Array.isArray(cloudClients) && cloudClients.length > 0) {
+      // Cloud wins: add cloud clients not in local, keep local-only clients too
+      const merged = [...cloudClients];
+      state.clients.forEach(lc => {
+        if (!merged.some(mc => mc.email.toLowerCase() === lc.email.toLowerCase())) {
+          merged.push(lc);
+        }
+      });
+      state.clients = merged;
+      state.localSave();
+      renderClientsTable();
+      populateBrevoClientSelector();
+      renderCentralDiscoveries();
+      if (typeof populateAdminRealSearchSelector === "function") populateAdminRealSearchSelector();
+
+      if (btn) { btn.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> ${cloudClients.length} clientes`; btn.disabled = false; }
+      setTimeout(() => { if (btn) { btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Recargar Nube`; } }, 3000);
+    } else {
+      if (btn) { btn.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-gold);"></i> Sin datos en nube`; btn.disabled = false; }
+      setTimeout(() => { if (btn) { btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Recargar Nube`; } }, 3000);
+    }
+  } catch (err) {
+    console.error("[SYNC] refreshClientsFromCloud error:", err);
+    if (btn) { btn.innerHTML = `<i class="fa-solid fa-xmark" style="color:#ef4444;"></i> Error de conexión`; btn.disabled = false; }
+    setTimeout(() => { if (btn) { btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Recargar Nube`; } }, 3000);
+  }
+}
+
+
 function renderFavoritesSection() {
   const wrapper = document.getElementById("client-favorites-section");
   const grid = document.getElementById("client-favorites-grid");
@@ -1305,7 +1374,7 @@ function updateBrevoPreview() {
 }
 
 // 5. ACTION CONTROLLERS & WORKFLOW SIMULATOR
-function handleAddClient(e) {
+async function handleAddClient(e) {
   e.preventDefault();
   const name = document.getElementById("client-name").value.trim();
   const email = document.getElementById("client-email").value.trim();
@@ -1346,11 +1415,24 @@ function handleAddClient(e) {
     return;
   }
 
-  state.addClient({ 
+  // Show loading state on submit button
+  const submitBtn = document.querySelector("#add-client-form button[type='submit']");
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : "";
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando en nube...`;
+  }
+
+  const cloudOk = await state.addClient({ 
     name, email, phone, password, type, zone: selectedZones, barrio: selectedBarrios, minPrice, maxPrice, 
     beds, baths, parking, minArea, features, deal, sources: selectedPortals 
   });
   
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
+
   // Reset Form
   document.getElementById("add-client-form").reset();
   
@@ -1372,7 +1454,12 @@ function handleAddClient(e) {
   if (typeof populateAdminRealSearchSelector === "function") {
     populateAdminRealSearchSelector();
   }
-  alert(`¡Cliente ${name} registrado con éxito! Puedes iniciar sesión usando su email en el portal privado.`);
+
+  if (cloudOk) {
+    alert(`✅ ¡Cliente ${name} registrado y guardado en la nube! Puede iniciar sesión con su email en el portal privado.`);
+  } else {
+    alert(`⚠️ Cliente ${name} registrado localmente, pero hubo un problema al sincronizar con la nube. Usa el botón "↻ Recargar desde Nube" para verificar. El cliente puede iniciar sesión normalmente desde este dispositivo.`);
+  }
 }
 
 // Dynamic barrio checkboxes generator supporting MULTIPLE active zones

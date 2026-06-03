@@ -443,7 +443,12 @@
           <div class="glass-panel admin-subcard overflow-x">
             <div class="subcard-header">
               <h3><i class="fa-solid fa-database text-glow-cyan"></i> Base de Datos de Clientes</h3>
-              <span class="table-count" id="clients-count-badge">3 Registrados</span>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span class="table-count" id="clients-count-badge">3 Registrados</span>
+                <button id="btn-refresh-clients" onclick="refreshClientsFromCloud()" title="Recargar desde la base de datos en la nube" style="background:rgba(0,243,255,0.08); border:1px solid var(--accent-cyan); color:var(--accent-cyan); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s;">
+                  <i class="fa-solid fa-rotate"></i> Recargar Nube
+                </button>
+              </div>
             </div>
             <table class="premium-table" id="clients-table">
               <thead>
