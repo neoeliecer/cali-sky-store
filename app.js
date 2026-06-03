@@ -2204,25 +2204,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 3. Bind manual search button inside the client's Private Portal user bar
   const btnPortalRunSearch = document.getElementById("btn-portal-run-search");
   if (btnPortalRunSearch) {
-    btnPortalRunSearch.addEventListener("click", () => {
-      alert("Iniciando la búsqueda inteligente de IA en segundo plano. Te desplazaremos a la consola visual de automatización para que puedas ver el escaneo de nodos en tiempo real...");
-      
-      // Since they clicked from the client dashboard, programmatically unlock the admin panel
-      // so they can see the n8n nodes light up and pulse.
-      sessionStorage.setItem("calisky_admin_unlocked", "true");
-      
-      const adminLockScreen = document.getElementById("admin-lock-screen");
-      const adminContentWrapper = document.getElementById("admin-content-wrapper");
-      if (adminLockScreen) adminLockScreen.style.display = "none";
-      if (adminContentWrapper) adminContentWrapper.classList.remove("hidden");
-      
-      // Also update the UI state using the check state helper
-      if (typeof checkAdminUnlockState === "function") {
-        checkAdminUnlockState();
+    btnPortalRunSearch.addEventListener("click", async () => {
+      if (!state.currentUser) return;
+
+      // Visual feedback on the button
+      const originalHtml = btnPortalRunSearch.innerHTML;
+      btnPortalRunSearch.disabled = true;
+      btnPortalRunSearch.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Buscando...`;
+
+      // Update real search engine links for the current user profile
+      if (typeof window.updateRealSearchLinks === "function") {
+        window.updateRealSearchLinks(state.currentUser);
       }
 
-      // Trigger the workflow simulation
-      triggerWorkflowSimulation();
+      // Scroll to the live search results section
+      const realSection = document.getElementById("real-results-section-wrapper") 
+                       || document.getElementById("real-results-section");
+      if (realSection) {
+        realSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // Re-trigger the live Mercado Libre property search
+      if (typeof window.fetchAndRenderRealProperties === "function") {
+        await window.fetchAndRenderRealProperties(state.currentUser);
+      }
+
+      btnPortalRunSearch.disabled = false;
+      btnPortalRunSearch.innerHTML = originalHtml;
     });
   }
 
