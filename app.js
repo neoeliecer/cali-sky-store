@@ -1499,6 +1499,74 @@ function logoutUser() {
   renderFavoritesSection();
 }
 
+// ── Budget Edit Panel (Client Portal) ──────────────────────────────────────
+function toggleBudgetEdit() {
+  const panel = document.getElementById("portal-budget-edit-panel");
+  const chip  = document.getElementById("portal-budget-chip");
+  if (!panel) return;
+
+  const isOpen = panel.style.display !== "none";
+  if (isOpen) {
+    panel.style.display = "none";
+    if (chip) chip.style.borderColor = "transparent";
+  } else {
+    // Pre-fill with current values
+    const user = state.currentUser;
+    if (user) {
+      document.getElementById("portal-edit-min-price").value = user.minPrice || 0;
+      document.getElementById("portal-edit-max-price").value = user.maxPrice || 0;
+      document.getElementById("portal-edit-min-label").textContent = formatCOP(user.minPrice || 0);
+      document.getElementById("portal-edit-max-label").textContent = formatCOP(user.maxPrice || 0);
+    }
+    panel.style.display = "block";
+    if (chip) chip.style.borderColor = "var(--accent-cyan)";
+
+    // Live COP preview as user types
+    const minInput = document.getElementById("portal-edit-min-price");
+    const maxInput = document.getElementById("portal-edit-max-price");
+    const minLabel = document.getElementById("portal-edit-min-label");
+    const maxLabel = document.getElementById("portal-edit-max-label");
+    minInput.oninput = () => { minLabel.textContent = minInput.value ? formatCOP(parseInt(minInput.value)) : ""; };
+    maxInput.oninput = () => { maxLabel.textContent = maxInput.value ? formatCOP(parseInt(maxInput.value)) : ""; };
+
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
+function saveBudgetEdit() {
+  const minPrice = parseInt(document.getElementById("portal-edit-min-price").value) || 0;
+  const maxPrice = parseInt(document.getElementById("portal-edit-max-price").value) || 0;
+
+  if (minPrice < 0 || maxPrice < 0) {
+    alert("Los precios deben ser positivos."); return;
+  }
+  if (minPrice >= maxPrice) {
+    alert("El precio mínimo debe ser menor que el máximo."); return;
+  }
+
+  // Persist to state
+  const client = state.clients.find(c => c.id === state.currentUser.id);
+  if (client) {
+    client.minPrice = minPrice;
+    client.maxPrice = maxPrice;
+  }
+  state.currentUser.minPrice = minPrice;
+  state.currentUser.maxPrice = maxPrice;
+  state.save();
+
+  // Update budget chip label
+  document.getElementById("portal-search-budget").textContent = `${formatCOP(minPrice)} - ${formatCOP(maxPrice)}`;
+
+  // Close panel
+  toggleBudgetEdit();
+
+  // Refresh searches with new budget
+  renderPrivateProperties();
+  if (typeof window.updateRealSearchLinks === "function") window.updateRealSearchLinks(state.currentUser);
+  if (typeof window.fetchAndRenderRealProperties === "function") window.fetchAndRenderRealProperties(state.currentUser);
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 // Contact Modal Handling
 function openContactModal(propId) {
   const prop = state.properties.find(p => p.id === propId);
@@ -1907,7 +1975,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const maxInput = document.getElementById("client-max-price");
       if (minInput && maxInput) {
         if (deal === "Arriendo") {
-          minInput.value = "800000";
+          minInput.value = "500000";
           maxInput.value = "3000000";
         } else {
           minInput.value = "100000000";
@@ -2392,8 +2460,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }
 
-      // Filter by max budget
-      let filteredResults = mergedResults.filter(item => item.price <= budget);
+      // Filter by min and max budget
+      const minBudget = client.minPrice || 0;
+      let filteredResults = mergedResults.filter(item => item.price >= minBudget && item.price <= budget);
 
       // Limit to 8 results
       filteredResults = filteredResults.slice(0, 8);

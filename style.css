@@ -949,6 +949,15 @@ body {
   color: #fff;
   font-weight: 500;
 }
+#portal-budget-chip:hover {
+  border-color: var(--accent-cyan) !important;
+  background: rgba(0, 243, 255, 0.07);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
+  color: #fff;
+}
+#portal-budget-chip:hover .fa-pen-to-square {
+  text-shadow: 0 0 8px var(--accent-cyan);
+}
 
 /* Fallback screen */
 .pad-xl { padding: 80px 40px; }
