@@ -4,10 +4,33 @@
 
 // 1. ZONING DATA STRUCTURE
 const ZONES_AND_BARRIOS = {
-  Sur: ["El Ingenio", "Ciudad Jardín", "Pance", "Valle del Lili", "El Caney", "La Hacienda", "Meléndez"],
+  Sur: [
+    // Comuna 17
+    "El Ingenio", "El Limonar", "Bosques del Limonar", "Prados del Limonar", "El Gran Limonar",
+    "Valle del Lili", "El Caney", "La Hacienda", "Cuarto de Legua", "Club Campestre",
+    "Los Portales", "La Cascada", "La Rivera", "Nuevo Latir", "Quintas de Don Simón",
+    // Comuna 19
+    "El Refugio", "Pampalinda", "Tequendama", "Nueva Tequendama", "Meléndez",
+    "Cañaveralejo", "San Cristóbal", "Cristóbal Colón", "La Hacienda",
+    // Comuna 22
+    "Ciudad Jardín", "Pance", "Valle del Lili (Sur)", "La Fonda", "Altos de Normandía",
+    "Urbanización Campestre", "Urbanización Pance", "El Portal de Pance", "Ecobarrio Pance"
+  ],
   Norte: ["La Flora", "Chipichape", "Versalles", "Vipasa", "San Vicente", "Santa Mónica", "Menga"],
   Oeste: ["Normandía", "Juanambú", "Santa Rita", "Santa Teresita", "El Peñón", "San Antonio", "Cristales"],
-  Centro: ["Avenida Colombia", "Centenario", "San Fernando", "Miraflores", "Tequendama", "Junín"],
+  Centro: [
+    // Comuna 3 – Centro Histórico
+    "San Antonio", "San Cayetano", "San Nicolás", "San Pedro", "La Merced",
+    "El Calvario", "El Peñón", "El Piloto", "El Hoyo", "Santa Rosa",
+    "Los Libertadores", "San Pascual", "San Juan Bosco",
+    // Comuna 9 – Centro Tradicional
+    "Junín", "Alameda", "Aranjuez", "Barrio Obrero", "Belalcázar",
+    "Bretaña", "Guayaquil", "Sucre", "Manuel María Buenaventura",
+    // Comuna 10 – Centro-Sur
+    "Avenida Colombia", "Centenario", "San Fernando", "Miraflores",
+    "Pasoancho", "El Guabal", "Panamericano", "Olímpico", "El Dorado",
+    "Colseguros", "Las Acacias", "Los Laureles", "La Selva", "Departamental"
+  ],
   Oriente: ["Ciudad Córdoba", "Aguablanca", "Mariano Ramos", "Antonio Nariño"]
 };
 
@@ -267,8 +290,119 @@ const DEFAULT_PROPERTIES = [
     sourceLink: "https://olx.com.co/item/casa-colonial-normandia-29",
     grokAnalysis: "Clásica casona de Normandía restaurada. Conserva patio central andaluz, techos altos de madera y frescura inigualable por brisa del oeste.",
     advisorNote: "Sector residencial histórico, de muy alta alcurnia y valorización sostenida. Cuenta con seguridad vecinal privada."
+  },
+  {
+    id: "prop-arr-1",
+    title: "Apartamento en Arriendo El Limonar",
+    type: "apartamento",
+    zone: "Sur",
+    barrio: "El Limonar",
+    price: 1350000,
+    beds: 3,
+    bathrooms: 2,
+    area: 90,
+    parking: 1,
+    features: ["balcon", "seguridad"],
+    deal: "Arriendo",
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80",
+    address: "Carrera 38 # 5A-30, Apt 401, El Limonar, Cali",
+    phone: "+57 315 111 2222",
+    owner: "Jorge Alberto Ríos",
+    source: "Fincaraiz",
+    sourceLink: "https://fincaraiz.com.co/arriendo/apartamento/limonar-cali",
+    grokAnalysis: "Apartamento luminoso en conjunto cerrado con portería 24h, zonas verdes y parqueadero cubierto. Cocina integral, pisos en porcelanato.",
+    advisorNote: "Arriendo inmediato, propietario flexible con mascotas pequeñas. A 5 min del Centro Comercial Unicentro."
+  },
+  {
+    id: "prop-arr-2",
+    title: "Apartamento Moderno en Arriendo Pampalinda",
+    type: "apartamento",
+    zone: "Sur",
+    barrio: "Pampalinda",
+    price: 1200000,
+    beds: 2,
+    bathrooms: 2,
+    area: 75,
+    parking: 1,
+    features: ["seguridad"],
+    deal: "Arriendo",
+    image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=600&q=80",
+    address: "Calle 5 # 40-20, Apt 302, Pampalinda, Cali",
+    phone: "+57 316 333 4444",
+    owner: "Luz Marina Castaño",
+    source: "Facebook Marketplace",
+    sourceLink: "https://facebook.com/marketplace/cali/arriendo-pampalinda",
+    grokAnalysis: "Apartamento completamente remodelado, cocina abierta americana, habitación principal con walking closet y baño privado.",
+    advisorNote: "Propietaria vive en el mismo conjunto. Excelente vecindad y seguridad. Incluye agua en el canon."
+  },
+  {
+    id: "prop-arr-3",
+    title: "Casa en Arriendo Ciudad Jardín",
+    type: "casa",
+    zone: "Sur",
+    barrio: "Ciudad Jardín",
+    price: 3500000,
+    beds: 4,
+    bathrooms: 3,
+    area: 210,
+    parking: 2,
+    features: ["piscina", "seguridad"],
+    deal: "Arriendo",
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80",
+    address: "Calle 16 # 108-40, Casa 7, Ciudad Jardín, Cali",
+    phone: "+57 300 555 6666",
+    owner: "Familia Montoya Restrepo",
+    source: "Metrocuadrado",
+    sourceLink: "https://metrocuadrado.com/arriendo/casa/ciudad-jardin-cali",
+    grokAnalysis: "Espaciosa casa en condominio privado con piscina comunal, jardín propio y cuarto de servicio. Zona de altísima valorización y tranquilidad.",
+    advisorNote: "Propietario exige fiador o depósito de 2 meses. Contrato mínimo 1 año. Mascotas medianas permitidas."
+  },
+  {
+    id: "prop-arr-4",
+    title: "Apartamento en Arriendo Junín Centro",
+    type: "apartamento",
+    zone: "Centro",
+    barrio: "Junín",
+    price: 900000,
+    beds: 2,
+    bathrooms: 1,
+    area: 65,
+    parking: 0,
+    features: ["seguridad"],
+    deal: "Arriendo",
+    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80",
+    address: "Calle 13 # 6-30, Apt 205, Junín, Cali",
+    phone: "+57 312 777 8888",
+    owner: "Pedro Antonio Salcedo",
+    source: "OLX Cali",
+    sourceLink: "https://olx.com.co/item/arriendo-apto-junin-cali",
+    grokAnalysis: "Apartamento acogedor en el corazón del centro histórico de Cali. Ideal para estudiantes universitarios o profesionales. Cerca de universidades y transporte masivo.",
+    advisorNote: "Canon todo incluido (agua y gas). No permite mascotas. Disponible de inmediato."
+  },
+  {
+    id: "prop-arr-5",
+    title: "Apartamento en Arriendo Norte Chipichape",
+    type: "apartamento",
+    zone: "Norte",
+    barrio: "Chipichape",
+    price: 1500000,
+    beds: 3,
+    bathrooms: 2,
+    area: 95,
+    parking: 1,
+    features: ["balcon", "seguridad"],
+    deal: "Arriendo",
+    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80",
+    address: "Avenida 6N # 25N-12, Apt 601, Chipichape, Cali",
+    phone: "+57 317 999 0000",
+    owner: "Rodrigo Valencia",
+    source: "Finca Raíz",
+    sourceLink: "https://fincaraiz.com.co/arriendo/apartamento/chipichape-cali",
+    grokAnalysis: "Apartamento de lujo en el norte, a pocos metros del Centro Comercial Chipichape. Acabados modernos, balcón con vista a la ciudad y portería inteligente.",
+    advisorNote: "Conjunto de última tecnología con acceso biométrico. Canon incluye administración."
   }
 ];
+
 
 const SIMULATED_NEW_PROPERTIES = [
   {
@@ -344,7 +478,16 @@ class AppState {
   constructor() {
     // Initial quick load from local storage to keep the interface fast
     this.clients = JSON.parse(localStorage.getItem("calisky_clients")) || DEFAULT_CLIENTS;
-    this.properties = JSON.parse(localStorage.getItem("calisky_properties")) || DEFAULT_PROPERTIES;
+    const cachedProps = JSON.parse(localStorage.getItem("calisky_properties")) || [];
+    // Always merge DEFAULT_PROPERTIES so new demo listings (e.g. Arriendos) show up
+    // even when localStorage has an older snapshot without them
+    const mergedDefaults = [...cachedProps];
+    DEFAULT_PROPERTIES.forEach(dp => {
+      if (!mergedDefaults.some(p => p.id === dp.id)) {
+        mergedDefaults.push(dp);
+      }
+    });
+    this.properties = mergedDefaults.length > 0 ? mergedDefaults : DEFAULT_PROPERTIES;
     this.currentUser = JSON.parse(localStorage.getItem("calisky_current_user")) || null;
     this.inquiries = JSON.parse(localStorage.getItem("calisky_inquiries")) || [];
     this.logs = [];
@@ -2479,7 +2622,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (tipo.endsWith("s")) tipo = tipo.slice(0, -1); // e.g. apartamentos -> apartamento, casas -> casa
     tipo = tipo.charAt(0).toUpperCase() + tipo.slice(1);
 
-    const dealTerm = (client.deal || "Compra").toLowerCase() === "arriendo" ? "arriendo" : "venta";
+    const isArriendo = (client.deal || "Compra").toLowerCase() === "arriendo";
+    const dealTerm = isArriendo ? "arriendo" : "venta";
 
     // Extract all unique query terms (barrios AND zones) to guarantee rich results
     let queryTerms = [];
@@ -2555,9 +2699,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }
 
-      // Filter by min and max budget
+      // Filter by min and max budget — for arriendos allow a 50% upper tolerance
+      // since ML may list prices slightly outside the range or use different units
       const minBudget = client.minPrice || 0;
-      let filteredResults = mergedResults.filter(item => item.price >= minBudget && item.price <= budget);
+      const budgetCeiling = isArriendo ? budget * 1.5 : budget;
+      let filteredResults = mergedResults.filter(item => {
+        if (!item.price || item.price <= 0) return false;
+        // For arriendos: accept if price is within minBudget..budgetCeiling
+        // For compra: strict range
+        return item.price >= (minBudget * 0.5) && item.price <= budgetCeiling;
+      });
 
       // Limit to 8 results
       filteredResults = filteredResults.slice(0, 8);
@@ -2656,7 +2807,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <h3 class="property-title-text" style="font-size:14px; font-weight:700; margin-bottom:8px; line-height:1.4; height:38px; overflow:hidden;">${item.title}</h3>
             
             <div class="property-specs" style="margin-bottom: 10px; font-size: 11.5px;">
-              <span><i class="fa-solid fa-location-dot"></i> Cali, ${barrio}</span>
+              <span><i class="fa-solid fa-location-dot"></i> Cali, ${item.queryBarrio}</span>
             </div>
             
             <div style="background: rgba(0,243,255,0.03); border: 1px solid var(--border-light); padding: 8px; border-radius: 6px; margin-bottom:12px; font-size: 11px;">
@@ -2665,7 +2816,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
             
             <div style="display: flex; gap: 8px;">
-              <a href="https://wa.me/57${ownerPhone}?text=Hola,%20estoy%20interesado%20en%20el%20inmueble%20publicado%20en%20Cali%20${barrio}:%20${encodeURIComponent(item.title)}" target="_blank" class="btn btn-glow-cyan" style="flex: 1; padding: 6px; font-size:10.5px; margin: 0; display:inline-flex; align-items:center; justify-content:center; gap: 4px;">
+              <a href="https://wa.me/57${ownerPhone}?text=Hola,%20estoy%20interesado%20en%20el%20inmueble%20publicado%20en%20Cali%20${item.queryBarrio}:%20${encodeURIComponent(item.title)}" target="_blank" class="btn btn-glow-cyan" style="flex: 1; padding: 6px; font-size:10.5px; margin: 0; display:inline-flex; align-items:center; justify-content:center; gap: 4px;">
                 <i class="fa-brands fa-whatsapp"></i> Whatsapp
               </a>
               <a href="${originalSource}" target="_blank" class="btn btn-outline" style="flex: 1; padding: 6px; font-size:10.5px; margin: 0; display:inline-flex; align-items:center; justify-content:center; gap: 4px; border-color: var(--accent-purple); color: var(--accent-purple);">
