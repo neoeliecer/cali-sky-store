@@ -1206,7 +1206,7 @@ function renderPrivateProperties() {
             <i class="fa-brands fa-whatsapp"></i> Agendar Visita
           </button>
           
-          <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Mira esta espectacular propiedad exclusiva que encontré en Cali Sky Stores! 🚀\n\n🏡 *${p.title}*\n📍 Barrio: ${p.barrio} (Zona ${p.zone})\n💵 Precio: ${formatCOP(p.price)}\n🛌 Habitaciones: ${p.beds} | 🛁 Baños: ${p.bathrooms}\n\n✨ Ver detalles exclusivos desbloqueados aquí: https://cali-sky-store-neoeliecercolombia-gmailcoms-projects.vercel.app/`)}" target="_blank" class="btn" style="flex: 1; margin: 0; padding: 10px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; font-weight: 700; background: rgba(0, 243, 255, 0.05); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); text-decoration: none; border-radius: 6px; transition: all 0.2s;">
+          <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Mira esta espectacular propiedad exclusiva que encontré en Cali Sky Stores! 🚀\n\n🏡 *${p.title}*\n📍 Barrio: ${p.barrio} (Zona ${p.zone})\n💵 Precio: ${formatCOP(p.price)}\n🛌 Habitaciones: ${p.beds} | 🛁 Baños: ${p.bathrooms}\n\n✨ Ver detalles exclusivos desbloqueados aquí: ${window.location.origin}${window.location.pathname}?prop=${p.id}`)}" target="_blank" class="btn" style="flex: 1; margin: 0; padding: 10px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; font-weight: 700; background: rgba(0, 243, 255, 0.05); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); text-decoration: none; border-radius: 6px; transition: all 0.2s;">
             <i class="fa-solid fa-share-nodes"></i> Compartir
           </a>
         </div>
@@ -2016,6 +2016,133 @@ function saveBudgetEdit() {
   if (typeof window.fetchAndRenderRealProperties === "function") window.fetchAndRenderRealProperties(state.currentUser);
 }
 // ────────────────────────────────────────────────────────────────────────────
+
+// Property Detail Modal Handling
+function openPropertyDetailModal(propId) {
+  const p = state.properties.find(prop => prop.id === propId);
+  if (!p) return;
+
+  const content = document.getElementById("property-detail-content");
+  if (!content) return;
+
+  const amenitiesText = p.features ? p.features.map(f => {
+    if (f === "piscina") return "Piscina";
+    if (f === "balcon") return "Balcón/Terraza";
+    if (f === "seguridad") return "Club House/Seguridad";
+    return f;
+  }).join(", ") : "Ninguno";
+
+  content.innerHTML = `
+    <div class="card-image-wrap" style="height: 250px; border-radius: 8px; margin-bottom: 20px;">
+      <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80'">
+      <div class="card-badge-zone"><i class="fa-solid fa-location-dot"></i> ${p.barrio} (Zona ${p.zone})</div>
+      <div class="card-badge-type" style="top: 16px; right: 16px;">${p.type}</div>
+    </div>
+    
+    <div class="card-price-row" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+      <span class="price-tag text-glow-gold" style="font-size: 24px;">${formatCOP(p.price)}</span>
+      <span class="deal-type-badge" style="font-size: 12px; font-weight: 700; color: var(--accent-cyan); border-color: var(--accent-cyan); background: rgba(0, 243, 255, 0.05);">${p.deal}</span>
+    </div>
+
+    <h3 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 12px; font-family: var(--font-display);">${p.title}</h3>
+    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">${p.grokAnalysis || ''}</p>
+
+    <div class="card-specs-row" style="margin-bottom: 20px;">
+      <div class="spec-item">
+        <i class="fa-solid fa-maximize" style="color: var(--accent-cyan);"></i>
+        <span style="font-weight: 700;">${p.area} m²</span>
+      </div>
+      <div class="spec-item">
+        <i class="fa-solid fa-bed" style="color: var(--accent-cyan);"></i>
+        <span style="font-weight: 700;">${p.beds} Hab.</span>
+      </div>
+      <div class="spec-item">
+        <i class="fa-solid fa-bath" style="color: var(--accent-cyan);"></i>
+        <span style="font-weight: 700;">${p.bathrooms} Baños</span>
+      </div>
+    </div>
+
+    <!-- Private Details (Since they shared the unique finding, we show details) -->
+    <div class="private-unlocked-info" style="margin-bottom: 20px; background: rgba(0, 243, 255, 0.02); border-color: rgba(0, 243, 255, 0.15);">
+      <div class="unlocked-item">
+        <strong>Dirección:</strong>
+        <span><i class="fa-solid fa-map-pin"></i> ${p.address || "No especificada"}</span>
+      </div>
+      <div class="unlocked-item">
+        <strong>Parqueos:</strong>
+        <span><i class="fa-solid fa-car"></i> ${p.parking > 0 ? `${p.parking} puesto(s)` : "Ninguno"}</span>
+      </div>
+      <div class="unlocked-item">
+        <strong>Extras:</strong>
+        <span><i class="fa-solid fa-circle-check"></i> ${amenitiesText}</span>
+      </div>
+      ${p.owner ? `
+      <div class="unlocked-item">
+        <strong>Contacto:</strong>
+        <span><i class="fa-solid fa-user"></i> ${p.owner} - <a href="https://wa.me/${p.phone.replace(/[\s\+]/g, '')}?text=Hola+${p.owner.replace(' ', '+')},+estoy+interesado+en+tu+propiedad+en+Cali+Sky+Stores" target="_blank">${p.phone}</a></span>
+      </div>
+      ` : ''}
+      ${p.sourceLink ? `
+      <div class="unlocked-item">
+        <strong>Fuente:</strong>
+        <span><a href="${p.sourceLink}" target="_blank"><i class="fa-solid fa-square-arrow-up-right"></i> Ver en ${p.source || "la fuente"}</a></span>
+      </div>
+      ` : ''}
+      ${p.advisorNote ? `
+      <div class="unlocked-item private-notes-box" style="margin-top: 10px;">
+        <div class="spec-item" style="text-align: left; border: none;">
+          <strong style="color: var(--accent-gold); font-size: 11px; width: auto;"><i class="fa-solid fa-user-shield"></i> Nota del Asesor Cali Sky:</strong>
+          <p style="font-size: 12px; margin-top: 4px; line-height: 1.4; color: #ffe082;">"${p.advisorNote}"</p>
+        </div>
+      </div>
+      ` : ''}
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+      <button class="btn btn-glow-purple btn-detail-action" style="flex: 1; margin: 0; padding: 12px; font-weight: 700; border-radius: 6px;">
+        <i class="fa-brands fa-whatsapp"></i> Agendar Visita / Contactar
+      </button>
+      <button class="btn btn-outline" id="btn-close-detail-modal-inner" style="flex: 1; margin: 0; padding: 12px; font-weight: 700; border-radius: 6px; border: 1px solid var(--border-light); color: var(--text-secondary); background: rgba(255,255,255,0.02);">
+        Cerrar
+      </button>
+    </div>
+  `;
+
+  // Bind actions
+  const detailModal = document.getElementById("property-detail-modal");
+  
+  content.querySelector(".btn-detail-action").addEventListener("click", () => {
+    detailModal.classList.remove("active");
+    if (state.currentUser) {
+      // Authenticated user
+      state.addInquiry({
+        clientId: state.currentUser.id,
+        clientName: state.currentUser.name,
+        clientEmail: state.currentUser.email,
+        clientPhone: state.currentUser.phone || "3004567890",
+        propertyId: p.id,
+        propertyTitle: p.title,
+        propertyPrice: p.price
+      });
+      renderAdminInquiries();
+      const text = encodeURIComponent(`Hola Cali Sky Stores, soy ${state.currentUser.name} y acabo de solicitar información/visita para el inmueble: "${p.title}" en la zona de ${p.barrio}. Quedo atento a agendar la cita.`);
+      window.open(`https://wa.me/57${state.currentUser.phone || "3004567890"}?text=${text}`, "_blank");
+      alert("¡Tu solicitud de cita e información ha sido registrada y notificada al Panel de Control de la Agencia!");
+    } else {
+      // Anonymous visitor - open contact form
+      openContactModal(p.id);
+    }
+  });
+
+  const closeInner = content.querySelector("#btn-close-detail-modal-inner");
+  if (closeInner) {
+    closeInner.addEventListener("click", () => {
+      detailModal.classList.remove("active");
+    });
+  }
+
+  detailModal.classList.add("active");
+}
 
 // Contact Modal Handling
 function openContactModal(propId) {
@@ -3124,6 +3251,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Hook populateAdminRealSearchSelector when rendering or loading
   populateAdminRealSearchSelector();
+
+  // Close Property Detail Modal
+  const closeDetailBtn = document.getElementById("close-property-detail-modal");
+  if (closeDetailBtn) {
+    closeDetailBtn.addEventListener("click", () => {
+      document.getElementById("property-detail-modal").classList.remove("active");
+    });
+  }
+
+  // Check URL query parameters and hash on load
+  const checkUrlForProperty = () => {
+    const params = new URLSearchParams(window.location.search);
+    let propId = params.get('prop');
+    if (!propId && window.location.hash.startsWith('#prop-')) {
+      propId = window.location.hash.replace('#prop-', '');
+    }
+    if (propId) {
+      openPropertyDetailModal(propId);
+    }
+  };
+
+  // Wait slightly to make sure properties are loaded and initialized
+  setTimeout(checkUrlForProperty, 600);
 
   // Run initial secure check
   checkAdminUnlockState();
