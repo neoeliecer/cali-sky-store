@@ -1926,6 +1926,16 @@ function loginUser(email, password) {
   const loginResult = state.login(email, password);
   if (loginResult.success) {
     const user = loginResult.user;
+    
+    // Forced Amelia zones migration on login
+    if (user && (user.email.toLowerCase() === 'amelia@gmail.com' || user.name.toLowerCase() === 'amelia')) {
+      if (!user.zone.includes("Norte") || !user.zone.includes("Centro")) {
+        user.zone = ["Sur", "Centro", "Norte"];
+        user.barrio = ["El Ingenio", "Todos los barrios de Centro", "Todos los barrios de Norte"];
+        state.save();
+      }
+    }
+
     state.currentUser = user;
     state.save();
     
