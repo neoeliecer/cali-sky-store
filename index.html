@@ -282,6 +282,32 @@
         </div>
       </div>
 
+      <div class="portal-main-content">
+        <div class="section-header text-left">
+          <h2 class="section-title"><i class="fa-solid fa-unlock text-glow-gold"></i> Tus Coincidencias Exclusivas</h2>
+          <p class="section-desc">
+            Inmuebles recolectados y filtrados por nuestro rastreador de IA en tiempo real. Estos listados revelan las direcciones exactas, teléfonos del propietario y enlaces originales.
+          </p>
+        </div>
+
+        <div class="showcase-grid" id="private-properties-grid">
+          <!-- Rendered dynamically by app.js when logged in -->
+        </div>
+
+        <!-- Client Favorites Gallery Section -->
+        <div class="favorites-section-wrapper" id="client-favorites-section" style="margin-top: 45px; border-top: 1px dashed var(--border-light); padding-top: 35px; display: none;">
+          <div class="section-header text-left" style="margin-bottom: 20px;">
+            <h2 class="section-title" style="font-size: 22px; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-heart text-glow-purple"></i> Mis Inmuebles Favoritos (<span id="client-favorites-count">0</span>)</h2>
+            <p class="section-desc">
+              Tus inmuebles preferidos de lujo guardados. El agente Cali Sky Store tiene visibilidad de esta lista para coordinar tus visitas de inmediato.
+            </p>
+          </div>
+          <div class="showcase-grid" id="client-favorites-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            <!-- Loaded dynamically in app.js -->
+          </div>
+        </div>
+      </div>
+
       <!-- Real-Time Search Engines Hub (Caza Inmuebles Real) -->
       <div class="glass-panel" style="padding: 24px; margin-bottom: 40px; border: 1px solid var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.08); margin-top: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
@@ -339,32 +365,6 @@
         </div>
         <div class="showcase-grid" id="real-live-properties-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px;">
           <!-- Loaded dynamically from Mercado Libre real API in app.js -->
-        </div>
-      </div>
-
-      <div class="portal-main-content">
-        <div class="section-header text-left">
-          <h2 class="section-title"><i class="fa-solid fa-unlock text-glow-gold"></i> Tus Coincidencias Exclusivas</h2>
-          <p class="section-desc">
-            Inmuebles recolectados y filtrados por nuestro rastreador de IA en tiempo real. Estos listados revelan las direcciones exactas, teléfonos del propietario y enlaces originales.
-          </p>
-        </div>
-
-        <div class="showcase-grid" id="private-properties-grid">
-          <!-- Rendered dynamically by app.js when logged in -->
-        </div>
-
-        <!-- Client Favorites Gallery Section -->
-        <div class="favorites-section-wrapper" id="client-favorites-section" style="margin-top: 45px; border-top: 1px dashed var(--border-light); padding-top: 35px; display: none;">
-          <div class="section-header text-left" style="margin-bottom: 20px;">
-            <h2 class="section-title" style="font-size: 22px; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-heart text-glow-purple"></i> Mis Inmuebles Favoritos (<span id="client-favorites-count">0</span>)</h2>
-            <p class="section-desc">
-              Tus inmuebles preferidos de lujo guardados. El agente Cali Sky Store tiene visibilidad de esta lista para coordinar tus visitas de inmediato.
-            </p>
-          </div>
-          <div class="showcase-grid" id="client-favorites-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
-            <!-- Loaded dynamically in app.js -->
-          </div>
         </div>
       </div>
     </div>
