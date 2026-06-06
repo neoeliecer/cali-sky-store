@@ -689,7 +689,28 @@ const SIMULATED_NEW_PROPERTIES = [
     source: "Finca Raíz (Cazado anoche)",
     sourceLink: "https://fincaraiz.com.co/inmueble/new-chipichape-1",
     grokAnalysis: "Apartamento espectacular en el norte de Cali con acabados modernos, balcón panorámico y seguridad privada. Ideal para Amelia.",
-    advisorNote: "Ubicación privilegiada en Chipichape, alta valorización y cerca de centros comerciales. Precio negociable."
+  },
+  {
+    id: "prop-centro-amelia",
+    title: "EXCLUSIVO: Apartamento Clásico Avenida Colombia",
+    type: "apartamento",
+    zone: "Centro",
+    barrio: "Avenida Colombia",
+    price: 360000000,
+    beds: 3,
+    bathrooms: 2,
+    area: 110,
+    parking: 1,
+    features: ["balcon", "seguridad"],
+    deal: "Compra",
+    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80",
+    address: "Avenida Colombia # 10-30, Apt 503, Cali",
+    phone: "+57 312 456 7890",
+    owner: "Fernando Mejía",
+    source: "Metrocuadrado (Cazado anoche)",
+    sourceLink: "https://metrocuadrado.com/inmueble/new-centro-1",
+    grokAnalysis: "Apartamento amplio con vista al río Cali, excelente iluminación, cocina integral y portería con vigilancia 24/7. Ubicación céntrica ideal.",
+    advisorNote: "Excelente precio por metro cuadrado en el Centro. Negociación directa."
   }
 ];
 
@@ -795,6 +816,23 @@ class AppState {
       if (activeUser) {
         this.currentUser = activeUser;
       }
+    }
+
+    // Ensure Amelia searches in Sur, Centro, Norte
+    const ameliaClient = this.clients.find(c => c.name.toLowerCase() === 'amelia' || c.email.toLowerCase() === 'amelia@gmail.com');
+    if (ameliaClient && (!ameliaClient.zone.includes("Norte") || !ameliaClient.zone.includes("Centro"))) {
+      ameliaClient.zone = ["Sur", "Centro", "Norte"];
+      ameliaClient.barrio = [
+        "El Ingenio", 
+        "Todos los barrios de Centro", 
+        "Todos los barrios de Norte"
+      ];
+      this.save();
+      if (this.currentUser && (this.currentUser.email.toLowerCase() === 'amelia@gmail.com' || this.currentUser.name.toLowerCase() === 'amelia')) {
+        this.currentUser = ameliaClient;
+        localStorage.setItem("calisky_current_user", JSON.stringify(this.currentUser));
+      }
+      console.log("[MIGRATION] Amelia zones dynamically expanded to Sur, Centro, Norte.");
     }
   }
 
