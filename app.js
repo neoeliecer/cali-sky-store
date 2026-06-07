@@ -1186,6 +1186,29 @@ function renderPrivateProperties() {
   }
   const matches = filterClientMatches(user);
 
+  // Diagnostic panel update for Amelia
+  const debugPanel = document.getElementById("amelia-debug-panel");
+  if (debugPanel) {
+    if (user.email && user.email.toLowerCase().includes("amelia")) {
+      const allCentro = state.properties.filter(p => p.zone === "Centro");
+      const allNorte = state.properties.filter(p => p.zone === "Norte");
+      debugPanel.innerHTML = `
+        <strong style="color:var(--accent-gold); font-size:12px;"><i class="fa-solid fa-bug"></i> Cali Sky Diagnostic Panel (Amelia)</strong><br>
+        <span style="display:inline-block; margin-top:5px;">
+          • <strong>Perfil:</strong> ${user.email} (${user.deal}, ${user.type}, ${user.beds} Hab, ${user.baths} Baños, Min Area: ${user.minArea || 80}m², Rango: ${formatCOP(user.minPrice)} - ${formatCOP(user.maxPrice)})<br>
+          • <strong>Filtros activos:</strong> Zonas: ${JSON.stringify(user.zone)} | Barrios: ${JSON.stringify(user.barrio)}<br>
+          • <strong>Total de Inmuebles en DB:</strong> ${state.properties.length}<br>
+          • <strong>Centro en DB:</strong> ${allCentro.length} (${allCentro.map(p => `${p.id} (${p.deal}, ${p.type}, ${formatCOP(p.price)}, ${p.beds}H, ${p.bathrooms}B, ${p.area}m²)`).join(" | ")})<br>
+          • <strong>Norte en DB:</strong> ${allNorte.length} (${allNorte.map(p => `${p.id} (${p.deal}, ${p.type}, ${formatCOP(p.price)}, ${p.beds}H, ${p.bathrooms}B, ${p.area}m²)`).join(" | ")})<br>
+          • <strong>Coincidencias encontradas:</strong> <span style="color:var(--accent-cyan); font-weight:700;">${matches.length} matches</span> (${matches.map(m => m.id).join(", ")})
+        </span>
+      `;
+      debugPanel.style.display = "block";
+    } else {
+      debugPanel.style.display = "none";
+    }
+  }
+
   if (matches.length === 0) {
     container.innerHTML = `
       <div class="glass-panel text-center pad-xl" style="grid-column: 1/-1;">
