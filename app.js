@@ -1091,6 +1091,41 @@ function renderPublicProperties(filter = "all") {
 // Rich Match Algorithm supporting multi-zone & multi-barrio arrays
 function filterClientMatches(user) {
   return state.properties.filter(p => {
+    if (p.id === "prop-centro-amelia" && user.email && user.email.toLowerCase().includes("amelia")) {
+      console.log("[DEBUG-AMELIA] Checking prop-centro-amelia:", {
+        id: p.id,
+        dealMatch: p.deal.toLowerCase() === user.deal.toLowerCase(),
+        typeMatch: p.type.toLowerCase() === user.type.toLowerCase(),
+        zoneMatch: !user.zone || user.zone.length === 0 || user.zone.includes(p.zone),
+        barrioMatch: !user.barrio || user.barrio.length === 0 || user.barrio.includes(p.barrio) || user.barrio.includes(`Todos los barrios de ${p.zone}`),
+        priceMatch: p.price >= user.minPrice && p.price <= user.maxPrice,
+        bedsMatch: p.beds >= user.beds,
+        bathsMatch: !user.baths || p.bathrooms >= user.baths,
+        areaMatch: !user.minArea || p.area >= user.minArea,
+        parkingMatch: user.parking !== "requerido" || p.parking >= 1,
+        featuresMatch: !user.features || user.features === "ninguno" || p.features.includes(user.features),
+        pDeal: p.deal,
+        pType: p.type,
+        pZone: p.zone,
+        pBarrio: p.barrio,
+        pPrice: p.price,
+        pBeds: p.beds,
+        pBaths: p.bathrooms,
+        pArea: p.area,
+        pFeatures: p.features,
+        userDeal: user.deal,
+        userType: user.type,
+        userZone: user.zone,
+        userBarrio: user.barrio,
+        userMinPrice: user.minPrice,
+        userMaxPrice: user.maxPrice,
+        userBeds: user.beds,
+        userBaths: user.baths,
+        userMinArea: user.minArea,
+        userFeatures: user.features
+      });
+    }
+
     // 1. Transaction Type (Compra / Arriendo)
     if (p.deal.toLowerCase() !== user.deal.toLowerCase()) return false;
     
@@ -1143,6 +1178,12 @@ function renderPrivateProperties() {
   const user = state.currentUser;
 
   // Run the rich dynamic filtering
+  if (user.email && user.email.toLowerCase().includes("amelia")) {
+    console.log("[DEBUG-AMELIA] All state.properties:", state.properties);
+    console.log("[DEBUG-AMELIA] All state.properties in Centro:", state.properties.filter(p => p.zone === "Centro"));
+    console.log("[DEBUG-AMELIA] All state.properties in Norte:", state.properties.filter(p => p.zone === "Norte"));
+    console.log("[DEBUG-AMELIA] Amelia profile:", JSON.stringify(user));
+  }
   const matches = filterClientMatches(user);
 
   if (matches.length === 0) {
