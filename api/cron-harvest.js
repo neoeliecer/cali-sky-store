@@ -144,9 +144,13 @@ module.exports = async (req, res) => {
       const maxBudget = client.maxPrice || 500000000;
       
       // Clean and map barrio
-      let barrio = Array.isArray(client.barrio) && client.barrio.length > 0 
-        ? client.barrio[0].replace("Todos los barrios de ", "") 
+      let barrioStr = Array.isArray(client.barrio) && client.barrio.length > 0 
+        ? client.barrio[0] 
         : (typeof client.barrio === "string" ? client.barrio : "Cali");
+
+      let barrio = barrioStr.toLowerCase().replace("todos los barrios de ", "").trim();
+      // Capitalize first letter
+      barrio = barrio.charAt(0).toUpperCase() + barrio.slice(1);
 
       if (barrio.toLowerCase().includes("todos los barrios")) {
         barrio = client.zone && client.zone.length > 0 ? client.zone[0] : "Cali";
@@ -170,14 +174,16 @@ module.exports = async (req, res) => {
           const matchesType = item.type.includes(tipo.toLowerCase()) || tipo.toLowerCase().includes(item.type);
           const matchesPrice = item.price <= maxBudget;
           
-          const cleanBarrios = (client.barrio || []).map(b => b.replace("Todos los barrios de ", "").toLowerCase());
+          const cleanBarrios = (client.barrio || []).map(b => b.toLowerCase());
           const cleanZones = (client.zone || []).map(z => z.toLowerCase());
           
-          const matchesBarrio = cleanBarrios.some(cb => 
-            cb.includes("todos los barrios") || 
-            item.barrio.toLowerCase().includes(cb) || 
-            cb.includes(item.barrio.toLowerCase())
-          );
+          const matchesBarrio = cleanBarrios.some(cb => {
+            if (cb.includes("todos los barrios")) {
+              const zoneFromBarrio = cb.replace("todos los barrios de ", "").trim();
+              return item.zone.toLowerCase() === zoneFromBarrio;
+            }
+            return item.barrio.toLowerCase().includes(cb) || cb.includes(item.barrio.toLowerCase());
+          });
           const matchesZone = cleanZones.some(cz => 
             item.zone.toLowerCase().includes(cz) || 
             cz.includes(item.zone.toLowerCase())
