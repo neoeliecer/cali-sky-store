@@ -819,7 +819,7 @@ class AppState {
     }
 
     // Ensure Amelia searches in Sur, Centro, Norte
-    const ameliaClient = this.clients.find(c => c.name.toLowerCase() === 'amelia' || c.email.toLowerCase() === 'amelia@gmail.com');
+    const ameliaClient = this.clients.find(c => c.name.toLowerCase() === 'amelia' || c.email.toLowerCase().includes("amelia"));
     if (ameliaClient && (!ameliaClient.zone.includes("Norte") || !ameliaClient.zone.includes("Centro"))) {
       ameliaClient.zone = ["Sur", "Centro", "Norte"];
       ameliaClient.barrio = [
@@ -828,11 +828,22 @@ class AppState {
         "Todos los barrios de Norte"
       ];
       this.save();
-      if (this.currentUser && (this.currentUser.email.toLowerCase() === 'amelia@gmail.com' || this.currentUser.name.toLowerCase() === 'amelia')) {
+      if (this.currentUser && (this.currentUser.email.toLowerCase().includes("amelia") || this.currentUser.name.toLowerCase() === 'amelia')) {
         this.currentUser = ameliaClient;
         localStorage.setItem("calisky_current_user", JSON.stringify(this.currentUser));
       }
       console.log("[MIGRATION] Amelia zones dynamically expanded to Sur, Centro, Norte.");
+    }
+
+    // Ensure prop-centro-amelia is in the properties database
+    const hasCentroAmelia = this.properties.some(p => p.id === "prop-centro-amelia");
+    if (!hasCentroAmelia) {
+      const centroAmelia = DEFAULT_PROPERTIES.find(p => p.id === "prop-centro-amelia");
+      if (centroAmelia) {
+        this.properties.push(centroAmelia);
+        this.save();
+        console.log("[MIGRATION] prop-centro-amelia added and synced to cloud database.");
+      }
     }
   }
 
@@ -1010,6 +1021,7 @@ const state = new AppState();
 
 // 4. UI RENDERING ENGINES
 function formatCOP(num) {
+  if (num === undefined || num === null || isNaN(num)) return "N/A";
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP',
