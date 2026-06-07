@@ -835,15 +835,21 @@ class AppState {
       console.log("[MIGRATION] Amelia zones dynamically expanded to Sur, Centro, Norte.");
     }
 
-    // Ensure prop-centro-amelia is in the properties database
-    const hasCentroAmelia = this.properties.some(p => p.id === "prop-centro-amelia");
-    if (!hasCentroAmelia) {
-      const centroAmelia = DEFAULT_PROPERTIES.find(p => p.id === "prop-centro-amelia");
-      if (centroAmelia) {
-        this.properties.push(centroAmelia);
-        this.save();
-        console.log("[MIGRATION] prop-centro-amelia added and synced to cloud database.");
+    // Ensure prop-centro-amelia and new-prop-amelia are in the properties database
+    let changedProps = false;
+    const requiredProps = ["prop-centro-amelia", "new-prop-amelia"];
+    requiredProps.forEach(id => {
+      if (!this.properties.some(p => p.id === id)) {
+        const prop = SIMULATED_NEW_PROPERTIES.find(p => p.id === id);
+        if (prop) {
+          this.properties.push(prop);
+          changedProps = true;
+          console.log(`[MIGRATION] ${id} added.`);
+        }
       }
+    });
+    if (changedProps) {
+      this.save();
     }
   }
 
@@ -1146,13 +1152,19 @@ function filterClientMatches(user) {
     
     // 3. Zone Match (supporting arrays)
     if (user.zone && user.zone.length > 0) {
-      if (!user.zone.includes(p.zone)) return false;
+      const userZonesLower = user.zone.map(z => z.toLowerCase());
+      if (!userZonesLower.includes(p.zone.toLowerCase())) return false;
     }
     
     // 4. Barrio Match (supporting arrays)
     if (user.barrio && user.barrio.length > 0) {
-      const allowedBySpecificBarrio = user.barrio.includes(p.barrio);
-      const allowedByAllInZone = user.barrio.includes(`Todos los barrios de ${p.zone}`);
+      const userBarriosLower = user.barrio.map(b => b.toLowerCase());
+      const allowedBySpecificBarrio = userBarriosLower.includes(p.barrio.toLowerCase());
+      const allowedByAllInZone = userBarriosLower.some(b => 
+        b === `todos los barrios de ${p.zone.toLowerCase()}` ||
+        b.includes(`todos los barrios de ${p.zone.toLowerCase()}`) ||
+        b.includes(p.barrio.toLowerCase())
+      );
       if (!allowedBySpecificBarrio && !allowedByAllInZone) return false;
     }
     
